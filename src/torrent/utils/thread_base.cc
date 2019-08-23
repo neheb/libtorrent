@@ -1,9 +1,10 @@
 #include "config.h"
 
+#include <chrono>
 #include <cstring>
 #include <pthread.h>
 #include <signal.h>
-#include <unistd.h>
+#include <thread>
 
 #include "torrent/exceptions.h"
 #include "torrent/poll.h"
@@ -63,7 +64,7 @@ thread_base::stop_thread_wait() {
   release_global_lock();
 
   while (!is_inactive()) {
-    usleep(1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   acquire_global_lock();
@@ -135,7 +136,7 @@ thread_base::event_loop(thread_base* thread) {
       }
 
       // Add the sleep call when testing interrupts, etc.
-      // usleep(50);
+      // std::this_thread::sleep_for(std::chrono::microseconds(50));
 
       int poll_flags = 0;
 

@@ -38,7 +38,7 @@
 
 #include <condition_variable>
 #include <functional>
-#include <unistd.h>
+#include <thread>
 
 #include "torrent/exceptions.h"
 #include "torrent/data/download_data.h"
