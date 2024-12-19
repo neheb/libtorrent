@@ -41,6 +41,8 @@
 
 #include <functional>
 #include <list>
+#include <memory>
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
@@ -165,7 +167,7 @@ public:
   slot_throttle_type& address_throttle()  { return m_slot_address_throttle; }
 
   // For internal usage.
-  Listen*             listen()            { return m_listen; }
+  const std::unique_ptr<Listen>& listen() { return m_listen; }
 
   bool                is_block_ipv4() const  { return m_block_ipv4; }
   void                set_block_ipv4(bool v) { m_block_ipv4 = v; }
@@ -192,7 +194,7 @@ private:
   sockaddr*           m_localAddress;
   sockaddr*           m_proxyAddress;
 
-  Listen*             m_listen;
+  std::unique_ptr<Listen> m_listen;
   port_type           m_listen_port;
   uint32_t            m_listen_backlog;
 

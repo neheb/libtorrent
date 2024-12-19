@@ -79,21 +79,21 @@ resolve_host(const char* host, int family, int socktype, ConnectionManager::slot
 }
 
 ConnectionManager::ConnectionManager() :
-  m_size(0),
-  m_maxSize(0),
+    m_size(0),
+    m_maxSize(0),
 
-  m_priority(iptos_throughput),
-  m_sendBufferSize(0),
-  m_receiveBufferSize(0),
-  m_encryptionOptions(encryption_none),
+    m_priority(iptos_throughput),
+    m_sendBufferSize(0),
+    m_receiveBufferSize(0),
+    m_encryptionOptions(encryption_none),
 
-  m_listen(new Listen),
-  m_listen_port(0),
-  m_listen_backlog(SOMAXCONN),
+    m_listen(std::make_unique<Listen>()),
+    m_listen_port(0),
+    m_listen_backlog(SOMAXCONN),
 
-  m_block_ipv4(false),
-  m_block_ipv6(false),
-  m_prefer_ipv6(false) {
+    m_block_ipv4(false),
+    m_block_ipv6(false),
+    m_prefer_ipv6(false) {
 
   m_bindAddress = (new rak::socket_address())->c_sockaddr();
   m_localAddress = (new rak::socket_address())->c_sockaddr();
@@ -111,8 +111,6 @@ ConnectionManager::ConnectionManager() :
 }
 
 ConnectionManager::~ConnectionManager() {
-  delete m_listen;
-
   delete m_bindAddress;
   delete m_localAddress;
   delete m_proxyAddress;
