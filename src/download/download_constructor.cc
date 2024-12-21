@@ -178,7 +178,7 @@ DownloadConstructor::parse_tracker(const Object& b) {
       // Some torrent makers create empty/invalid 'announce-list'
       // entries while still having valid 'announce'.
       !(announce_list = &b.get_key_list("announce-list"))->empty() &&
-      std::find_if(announce_list->begin(), announce_list->end(), std::mem_fn(&Object::is_list)) != announce_list->end()) {
+      std::any_of(announce_list->begin(), announce_list->end(), std::mem_fn(&Object::is_list))) {
     for (const auto& group : *announce_list) {
       add_tracker_group(group);
     }
