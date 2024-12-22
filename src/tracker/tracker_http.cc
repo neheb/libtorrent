@@ -32,10 +32,8 @@
 namespace torrent {
 
 TrackerHttp::TrackerHttp(TrackerList* parent, const std::string& url, int flags) :
-  Tracker(parent, url, flags),
-
-  m_get(Http::slot_factory()()),
-  m_data(NULL) {
+    Tracker(parent, url, flags),
+    m_get(Http::slot_factory()()) {
 
   m_get->signal_done().emplace_back(std::bind(&TrackerHttp::receive_done, this));
   m_get->signal_failed().emplace_back(std::bind(&TrackerHttp::receive_signal_failed, this, std::placeholders::_1));

@@ -44,11 +44,8 @@ verify_file_list(const FileList* fl) {
 }
 
 FileList::FileList() :
-  m_isOpen(false),
 
-  m_torrentSize(0),
-  m_chunkSize(0),
-  m_maxFileSize(~uint64_t()) {
+    m_maxFileSize(~uint64_t()) {
 }
 
 FileList::~FileList() {

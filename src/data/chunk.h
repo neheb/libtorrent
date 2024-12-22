@@ -30,7 +30,7 @@ public:
   using base_type::front;
   using base_type::back;
 
-  Chunk() : m_chunkSize(0), m_prot(~0) {}
+  Chunk() = default;
   ~Chunk() { clear(); }
 
   bool                is_all_valid() const;
@@ -71,8 +71,8 @@ private:
   Chunk(const Chunk&);
   void operator = (const Chunk&);
 
-  uint32_t            m_chunkSize;
-  int                 m_prot;
+  uint32_t m_chunkSize{0};
+  int      m_prot{~0};
 };
 
 inline Chunk::iterator

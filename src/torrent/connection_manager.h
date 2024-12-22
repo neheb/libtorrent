@@ -182,12 +182,12 @@ private:
   ConnectionManager(const ConnectionManager&);
   void operator = (const ConnectionManager&);
 
-  size_type           m_size;
-  size_type           m_maxSize;
+  size_type           m_size{0};
+  size_type           m_maxSize{0};
 
   priority_type       m_priority;
-  uint32_t            m_sendBufferSize;
-  uint32_t            m_receiveBufferSize;
+  uint32_t            m_sendBufferSize{0};
+  uint32_t            m_receiveBufferSize{0};
   int                 m_encryptionOptions;
 
   sockaddr*           m_bindAddress;
@@ -195,16 +195,16 @@ private:
   sockaddr*           m_proxyAddress;
 
   std::unique_ptr<Listen> m_listen;
-  port_type           m_listen_port;
-  uint32_t            m_listen_backlog;
+  port_type           m_listen_port{0};
+  uint32_t            m_listen_backlog{SOMAXCONN};
 
   slot_filter_type    m_slot_filter;
   slot_resolver_type  m_slot_resolver;
   slot_throttle_type  m_slot_address_throttle;
 
-  bool                m_block_ipv4;
-  bool                m_block_ipv6;
-  bool                m_prefer_ipv6;
+  bool                m_block_ipv4{false};
+  bool                m_block_ipv6{false};
+  bool                m_prefer_ipv6{false};
 };
 
 }

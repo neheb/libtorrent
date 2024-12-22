@@ -55,10 +55,10 @@ namespace torrent {
 // this would let us be abit more flexible with the interval.
 
 ThrottleInternal::ThrottleInternal(int flags) :
-  m_flags(flags),
-  m_nextSlave(m_slaveList.end()),
-  m_unusedQuota(0),
-  m_timeLastTick(cachedTime) {
+    m_flags(flags),
+    m_nextSlave(m_slaveList.end()),
+
+    m_timeLastTick(cachedTime) {
 
   if (is_root())
     m_taskTick.slot() = std::bind(&ThrottleInternal::receive_tick, this);

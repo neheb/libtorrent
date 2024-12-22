@@ -171,8 +171,8 @@ private:
   DownloadInfo*       m_info;
   int                 m_state;
 
-  uint32_t            m_key;
-  int32_t             m_numwant;
+  uint32_t                      m_key{0};
+  int32_t                       m_numwant{-1};
 
   slot_address_list   m_slot_success;
   slot_string         m_slot_failed;

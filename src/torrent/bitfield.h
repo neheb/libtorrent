@@ -50,7 +50,7 @@ public:
   typedef value_type*           iterator;
   typedef const value_type*     const_iterator;
 
-  Bitfield() : m_size(0), m_set(0), m_data(NULL)    {}
+  Bitfield() = default;
   ~Bitfield()                                       { clear(); }
 
   bool                empty() const                 { return m_data == NULL; }
@@ -115,10 +115,10 @@ private:
   Bitfield(const Bitfield& bf);
   Bitfield& operator = (const Bitfield& bf);
 
-  size_type           m_size;
-  size_type           m_set;
+  size_type   m_size{0};
+  size_type   m_set{0};
 
-  value_type*         m_data;
+  value_type* m_data{};
 };
 
 }

@@ -74,7 +74,7 @@ private:
   void                process_scrape(const Object& object);
 
   Http*               m_get;
-  std::stringstream*  m_data;
+  std::stringstream*  m_data{};
 
   bool                m_dropDeliminator;
 };

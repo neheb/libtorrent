@@ -58,12 +58,7 @@
 namespace torrent {
 
 TrackerList::TrackerList() :
-  m_info(NULL),
-  m_state(DownloadInfo::STOPPED),
-
-  m_key(0),
-  m_numwant(-1) {
-}
+    m_state(DownloadInfo::STOPPED) {}
 
 bool
 TrackerList::has_active() const {

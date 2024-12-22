@@ -146,10 +146,10 @@ private:
 
   download_data       m_data;
 
-  bool                m_isOpen;
+  bool                m_isOpen{false};
 
-  uint64_t            m_torrentSize;
-  uint32_t            m_chunkSize;
+  uint64_t            m_torrentSize{0};
+  uint32_t            m_chunkSize{0};
   uint64_t            m_maxFileSize;
 
   std::string         m_rootDir;

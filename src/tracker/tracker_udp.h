@@ -97,18 +97,18 @@ private:
   resolver_type*      make_resolver_slot(const hostname_type& hostname);
 
   rak::socket_address m_connectAddress;
-  int                 m_port;
+  int                 m_port{0};
 
   int                 m_sendState;
 
-  resolver_type*      m_slot_resolver;
+  resolver_type*      m_slot_resolver{};
 
   uint32_t            m_action;
   uint64_t            m_connectionId;
   uint32_t            m_transactionId;
 
-  ReadBuffer*         m_readBuffer;
-  WriteBuffer*        m_writeBuffer;
+  ReadBuffer*         m_readBuffer{};
+  WriteBuffer*        m_writeBuffer{};
 
   uint32_t            m_tries;
 

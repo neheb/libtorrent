@@ -61,7 +61,7 @@ class LIBTORRENT_EXPORT Http {
   static const int flag_delete_self   = 0x1;
   static const int flag_delete_stream = 0x2;
 
-  Http() : m_flags(0), m_stream(NULL), m_timeout(0) {}
+  Http() = default;
   virtual ~Http();
 
   // Start must never throw on bad input. Calling start/stop on an
@@ -98,10 +98,10 @@ protected:
   void               trigger_done();
   void               trigger_failed(const std::string& message);
 
-  int                m_flags;
+  int                m_flags{0};
   std::string        m_url;
-  std::iostream*     m_stream;
-  uint32_t           m_timeout;
+  std::iostream*     m_stream{};
+  uint32_t           m_timeout{0};
 
   signal_void        m_signal_done;
   signal_string      m_signal_failed;

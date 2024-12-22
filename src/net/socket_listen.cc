@@ -14,7 +14,7 @@
 
 namespace torrent {
 
-socket_listen::socket_listen() : m_backlog(SOMAXCONN) {
+socket_listen::socket_listen() {
 }
 
 void

@@ -58,7 +58,7 @@ public:
   using base_type::rbegin;
   using base_type::rend;
 
-  FileManager();
+  FileManager() = default;
   ~FileManager();
 
   size_type           open_files() const              { return base_type::size(); }
@@ -80,11 +80,11 @@ private:
   FileManager(const FileManager&) LIBTORRENT_NO_EXPORT;
   void operator = (const FileManager&) LIBTORRENT_NO_EXPORT;
 
-  size_type           m_maxOpenFiles;
+  size_type m_maxOpenFiles{0};
 
-  uint64_t            m_filesOpenedCounter;
-  uint64_t            m_filesClosedCounter;
-  uint64_t            m_filesFailedCounter;
+  uint64_t  m_filesOpenedCounter{0};
+  uint64_t  m_filesClosedCounter{0};
+  uint64_t  m_filesFailedCounter{0};
 };
 
 }

@@ -47,12 +47,6 @@
 
 namespace torrent {
 
-FileManager::FileManager() :
-  m_maxOpenFiles(0),
-  m_filesOpenedCounter(0),
-  m_filesClosedCounter(0),
-  m_filesFailedCounter(0) {}
-
 FileManager::~FileManager() {
   if (!empty())
     throw internal_error("FileManager::~FileManager() called but empty() != true.");

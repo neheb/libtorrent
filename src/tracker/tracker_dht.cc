@@ -59,8 +59,7 @@ const char* TrackerDht::states[] = { "Idle", "Searching", "Announcing" };
 bool TrackerDht::is_allowed() { return manager->dht_manager()->is_valid(); }
 
 TrackerDht::TrackerDht(TrackerList* parent, const std::string& url, int flags) :
-  Tracker(parent, url, flags),
-  m_state(state_idle) {
+    Tracker(parent, url, flags) {
 
   if (!manager->dht_manager()->is_valid())
     throw internal_error("Trying to add DHT tracker with no DHT manager.");

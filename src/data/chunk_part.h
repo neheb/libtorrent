@@ -51,7 +51,7 @@ public:
   } mapped_type;
 
   ChunkPart(mapped_type mapped, const MemoryChunk& c, uint32_t pos) :
-    m_mapped(mapped), m_chunk(c), m_position(pos), m_file(NULL), m_file_offset(0) {}
+      m_mapped(mapped), m_chunk(c), m_position(pos) {}
 
   bool operator==(uint32_t pos) const {
     return is_contained(pos);
@@ -95,8 +95,8 @@ private:
   // Currently used to figure out what file and where a SIGBUS
   // occurred. Can also be used in the future to indicate if a part is
   // temporary storage, etc.
-  File*               m_file;
-  uint64_t            m_file_offset;
+  File*    m_file{};
+  uint64_t m_file_offset{0};
 };
 
 }

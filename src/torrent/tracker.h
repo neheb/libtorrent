@@ -126,35 +126,35 @@ protected:
   int                 m_flags;
 
   TrackerList*        m_parent;
-  uint32_t            m_group;
+  uint32_t            m_group{0};
 
   std::string         m_url;
   std::string         m_tracker_id;
 
-  uint32_t            m_normal_interval;
-  uint32_t            m_min_interval;
+  uint32_t            m_normal_interval{0};
+  uint32_t            m_min_interval{0};
 
-  int                 m_latest_event;
-  uint32_t            m_latest_new_peers;
-  uint32_t            m_latest_sum_peers;
+  int                 m_latest_event{EVENT_NONE};
+  uint32_t            m_latest_new_peers{0};
+  uint32_t            m_latest_sum_peers{0};
 
-  uint32_t            m_success_time_last;
-  uint32_t            m_success_counter;
+  uint32_t            m_success_time_last{0};
+  uint32_t            m_success_counter{0};
 
-  uint32_t            m_failed_time_last;
-  uint32_t            m_failed_counter;
+  uint32_t            m_failed_time_last{0};
+  uint32_t            m_failed_counter{0};
 
-  uint32_t            m_scrape_time_last;
-  uint32_t            m_scrape_counter;
+  uint32_t            m_scrape_time_last{0};
+  uint32_t            m_scrape_counter{0};
 
-  uint32_t            m_scrape_complete;
-  uint32_t            m_scrape_incomplete;
-  uint32_t            m_scrape_downloaded;
+  uint32_t            m_scrape_complete{0};
+  uint32_t            m_scrape_incomplete{0};
+  uint32_t            m_scrape_downloaded{0};
 
   // Timing of the last request, and a counter for how many requests
   // there's been in the recent past.
   uint32_t            m_request_time_last;
-  uint32_t            m_request_counter;
+  uint32_t            m_request_counter{0};
 };
 
 inline bool

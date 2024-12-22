@@ -81,7 +81,7 @@ public:
 
 private:
   AddressList  m_peers;
-  state_type   m_state;
+  state_type   m_state{state_idle};
 
   int          m_replied;
   int          m_contacted;

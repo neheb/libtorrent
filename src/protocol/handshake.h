@@ -138,12 +138,12 @@ protected:
 
   static const char*  m_protocol;
 
-  State               m_state;
+  State               m_state{INACTIVE};
 
   HandshakeManager*   m_manager;
 
-  PeerInfo*           m_peerInfo;
-  DownloadMain*       m_download;
+  PeerInfo*           m_peerInfo{};
+  DownloadMain*       m_download{};
   Bitfield            m_bitfield;
 
   ThrottleList*       m_uploadThrottle;
@@ -155,8 +155,8 @@ protected:
   uint32_t            m_readPos;
   uint32_t            m_writePos;
 
-  bool                m_readDone;
-  bool                m_writeDone;
+  bool                m_readDone{false};
+  bool                m_writeDone{false};
 
   bool                m_incoming;
 

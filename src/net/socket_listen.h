@@ -34,7 +34,7 @@ public:
 private:
   bool m_open_port(int fd, sa_unique_ptr& sap, uint16_t port);
 
-  int           m_backlog;
+  int           m_backlog{SOMAXCONN};
   accepted_ftor m_slot_accepted;
 };
 

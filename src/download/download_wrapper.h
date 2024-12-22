@@ -75,13 +75,13 @@ private:
   void                finished_download();
 
   DownloadMain*       m_main;
-  Object*             m_bencode;
-  HashTorrent*        m_hashChecker;
+  Object*             m_bencode{};
+  HashTorrent*        m_hashChecker{};
   HashQueue*          m_hashQueue;
 
   std::string         m_hash;
 
-  int                 m_connectionType;
+  int                 m_connectionType{0};
 };
 
 }

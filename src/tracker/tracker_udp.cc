@@ -66,14 +66,7 @@
 namespace torrent {
 
 TrackerUdp::TrackerUdp(TrackerList* parent, const std::string& url, int flags) :
-  Tracker(parent, url, flags),
-
-  m_port(0),
-
-  m_slot_resolver(NULL),
-  m_readBuffer(NULL),
-  m_writeBuffer(NULL) {
-
+    Tracker(parent, url, flags) {
   m_taskTimeout.slot() = std::bind(&TrackerUdp::receive_timeout, this);
 }
 

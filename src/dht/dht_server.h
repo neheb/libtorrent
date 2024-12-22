@@ -187,7 +187,7 @@ private:
   unsigned int        m_errorsReceived;
   unsigned int        m_errorsCaught;
 
-  bool                m_networkUp;
+  bool                m_networkUp{false};
 };
 
 }

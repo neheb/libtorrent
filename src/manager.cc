@@ -29,20 +29,20 @@ namespace torrent {
 Manager* manager = NULL;
 
 Manager::Manager() :
-  m_downloadManager(new DownloadManager),
-  m_fileManager(new FileManager),
-  m_handshakeManager(new HandshakeManager),
-  m_resourceManager(new ResourceManager),
+    m_downloadManager(new DownloadManager),
+    m_fileManager(new FileManager),
+    m_handshakeManager(new HandshakeManager),
+    m_resourceManager(new ResourceManager),
 
-  m_chunkManager(new ChunkManager),
-  m_clientList(new ClientList),
-  m_connectionManager(new ConnectionManager),
-  m_dhtManager(new DhtManager),
+    m_chunkManager(new ChunkManager),
+    m_clientList(new ClientList),
+    m_connectionManager(new ConnectionManager),
+    m_dhtManager(new DhtManager),
 
-  m_uploadThrottle(Throttle::create_throttle()),
-  m_downloadThrottle(Throttle::create_throttle()),
+    m_uploadThrottle(Throttle::create_throttle()),
+    m_downloadThrottle(Throttle::create_throttle())
 
-  m_ticks(0) {
+{
 
   m_hashQueue = new HashQueue(&m_main_thread_disk);
   m_hashQueue->slot_has_work() =

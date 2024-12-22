@@ -109,15 +109,15 @@ private:
 };
 
 DhtServer::DhtServer(DhtRouter* router) :
-  m_router(router),
+    m_router(router),
 
-  m_uploadNode(60),
-  m_downloadNode(60),
+    m_uploadNode(60),
+    m_downloadNode(60),
 
-  m_uploadThrottle(manager->upload_throttle()->throttle_list()),
-  m_downloadThrottle(manager->download_throttle()->throttle_list()),
+    m_uploadThrottle(manager->upload_throttle()->throttle_list()),
+    m_downloadThrottle(manager->download_throttle()->throttle_list())
 
-  m_networkUp(false) {
+{
 
   get_fd().clear();
   reset_statistics();

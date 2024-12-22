@@ -41,8 +41,7 @@ public:
   using base_type::empty;
   using base_type::size;
 
-  log_buffer() :
-      m_max_size(200) {}
+  log_buffer() = default;
 
   unsigned int        max_size() const { return m_max_size; }
   
@@ -58,7 +57,7 @@ public:
 
 private:
   std::mutex          m_lock;
-  unsigned int        m_max_size;
+  unsigned int        m_max_size{200};
   slot_void           m_slot_update;
 };
 

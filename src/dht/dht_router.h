@@ -167,9 +167,9 @@ private:
   DhtBucketList       m_routingTable;
   DhtTrackerList      m_trackers;
 
-  std::deque<contact_t>* m_contacts;
+  std::deque<contact_t>* m_contacts{};
 
-  int                 m_numRefresh;
+  int                    m_numRefresh{0};
 
   bool                m_networkUp;
 

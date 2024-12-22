@@ -77,7 +77,7 @@ public:
     statistics_type(const Rate& up, const Rate& down) : up_rate(up), down_rate(down) { }
   };
 
-  DhtManager() : m_router(NULL), m_portSent(0), m_canReceive(true) { };
+  DhtManager() = default;
   ~DhtManager();
 
   void                initialize(const Object& dhtCache);
@@ -119,11 +119,11 @@ public:
   DhtRouter*          router()                                { return m_router; }
 
 private:
-  DhtRouter*          m_router;
+  DhtRouter*          m_router{};
   port_type           m_port;
 
-  int                 m_portSent;
-  bool                m_canReceive;
+  int                 m_portSent{0};
+  bool                m_canReceive{true};
 };
 
 }

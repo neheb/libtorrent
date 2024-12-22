@@ -159,11 +159,11 @@ private:
 
   int                 balance_unchoked(unsigned int weight, unsigned int max_unchoked, bool is_up);
 
-  unsigned int        m_currentlyUploadUnchoked;
-  unsigned int        m_currentlyDownloadUnchoked;
+  unsigned int        m_currentlyUploadUnchoked{0};
+  unsigned int        m_currentlyDownloadUnchoked{0};
 
-  unsigned int        m_maxUploadUnchoked;
-  unsigned int        m_maxDownloadUnchoked;
+  unsigned int        m_maxUploadUnchoked{0};
+  unsigned int        m_maxDownloadUnchoked{0};
 };
 
 }

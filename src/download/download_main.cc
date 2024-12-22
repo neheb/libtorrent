@@ -35,23 +35,13 @@
 namespace torrent {
 
 DownloadInfo::DownloadInfo() :
-  m_flags(flag_compact | flag_accepting_new_peers | flag_accepting_seeders | flag_pex_enabled | flag_pex_active),
+    m_flags(flag_compact | flag_accepting_new_peers | flag_accepting_seeders | flag_pex_enabled | flag_pex_active),
 
-  m_upRate(60),
-  m_downRate(60),
-  m_skipRate(60),
-  
-  m_uploadedBaseline(0),
-  m_completedBaseline(0),
-  m_sizePex(0),
-  m_maxSizePex(8),
-  m_metadataSize(0),
-  
-  m_creationDate(0),
-  m_loadDate(rak::timer::current_seconds()),
+    m_upRate(60),
+    m_downRate(60),
+    m_skipRate(60),
 
-  m_upload_unchoked(0),
-  m_download_unchoked(0) {
+    m_loadDate(rak::timer::current_seconds()) {
 }
 
 DownloadMain::DownloadMain() :
