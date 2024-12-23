@@ -80,7 +80,7 @@ public:
   virtual void        remove_error(Event* event);
 
 private:
-  PollSelect() {}
+  PollSelect() = default;
   PollSelect(const PollSelect&);
   void operator = (const PollSelect&);
 

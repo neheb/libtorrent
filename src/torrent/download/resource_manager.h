@@ -102,7 +102,7 @@ public:
   using base_type::size;
   using base_type::capacity;
 
-  ResourceManager();
+  ResourceManager() = default;
   ~ResourceManager();
 
   void                insert(DownloadMain* d, uint16_t priority) { insert(value_type(d, priority)); }

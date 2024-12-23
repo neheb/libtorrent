@@ -104,8 +104,8 @@ public:
   const PeerConnectionBase* c_ptr() const { return reinterpret_cast<const PeerConnectionBase*>(this); }
 
 protected:
-  Peer() {}
-  virtual ~Peer() {}
+  Peer()          = default;
+  virtual ~Peer() = default;
 
   Peer(const Peer&);
   void operator = (const Peer&);

@@ -24,11 +24,6 @@ namespace torrent {
 const Rate* resource_manager_entry::up_rate() const { return m_download->info()->up_rate(); }
 const Rate* resource_manager_entry::down_rate() const { return m_download->info()->down_rate(); }
 
-ResourceManager::ResourceManager()
-
-{
-}
-
 ResourceManager::~ResourceManager() {
   if (m_currentlyUploadUnchoked != 0)
     throw internal_error("ResourceManager::~ResourceManager() called but m_currentlyUploadUnchoked != 0.");

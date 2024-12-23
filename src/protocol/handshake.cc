@@ -51,7 +51,7 @@ private:
 
 class handshake_succeeded : public network_error {
 public:
-  handshake_succeeded() {}
+  handshake_succeeded() = default;
 };
 
 Handshake::Handshake(SocketFd fd, HandshakeManager* m, int encryptionOptions) :

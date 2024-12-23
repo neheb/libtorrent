@@ -52,7 +52,7 @@ public:
   static const uint32_t flag_waive_global_lock = 0x1;
 
   Poll() = default;
-  virtual ~Poll() {}
+  virtual ~Poll() = default;
 
   uint32_t            flags() const { return m_flags; }
   void                set_flags(uint32_t flags) { m_flags = flags; }

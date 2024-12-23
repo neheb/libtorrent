@@ -44,7 +44,7 @@ public:
   static constexpr int min_normal_interval     = 600;
   static constexpr int max_normal_interval     = 8 * 3600;
 
-  virtual ~Tracker() {}
+  virtual ~Tracker() = default;
 
   int                 flags() const { return m_flags; }
 
