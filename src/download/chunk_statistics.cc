@@ -145,9 +145,9 @@ ChunkStatistics::received_have_chunk(PeerChunks* pc, uint32_t index, uint32_t le
       
       m_complete++;
       m_accounted--;
-      
-      for (iterator itr = base_type::begin(), last = base_type::end(); itr != last; ++itr)
-	*itr -= 1;
+
+      for (auto& c : *this)
+        const_cast<uint8_t&>(c) -= 1;
     }
 
   } else {

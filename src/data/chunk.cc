@@ -169,13 +169,7 @@ Chunk::incore_length(uint32_t pos, uint32_t length) {
 
 bool
 Chunk::sync(int flags) {
-  bool success = true;
-
-  for (iterator itr = begin(), last = end(); itr != last; ++itr)
-    if (!itr->chunk().sync(0, itr->chunk().size(), flags))
-      success = false;
-
-  return success;
+  return std::all_of(begin(), end(), [flags](auto& c) { return c.chunk().sync(0, c.chunk().size(), flags); });
 }
 
 void

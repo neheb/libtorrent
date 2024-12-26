@@ -255,13 +255,13 @@ DownloadConstructor::parse_multi_files(const Object& b, uint32_t chunkSize) {
   std::vector<FileList::split_type> splitList(objectList.size());
   std::vector<FileList::split_type>::iterator splitItr = splitList.begin();
 
-  for (Object::list_const_iterator listItr = objectList.begin(), listLast = objectList.end(); listItr != listLast; ++listItr, ++splitItr) {
+  for (const auto& object : objectList) {
     std::list<Path> pathList;
 
-    if (listItr->has_key_list("path"))
-      pathList.push_back(create_path(listItr->get_key_list("path"), m_defaultEncoding));
+    if (object.has_key_list("path"))
+      pathList.push_back(create_path(object.get_key_list("path"), m_defaultEncoding));
 
-    for (const auto& path : listItr->as_map()) {
+    for (const auto& path : object.as_map()) {
       if (download_constructor_is_multi_path(path)) {
         pathList.push_back(create_path(path.second.as_list(), path.first.substr(sizeof("path.") - 1)));
       }
@@ -270,13 +270,14 @@ DownloadConstructor::parse_multi_files(const Object& b, uint32_t chunkSize) {
     if (pathList.empty())
       throw input_error("Bad torrent file, an entry has no valid filename.");
 
-    int64_t length = listItr->get_key_value("length");
+    int64_t length = object.get_key_value("length");
 
     if (length < 0 || torrentSize + length < 0)
       throw input_error("Bad torrent file, invalid length for file.");
 
     torrentSize += length;
     *splitItr = FileList::split_type(length, choose_path(&pathList));
+    ++splitItr;
   }
 
   FileList* fileList = m_download->main()->file_list();
@@ -306,18 +307,13 @@ DownloadConstructor::create_path(const Object::list_type& plist, const std::stri
 
 inline Path
 DownloadConstructor::choose_path(std::list<Path>* pathList) {
-  std::list<Path>::iterator pathFirst        = pathList->begin();
-  std::list<Path>::iterator pathLast         = pathList->end();
-  EncodingList::const_iterator encodingFirst = m_encodingList->begin();
-  EncodingList::const_iterator encodingLast  = m_encodingList->end();
-
-  for ( ; encodingFirst != encodingLast; ++encodingFirst) {
-    auto itr = std::find_if(pathFirst, pathLast, [encodingFirst](const Path& p) {
-      return strcasecmp(p.encoding().c_str(), encodingFirst->c_str()) == 0;
+  for (const auto& encoding : *m_encodingList) {
+    auto itr = std::find_if(pathList->begin(), pathList->end(), [&encoding](const Path& p) {
+      return strcasecmp(p.encoding().c_str(), encoding.c_str()) == 0;
     });
 
-    if (itr != pathLast)
-      pathList->splice(pathFirst, *pathList, itr);
+    if (itr != pathList->end())
+      pathList->splice(pathList->begin(), *pathList, itr);
   }
 
   return pathList->front();
