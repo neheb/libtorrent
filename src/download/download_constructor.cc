@@ -289,7 +289,7 @@ DownloadConstructor::parse_multi_files(const Object& b, uint32_t chunkSize) {
 }
 
 inline Path
-DownloadConstructor::create_path(const Object::list_type& plist, const std::string enc) {
+DownloadConstructor::create_path(const Object::list_type& plist, const std::string& enc) {
   // Make sure we are given a proper file path.
   if (plist.empty())
     throw input_error("Bad torrent file, \"path\" has zero entries.");

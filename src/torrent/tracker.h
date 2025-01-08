@@ -104,7 +104,7 @@ public:
   static std::string  scrape_url_from(std::string url);
 
 protected:
-  Tracker(TrackerList* parent, const std::string& url, int flags = 0);
+  Tracker(TrackerList* parent, std::string  url, int flags = 0);
   Tracker(const Tracker& t);
   void operator = (const Tracker& t);
 

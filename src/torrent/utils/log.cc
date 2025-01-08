@@ -245,7 +245,7 @@ log_find_output_name(const char* name) {
 }
 
 void
-log_open_output(const char* name, log_slot slot) {
+log_open_output(const char* name, const log_slot& slot) {
   auto lock = std::scoped_lock(log_mutex);
 
   if (log_outputs.size() >= log_group::max_size_outputs()) {
@@ -319,7 +319,7 @@ log_remove_child(int group, int child) {
 }
 
 void
-log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
+log_file_write(const std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
   // Add group name, data, etc as flags.
 
   // Normal groups are nul-terminated strings.
@@ -338,7 +338,7 @@ log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t
 }
 
 void
-log_gz_file_write(std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
+log_gz_file_write(const std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
   char buffer[64];
 
   // Normal groups are nul-terminated strings.

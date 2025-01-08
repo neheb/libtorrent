@@ -277,14 +277,14 @@ TrackerHttp::receive_done() {
 }
 
 void
-TrackerHttp::receive_signal_failed(std::string msg) {
+TrackerHttp::receive_signal_failed(const std::string& msg) {
   m_normal_interval = 0;
   m_min_interval    = 0;
   return receive_failed(msg);
 }
 
 void
-TrackerHttp::receive_failed(std::string msg) {
+TrackerHttp::receive_failed(const std::string& msg) {
   if (lt_log_is_valid(LOG_TRACKER_DEBUG)) {
     std::string dump = m_data->str();
     LT_LOG_TRACKER_DUMP(DEBUG, dump.c_str(), dump.size(), "Tracker HTTP failed.", 0);

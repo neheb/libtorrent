@@ -102,6 +102,6 @@ bool operator!= (const cacheline_allocator<T1>&, const cacheline_allocator<T2>&)
 //
 
 template <typename T>
-void* operator new(size_t s, rak::cacheline_allocator<T> a) { return a.alloc_size(s); }
+void* operator new(size_t s, const rak::cacheline_allocator<T>& a) { return a.alloc_size(s); }
 
 #endif // namespace rak
