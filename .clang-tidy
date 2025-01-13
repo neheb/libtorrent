@@ -1,7 +1,27 @@
 ---
-Checks: '-*,readability-identifier-naming'
+Checks: '-*'
 FormatStyle: 'file'
 CheckOptions:
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowImplicitlyDeletedCopyOrMove
+    value: true
+  - key: hicpp-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: hicpp-special-member-functions.AllowMissingMoveFunctions
+    value: true
+  - key: hicpp-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+    value: true
+  - key: hicpp-special-member-functions.AllowImplicitlyDeletedCopyOrMove
+    value: true
+  - key: modernize-use-auto.MinTypeNameLength
+    value: 4
+  - key: modernize-use-auto.RemoveStars
+    value: true
   - key: readability-identifier-naming.LocalVariableCase
     value: lower_case
   - key: readability-identifier-naming.ParameterCase
