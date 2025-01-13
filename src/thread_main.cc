@@ -23,7 +23,7 @@ thread_main::init_thread() {
   m_poll->set_flags(Poll::flag_waive_global_lock);
 
   m_state = STATE_INITIALIZED;
-  m_thread = pthread_self();
+  m_thread = std::thread(&thread_base::event_loop, this);
   m_flags |= flag_main_thread;
 
   m_instrumentation_index = INSTRUMENTATION_POLLING_DO_POLL_MAIN - INSTRUMENTATION_POLLING_DO_POLL;

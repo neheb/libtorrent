@@ -4,8 +4,8 @@
 #include <atomic>
 #include <functional>
 #include <mutex>
-#include <pthread.h>
 #include <sys/types.h>
+#include <thread>
 
 #include <torrent/common.h>
 #include <torrent/utils/signal_bitfield.h>
@@ -17,7 +17,6 @@ class thread_interrupt;
 
 class LIBTORRENT_EXPORT thread_base {
 public:
-  typedef void* (*pthread_func)(void*);
   typedef std::function<void ()>     slot_void;
   typedef std::function<uint64_t ()> slot_timer;
   typedef class signal_bitfield      signal_bitfield_t;
@@ -57,7 +56,6 @@ public:
 
   Poll*               poll()            { return m_poll; }
   signal_bitfield_t*  signal_bitfield() { return &m_signal_bitfield; }
-  pthread_t           pthread()         { return m_thread; }
 
   virtual void        init_thread() = 0;
 
@@ -93,7 +91,7 @@ protected:
 
   static global_lock_type m_global;
 
-  pthread_t               m_thread;
+  std::thread             m_thread;
   std::atomic<state_type> m_state;
   std::atomic_int         m_flags;
 
@@ -116,7 +114,7 @@ thread_base::is_polling() const {
 
 inline bool
 thread_base::is_current() const {
-  return m_thread == pthread_self();
+  return !m_thread.joinable();
 }
 
 inline void

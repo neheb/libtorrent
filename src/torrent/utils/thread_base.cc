@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <cstring>
+#include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
 
@@ -16,14 +17,11 @@ namespace torrent {
 thread_base::global_lock_type thread_base::m_global;
 
 thread_base::thread_base() :
-  m_state(STATE_UNKNOWN),
-  m_flags(0),
-  m_instrumentation_index(INSTRUMENTATION_POLLING_DO_POLL_OTHERS - INSTRUMENTATION_POLLING_DO_POLL),
+    m_state(STATE_UNKNOWN),
+    m_flags(0),
+    m_instrumentation_index(INSTRUMENTATION_POLLING_DO_POLL_OTHERS - INSTRUMENTATION_POLLING_DO_POLL),
 
-  m_poll(NULL)
-{
-  std::memset(&m_thread, 0, sizeof(pthread_t));
-
+    m_poll(NULL) {
 // #ifdef USE_INTERRUPT_SOCKET
   thread_interrupt::pair_type interrupt_sockets = thread_interrupt::create_pair();
 
@@ -33,7 +31,9 @@ thread_base::thread_base() :
 // #endif
 }
 
-thread_base::~thread_base() = default;
+thread_base::~thread_base() {
+  m_thread.detach();
+}
 
 void
 thread_base::start_thread() {
@@ -43,8 +43,11 @@ thread_base::start_thread() {
   if (!is_initialized())
     throw internal_error("Called thread_base::start_thread on an uninitialized object.");
 
-  if (pthread_create(&m_thread, NULL, (pthread_func)&thread_base::event_loop, this))
-    throw internal_error("Failed to create thread.");
+  try {
+    m_thread = std::thread(&thread_base::event_loop, this);
+  } catch (const std::system_error& e) {
+    throw internal_error("Failed to create thread: " + std::string(e.what()));
+  }
 }
 
 void
@@ -92,7 +95,7 @@ thread_base::event_loop(thread_base* thread) {
 #if defined(HAS_PTHREAD_SETNAME_NP_DARWIN)
   pthread_setname_np(thread->name());
 #elif defined(HAS_PTHREAD_SETNAME_NP_GENERIC)
-  pthread_setname_np(thread->m_thread, thread->name());
+  pthread_setname_np(thread->m_thread.native_handle(), thread->name());
 #endif
 
   lt_log_print(torrent::LOG_THREAD_NOTICE, "%s: Starting thread.", thread->name());
