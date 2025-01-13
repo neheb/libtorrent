@@ -1,0 +1,161 @@
+name: meson
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{github.workflow}}-${{github.head_ref}}
+  cancel-in-progress: true
+
+jobs:
+  Linux-GCC:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        cxx: ['9', '10', '11', '13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: egor-tensin/setup-gcc@v1
+        with:
+          version: ${{matrix.cxx}}
+
+      - name: Install packages
+        run: |
+          python3 -m pip install meson ninja
+          sudo apt install -y libcppunit-dev libcurl4-openssl-dev
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  Linux-Clang:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        cxx: ['13', '14', '15', '16', '17', '18', '19', '20']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: egor-tensin/setup-clang@v1
+        with:
+          version: ${{matrix.cxx}}
+
+      - name: Install packages
+        run: |
+          python3 -m pip install meson ninja
+          sudo apt install -y libc++abi-${{matrix.cxx}}-dev libc++-${{matrix.cxx}}-dev libunwind-${{matrix.cxx}}-dev libcurl4-openssl-dev
+
+      - name: Compile and Test
+        env:
+          CXXFLAGS: -stdlib=libc++
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  MacOS:
+    runs-on: macos-latest
+    env:
+      TEST_IGNORE_SIGNAL_INTERRUPT_LATENCY: YES
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          brew install cppunit meson
+
+      - name: Compile and Test
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose
+  DragonflyBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/dragonflybsd-vm@v1
+        with:
+          prepare: |
+            pkg install -y cppunit curl meson openssl pkgconf
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  FreeBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          prepare: |
+            pkg install -y cppunit curl meson openssl pkgconf
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  NetBSD:
+    runs-on: ubuntu-latest
+    env:
+      TEST_IGNORE_SIGNAL_INTERRUPT_LATENCY: YES
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/netbsd-vm@v1
+        with:
+          envs:
+            TEST_IGNORE_SIGNAL_INTERRUPT_LATENCY
+          prepare: |
+            /usr/sbin/pkg_add cppunit curl meson openssl pkgconf zlib
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  OmniOS:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/omnios-vm@v1
+        with:
+          prepare: |
+            pkg install curl gcc14 meson-312 ninja pkg-config python-312
+          run: |
+            /usr/lib/python3.12/bin/meson setup "${{github.workspace}}/build" -Dwarning_level=3
+            /usr/lib/python3.12/bin/meson compile -C "${{github.workspace}}/build" --verbose
+  OpenBSD:
+    runs-on: ubuntu-latest
+    env:
+      TEST_IGNORE_SIGNAL_INTERRUPT_LATENCY: YES
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/openbsd-vm@v1
+        with:
+          envs:
+            TEST_IGNORE_SIGNAL_INTERRUPT_LATENCY
+          prepare: |
+            pkg_add ninja cppunit curl meson pkgconf zlib
+          run: |
+            meson setup "${{github.workspace}}/build" -Dwarning_level=3
+            meson compile -C "${{github.workspace}}/build" --verbose
+            meson test -C "${{github.workspace}}/build" --verbose
+  Alpine:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ['x86_64', 'x86', 'armhf', 'armv7', 'aarch64', 'ppc64le', 'riscv64', 's390x']
+    defaults:
+      run:
+        shell: alpine.sh {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jirutka/setup-alpine@v1
+        with:
+          branch: edge
+          arch: ${{matrix.platform}}
+          packages: >
+            build-base clang cppunit-dev curl-dev linux-headers openssl-dev pkgconf zlib-dev meson samurai
+      - name: Compile and Test
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          meson setup "${{github.workspace}}/build" -Dwarning_level=3
+          meson compile -C "${{github.workspace}}/build" --verbose
+          meson test -C "${{github.workspace}}/build" --verbose

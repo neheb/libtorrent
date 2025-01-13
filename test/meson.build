@@ -90,7 +90,7 @@ foreach tn, t : tests
     tn.underscorify().to_lower(),
     t,
     link_with: tc,
-    dependencies: [libtorrent_dep, libtorrent_other_dep, cppunit_dep, curl_dep, ssl_dep],
+    dependencies: [libtorrent_dep, libtorrent_other_dep, cppunit_dep, ssl_dep],
     include_directories: incdirs,
   )
 
