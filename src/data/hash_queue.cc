@@ -36,6 +36,7 @@
 
 #include "config.h"
 
+#include <condition_variable>
 #include <functional>
 #include <unistd.h>
 
@@ -79,12 +80,9 @@ struct HashQueueWillneed {
 // everything is in memory, thus we need to throttle.
 
 HashQueue::HashQueue(thread_disk* thread) :
-  m_thread_disk(thread) {
-
-  pthread_mutex_init(&m_done_chunks_lock, NULL);
-  m_thread_disk->hash_queue()->slot_chunk_done() = std::bind(&HashQueue::chunk_done, this, std::placeholders::_1, std::placeholders::_2);
+    m_thread_disk(thread) {
+  m_thread_disk->hash_queue()->slot_chunk_done() = [this](auto hc, const auto& hv) { chunk_done(hc, hv); };
 }
-
 
 // If we're done immediately, move the chunk to the front of the list so
 // the next work cycle gets stuff done.
@@ -130,17 +128,12 @@ HashQueue::remove(HashQueueNode::id_type id) {
     // The hash chunk was not found, so we need to wait until the hash
     // check finishes.
     if (!result) {
-      pthread_mutex_lock(&m_done_chunks_lock);
-      done_chunks_type::iterator done_itr;
+      auto lock = std::unique_lock(m_done_chunks_lock);
+      std::condition_variable      cv;
 
-      while ((done_itr = m_done_chunks.find(hash_chunk)) == m_done_chunks.end()) {
-        pthread_mutex_unlock(&m_done_chunks_lock);
-        usleep(100);
-        pthread_mutex_lock(&m_done_chunks_lock);
-      }
+      cv.wait(lock, [this, hash_chunk] { return m_done_chunks.find(hash_chunk) != m_done_chunks.end(); });
 
-      m_done_chunks.erase(done_itr);
-      pthread_mutex_unlock(&m_done_chunks_lock);
+      m_done_chunks.erase(hash_chunk);
     }
 
     itr.slot_done()(*hash_chunk->chunk(), NULL);
@@ -163,8 +156,8 @@ HashQueue::clear() {
 
 void
 HashQueue::work() {
-  pthread_mutex_lock(&m_done_chunks_lock);
-    
+  auto lock = std::scoped_lock(m_done_chunks_lock);
+
   while (!m_done_chunks.empty()) {
     HashChunk* hash_chunk = m_done_chunks.begin()->first;
     HashString hash_value = m_done_chunks.begin()->second;
@@ -191,18 +184,14 @@ HashQueue::work() {
     slotDone(hash_chunk->handle(), hash_value.c_str());
     delete hash_chunk;
   }
-
-  pthread_mutex_unlock(&m_done_chunks_lock);
 }
 
 void
 HashQueue::chunk_done(HashChunk* hash_chunk, const HashString& hash_value) {
-  pthread_mutex_lock(&m_done_chunks_lock);
+  auto lock = std::scoped_lock(m_done_chunks_lock);
 
   m_done_chunks[hash_chunk] = hash_value;
   m_slot_has_work(m_done_chunks.empty());
-
-  pthread_mutex_unlock(&m_done_chunks_lock);
 }
 
 }
