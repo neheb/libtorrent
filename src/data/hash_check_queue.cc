@@ -44,9 +44,6 @@
 
 namespace torrent {
 
-HashCheckQueue::HashCheckQueue()  = default;
-HashCheckQueue::~HashCheckQueue() = default;
-
 // Always poke thread_disk after calling this.
 void
 HashCheckQueue::push_back(HashChunk* hash_chunk) {

@@ -63,9 +63,6 @@ public:
   using base_type::front;
   using base_type::back;
   
-  HashCheckQueue();
-  ~HashCheckQueue();
-
   // Guarded functions for adding new...
 
   void                push_back(HashChunk* node);

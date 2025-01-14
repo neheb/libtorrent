@@ -60,9 +60,7 @@ template<Download::ConnectionType type>
 class PeerConnection : public PeerConnectionBase {
 public:
   PeerConnection() = default;
-  ~PeerConnection();
-  PeerConnection(const PeerConnection&) = default;
-  PeerConnection& operator=(const PeerConnection&) = default;
+  ~PeerConnection() = default;
 
   virtual void        initialize_custom();
   virtual void        update_interested();

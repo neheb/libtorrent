@@ -14,8 +14,6 @@
 
 namespace torrent {
 
-socket_listen::socket_listen() = default;
-
 void
 socket_listen::set_backlog(int backlog) {
   if (backlog < 0 || backlog > SOMAXCONN)

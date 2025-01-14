@@ -45,7 +45,7 @@ namespace torrent {
 
 class PeerConnectionMetadata : public PeerConnectionBase {
 public:
-  ~PeerConnectionMetadata();
+  ~PeerConnectionMetadata() = default;
 
   virtual void        initialize_custom();
   virtual void        update_interested();

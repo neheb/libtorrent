@@ -62,7 +62,7 @@ class LIBTORRENT_EXPORT Http {
   static const int flag_delete_stream = 0x2;
 
   Http() = default;
-  virtual ~Http();
+  virtual ~Http() = default;
   Http(const Http&) = delete;
   Http& operator=(const Http&) = delete;
 

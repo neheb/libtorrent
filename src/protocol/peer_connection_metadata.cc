@@ -60,8 +60,6 @@
 
 namespace torrent {
 
-PeerConnectionMetadata::~PeerConnectionMetadata() = default;
-
 void
 PeerConnectionMetadata::initialize_custom() {
 }

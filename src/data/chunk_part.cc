@@ -57,7 +57,7 @@ ChunkPart::clear() {
     break;
   }
 
-  m_chunk.clear();
+  m_chunk = {};
 }
 
 bool

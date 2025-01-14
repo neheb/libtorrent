@@ -72,10 +72,8 @@ class MemoryChunk {
   static const int sync_async             = MS_ASYNC;
   static const int sync_invalidate        = MS_INVALIDATE;
 
-  MemoryChunk() { clear(); }
-  ~MemoryChunk() { clear(); }
-  MemoryChunk(const MemoryChunk&) = default;
-  MemoryChunk& operator=(const MemoryChunk&) = default;
+  MemoryChunk() = default;
+  ~MemoryChunk() = default;
 
   // Doesn't allow ptr == NULL, use the default ctor instead.
   MemoryChunk(char* ptr, char* begin, char* end, int prot, int flags);
@@ -97,7 +95,6 @@ class MemoryChunk {
 
   uint32_t            size() const                                         { return m_end - m_begin; }
   uint32_t            size_aligned() const;
-  inline void         clear();
   void                unmap();
 
   // Use errno and strerror if you want to know why these failed.
@@ -122,22 +119,17 @@ private:
 
   static uint32_t     m_pagesize;
 
-  char*               m_ptr;
-  char*               m_begin;
-  char*               m_end;
+  char*               m_ptr{};
+  char*               m_begin{};
+  char*               m_end{};
 
   int                 m_prot;
-  int                 m_flags;
+  int                 m_flags{PROT_NONE};
 };
 
 inline bool
 MemoryChunk::is_valid_range(uint32_t offset, uint32_t length) const {
   return length != 0 && (uint64_t)offset + length <= size();
-}
-
-inline void
-MemoryChunk::clear() {
-  m_ptr = m_begin = m_end = NULL; m_flags = PROT_NONE;
 }
 
 inline uint32_t

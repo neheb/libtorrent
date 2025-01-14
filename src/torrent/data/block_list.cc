@@ -69,10 +69,6 @@ BlockList::BlockList(const Piece& piece, uint32_t blockLength) :
   base_type::back().set_piece(Piece(m_piece.index(), offset, (m_piece.length() % blockLength) ? m_piece.length() % blockLength : blockLength));
 }
 
-BlockList::~BlockList() {
-  // The default dtor's handles cleaning up the blocks and block transfers.
-}
-
 void
 BlockList::do_all_failed() {
   clear_finished();

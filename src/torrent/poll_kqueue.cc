@@ -398,8 +398,6 @@ PollKQueue::create([[maybe_unused]] int maxOpenSockets) {
   return NULL;
 }
 
-PollKQueue::~PollKQueue() = default;
-
 int
 PollKQueue::poll([[maybe_unused]] int msec) {
   throw internal_error("An PollKQueue function was called, but it is disabled.");

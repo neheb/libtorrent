@@ -14,8 +14,6 @@ class socket_listen : public socket_event {
 public:
   typedef std::function<void (int, sa_unique_ptr)> accepted_ftor;
 
-  socket_listen();
-
   int  backlog() const;
 
   void set_backlog(int backlog);

@@ -49,7 +49,7 @@ public:
   typedef std::vector<std::pair<uint32_t, Event*> > Table;
 
   static PollEPoll*   create(int maxOpenSockets);
-  virtual ~PollEPoll();
+  virtual ~PollEPoll() = default;
 
   int                 poll(int msec);
   unsigned int        perform();
