@@ -65,7 +65,10 @@ public:
   using base_type::operator[];
 
   BlockList(const Piece& piece, uint32_t blockLength);
-  ~BlockList();
+  ~BlockList() = default;
+  BlockList(const BlockList&) = delete;
+  BlockList& operator=(const BlockList&) = delete;
+
   bool                is_all_finished() const       { return m_finished == size(); }
 
   const Piece&        piece() const                 { return m_piece; }
@@ -97,17 +100,14 @@ public:
   void                do_all_failed();
 
 private:
-  BlockList(const BlockList&);
-  void operator = (const BlockList&);
-
   Piece               m_piece;
-  priority_t          m_priority;
+  priority_t          m_priority{PRIORITY_OFF};
 
-  size_type           m_finished;
-  uint32_t            m_failed;
-  uint32_t            m_attempt;
+  size_type           m_finished{0};
+  uint32_t            m_failed{0};
+  uint32_t            m_attempt{0};
 
-  bool                m_bySeeder;
+  bool                m_bySeeder{false};
 };
 
 }

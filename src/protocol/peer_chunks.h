@@ -88,9 +88,9 @@ public:
   const ThrottleNode* upload_throttle() const       { return &m_uploadThrottle; }
 
 private:
-  PeerInfo*           m_peerInfo;
+  PeerInfo*           m_peerInfo{};
 
-  bool                m_usingCounter;
+  bool                m_usingCounter{false};
 
   Bitfield            m_bitfield;
 
@@ -107,19 +107,11 @@ private:
   ThrottleNode        m_uploadThrottle;
 };
 
-inline
-PeerChunks::PeerChunks() :
-  m_peerInfo(NULL),
-
-  m_usingCounter(false),
-
-  m_peerRate(600),
-
-  m_downloadThrottle(30),
-  m_uploadThrottle(30)
-{
+inline PeerChunks::PeerChunks() :
+    m_peerRate(600),
+    m_downloadThrottle(30),
+    m_uploadThrottle(30) {
 }
-
 }
 
 #endif

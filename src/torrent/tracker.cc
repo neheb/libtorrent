@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "exceptions.h"
 #include "globals.h"
@@ -16,34 +17,11 @@ constexpr int Tracker::default_normal_interval;
 constexpr int Tracker::min_normal_interval;
 constexpr int Tracker::max_normal_interval;
 
-Tracker::Tracker(TrackerList* parent, const std::string& url, int flags) :
-  m_flags(flags),
-  m_parent(parent),
-  m_group(0),
-  m_url(url),
-
-  m_normal_interval(0),
-  m_min_interval(0),
-
-  m_latest_event(EVENT_NONE),
-  m_latest_new_peers(0),
-  m_latest_sum_peers(0),
-
-  m_success_time_last(0),
-  m_success_counter(0),
-
-  m_failed_time_last(0),
-  m_failed_counter(0),
-
-  m_scrape_time_last(0),
-  m_scrape_counter(0),
-
-  m_scrape_complete(0),
-  m_scrape_incomplete(0),
-  m_scrape_downloaded(0),
-
-  m_request_time_last(torrent::cachedTime.seconds()),
-  m_request_counter(0)
+Tracker::Tracker(TrackerList* parent, std::string  url, int flags) :
+    m_flags(flags),
+    m_parent(parent),
+    m_url(std::move(url)),
+    m_request_time_last(torrent::cachedTime.seconds())
 {
 }
 

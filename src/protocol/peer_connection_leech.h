@@ -59,7 +59,8 @@ template<> struct PeerConnectionData<Download::CONNECTION_INITIAL_SEED> {
 template<Download::ConnectionType type>
 class PeerConnection : public PeerConnectionBase {
 public:
-  ~PeerConnection();
+  PeerConnection() = default;
+  ~PeerConnection() = default;
 
   virtual void        initialize_custom();
   virtual void        update_interested();

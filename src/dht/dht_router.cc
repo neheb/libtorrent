@@ -60,13 +60,10 @@ namespace torrent {
 HashString DhtRouter::zero_id;
 
 DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
-  DhtNode(zero_id, sa),  // actual ID is set later
-  m_server(this),
-  m_contacts(NULL),
-  m_numRefresh(0),
-  m_curToken(random()),
-  m_prevToken(random()) {
-
+    DhtNode(zero_id, sa), // actual ID is set later
+    m_server(this),
+    m_curToken(random()),
+    m_prevToken(random()) {
   HashString ones_id;
 
   zero_id.clear();
@@ -102,11 +99,11 @@ DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
 
     LT_LOG_THIS("adding nodes (size:%zu)", nodes.size());
 
-    for (Object::map_type::const_iterator itr = nodes.begin(); itr != nodes.end(); ++itr) {
-      if (itr->first.length() != HashString::size_data)
+    for (const auto& node : nodes) {
+      if (node.first.length() != HashString::size_data)
         throw bencode_error("Loading cache: Invalid node hash.");
 
-      add_node_to_bucket(m_nodes.add_node(new DhtNode(itr->first, itr->second)));
+      add_node_to_bucket(m_nodes.add_node(new DhtNode(node.first, node.second)));
     }
   }
 
@@ -116,8 +113,8 @@ DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
     if (cache.has_key("contacts")) {
       const Object::list_type& contacts = cache.get_key_list("contacts");
 
-      for (Object::list_type::const_iterator itr = contacts.begin(); itr != contacts.end(); ++itr) {
-        Object::list_type::const_iterator litr = itr->as_list().begin();
+      for (const auto& contact : contacts) {
+        auto               litr = contact.as_list().begin();
         const std::string& host = litr->as_string();
         int port = (++litr)->as_value();
         m_contacts->emplace_back(host, port);
@@ -130,14 +127,14 @@ DhtRouter::~DhtRouter() {
   stop();
   delete m_contacts;
 
-  for (DhtBucketList::iterator itr = m_routingTable.begin(), last = m_routingTable.end(); itr != last; itr++)
-    delete itr->second;
+  for (auto& route : m_routingTable)
+    delete route.second;
 
-  for (DhtTrackerList::iterator itr = m_trackers.begin(), last = m_trackers.end(); itr != last; itr++)
-    delete itr->second;
+  for (auto& tracker : m_trackers)
+    delete tracker.second;
 
-  for (DhtNodeList::iterator itr = m_nodes.begin(), last = m_nodes.end(); itr != last; itr++)
-    delete itr->second;
+  for (auto& node : m_nodes)
+    delete node.second;
 }
 
 void
@@ -361,10 +358,10 @@ DhtRouter::store_cache(Object* container) const {
   if (m_contacts != NULL) {
     Object& contacts = container->insert_key("contacts", Object::create_list());
 
-    for (std::deque<contact_t>::const_iterator itr = m_contacts->begin(); itr != m_contacts->end(); ++itr) {
+    for (const auto& m_contact : *m_contacts) {
       Object::list_type& list = contacts.insert_back(Object::create_list()).as_list();
-      list.emplace_back(itr->first);
-      list.emplace_back(itr->second);
+      list.emplace_back(m_contact.first);
+      list.emplace_back(m_contact.second);
     }
   }
 
@@ -633,9 +630,9 @@ DhtRouter::bootstrap() {
 
   // Aggressively ping all questionable nodes in our own bucket to weed
   // out bad nodes as early as possible and make room for fresh nodes.
-  for (DhtBucket::iterator itr = bucket()->begin(); itr != bucket()->end(); ++itr)
-    if (!(*itr)->is_good())
-      m_server.ping((*itr)->id(), (*itr)->address());
+  for (auto node : *bucket())
+    if (!node->is_good())
+      m_server.ping(node->id(), node->address());
 
   // Also bootstrap a random bucket, if there are others.
   if (m_routingTable.size() < 2)

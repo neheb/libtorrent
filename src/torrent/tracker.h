@@ -44,7 +44,9 @@ public:
   static constexpr int min_normal_interval     = 600;
   static constexpr int max_normal_interval     = 8 * 3600;
 
-  virtual ~Tracker() {}
+  virtual ~Tracker() = default;
+  Tracker(const Tracker&) = delete;
+  Tracker& operator = (const Tracker&) = delete;
 
   int                 flags() const { return m_flags; }
 
@@ -104,9 +106,7 @@ public:
   static std::string  scrape_url_from(std::string url);
 
 protected:
-  Tracker(TrackerList* parent, const std::string& url, int flags = 0);
-  Tracker(const Tracker& t);
-  void operator = (const Tracker& t);
+  Tracker(TrackerList* parent, std::string  url, int flags = 0);
 
   virtual void        send_state(int state) = 0;
   virtual void        send_scrape();
@@ -126,35 +126,35 @@ protected:
   int                 m_flags;
 
   TrackerList*        m_parent;
-  uint32_t            m_group;
+  uint32_t            m_group{0};
 
   std::string         m_url;
   std::string         m_tracker_id;
 
-  uint32_t            m_normal_interval;
-  uint32_t            m_min_interval;
+  uint32_t            m_normal_interval{0};
+  uint32_t            m_min_interval{0};
 
-  int                 m_latest_event;
-  uint32_t            m_latest_new_peers;
-  uint32_t            m_latest_sum_peers;
+  int                 m_latest_event{EVENT_NONE};
+  uint32_t            m_latest_new_peers{0};
+  uint32_t            m_latest_sum_peers{0};
 
-  uint32_t            m_success_time_last;
-  uint32_t            m_success_counter;
+  uint32_t            m_success_time_last{0};
+  uint32_t            m_success_counter{0};
 
-  uint32_t            m_failed_time_last;
-  uint32_t            m_failed_counter;
+  uint32_t            m_failed_time_last{0};
+  uint32_t            m_failed_counter{0};
 
-  uint32_t            m_scrape_time_last;
-  uint32_t            m_scrape_counter;
+  uint32_t            m_scrape_time_last{0};
+  uint32_t            m_scrape_counter{0};
 
-  uint32_t            m_scrape_complete;
-  uint32_t            m_scrape_incomplete;
-  uint32_t            m_scrape_downloaded;
+  uint32_t            m_scrape_complete{0};
+  uint32_t            m_scrape_incomplete{0};
+  uint32_t            m_scrape_downloaded{0};
 
   // Timing of the last request, and a counter for how many requests
   // there's been in the recent past.
   uint32_t            m_request_time_last;
-  uint32_t            m_request_counter;
+  uint32_t            m_request_counter{0};
 };
 
 inline bool

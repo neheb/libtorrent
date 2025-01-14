@@ -38,6 +38,7 @@
 #define LIBTORRENT_TRACKER_CONTROLLER_H
 
 #include <functional>
+#include <memory>
 #include <string>
 
 #include <torrent/common.h>
@@ -80,6 +81,8 @@ public:
 
   TrackerController(TrackerList* trackers);
   ~TrackerController();
+  TrackerController(const TrackerController&) = delete;
+  TrackerController& operator=(const TrackerController&) = delete;
 
   int                 flags() const               { return m_flags; }
 
@@ -139,9 +142,6 @@ private:
 
   inline int          current_send_state() const;
 
-  TrackerController();
-  void operator = (const TrackerController&);
-
   int                 m_flags;
   TrackerList*        m_tracker_list;
 
@@ -153,7 +153,7 @@ private:
   slot_tracker        m_slot_tracker_disabled;
 
   // Refactor this out.
-  tracker_controller_private* m_private;
+  std::unique_ptr<tracker_controller_private> m_private;
 };
 
 uint32_t tracker_next_timeout(Tracker* tracker, int controller_flags);

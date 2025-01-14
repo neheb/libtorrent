@@ -64,6 +64,8 @@ public:
 
   PeerInfo(const sockaddr* address);
   ~PeerInfo();
+  PeerInfo(const PeerInfo&) = delete;
+  PeerInfo& operator=(const PeerInfo&) = delete;
 
   bool                is_connected() const                  { return m_flags & flag_connected; }
   bool                is_incoming() const                   { return m_flags & flag_incoming; }
@@ -123,11 +125,8 @@ protected:
   void                set_connection(PeerConnectionBase* c) { m_connection = c; }
 
 private:
-  PeerInfo(const PeerInfo&);
-  void operator = (const PeerInfo&);
-
   // Replace id with a char buffer, or a cheap struct?
-  int                 m_flags;
+  int                 m_flags{0};
   HashString          m_id;
   char                m_id_hex[40];
 
@@ -135,18 +134,18 @@ private:
 
   char                m_options[8];
 
-  uint32_t            m_failedCounter;
-  uint32_t            m_transferCounter;
-  uint32_t            m_lastConnection;
-  uint32_t            m_lastHandshake;
+  uint32_t            m_failedCounter{0};
+  uint32_t            m_transferCounter{0};
+  uint32_t            m_lastConnection{0};
+  uint32_t            m_lastHandshake{0};
 
-  uint16_t            m_listenPort;
+  uint16_t            m_listenPort{0};
 
   // Replace this with a union. Since the user never copies PeerInfo
   // it should be safe to not require sockaddr_in6 to be part of it.
   sockaddr*           m_address;
 
-  PeerConnectionBase* m_connection;
+  PeerConnectionBase* m_connection{};
 };
 
 inline void

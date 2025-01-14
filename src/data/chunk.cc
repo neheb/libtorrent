@@ -95,7 +95,7 @@ Chunk::at_position(uint32_t pos) {
   if (pos >= m_chunkSize)
     throw internal_error("Chunk::at_position(...) tried to get Chunk position out of range.");
 
-  auto itr = std::find_if(begin(), end(), [pos](const auto& chunk) { return chunk.is_contained(pos); });
+  auto itr = std::find(begin(), end(), pos);
   if (itr == end())
     throw internal_error("Chunk::at_position(...) might be mangled, at_position failed horribly");
 
@@ -169,13 +169,7 @@ Chunk::incore_length(uint32_t pos, uint32_t length) {
 
 bool
 Chunk::sync(int flags) {
-  bool success = true;
-
-  for (iterator itr = begin(), last = end(); itr != last; ++itr)
-    if (!itr->chunk().sync(0, itr->chunk().size(), flags))
-      success = false;
-
-  return success;
+  return std::all_of(begin(), end(), [flags](auto& c) { return c.chunk().sync(0, c.chunk().size(), flags); });
 }
 
 void
@@ -199,10 +193,10 @@ Chunk::preload(uint32_t position, uint32_t length, bool useAdvise) {
 
     } else {
       for (char* first = (char*)data.first, *last = (char*)data.first + data.second; first < last; first += 4096)
-        volatile char __UNUSED touchChunk = *(char*)data.first;
+        [[maybe_unused]] volatile char touchChunk = *(char*)data.first;
 
       // Make sure we touch the last page in the range.
-      volatile char __UNUSED touchChunk = *((char*)data.first + data.second - 1);
+      [[maybe_unused]] volatile char ouchChunk = *((char*)data.first + data.second - 1);
     }
 
   } while (itr.next());

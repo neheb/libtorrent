@@ -59,6 +59,8 @@ public:
 
   File();
   ~File();
+  File(const File&) = delete;
+  File& operator=(const File&) = delete;
 
   bool                is_created() const;
   bool                is_open() const                          { return m_fd != -1; }
@@ -134,29 +136,26 @@ protected:
   void                set_match_depth_next(uint32_t l)         { m_matchDepthNext = l; }
 
 private:
-  File(const File&);
-  void operator = (const File&);
-
   bool                resize_file();
 
-  int                 m_fd;
-  int                 m_protection;
-  int                 m_flags;
+  int                 m_fd{-1};
+  int                 m_protection{0};
+  int                 m_flags{0};
 
   Path                m_path;
   std::string         m_frozenPath;
 
-  uint64_t            m_offset;
-  uint64_t            m_size;
+  uint64_t            m_offset{0};
+  uint64_t            m_size{0};
   uint64_t            m_lastTouched;
 
   range_type          m_range;
 
-  uint32_t            m_completed;
-  priority_t          m_priority;
+  uint32_t            m_completed{0};
+  priority_t          m_priority{PRIORITY_NORMAL};
 
-  uint32_t            m_matchDepthPrev;
-  uint32_t            m_matchDepthNext;
+  uint32_t            m_matchDepthPrev{0};
+  uint32_t            m_matchDepthNext{0};
 };
 
 inline bool

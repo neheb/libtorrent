@@ -88,6 +88,9 @@ public:
   using base_type::operator[];
 
   TrackerList();
+  ~TrackerList() = default;
+  TrackerList(const TrackerList&) = delete;
+  TrackerList& operator=(const TrackerList&) = delete;
 
   bool                has_active() const;
   bool                has_active_not_scrape() const;
@@ -165,14 +168,11 @@ protected:
   void                set_state(int s)                        { m_state = s; }
 
 private:
-  TrackerList(const TrackerList&) LIBTORRENT_NO_EXPORT;
-  void operator = (const TrackerList&) LIBTORRENT_NO_EXPORT;
-
   DownloadInfo*       m_info;
   int                 m_state;
 
-  uint32_t            m_key;
-  int32_t             m_numwant;
+  uint32_t                      m_key{0};
+  int32_t                       m_numwant{-1};
 
   slot_address_list   m_slot_success;
   slot_string         m_slot_failed;

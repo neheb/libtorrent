@@ -44,11 +44,8 @@ verify_file_list(const FileList* fl) {
 }
 
 FileList::FileList() :
-  m_isOpen(false),
 
-  m_torrentSize(0),
-  m_chunkSize(0),
-  m_maxFileSize(~uint64_t()) {
+    m_maxFileSize(~uint64_t()) {
 }
 
 FileList::~FileList() {
@@ -160,10 +157,10 @@ uint64_t
 FileList::free_diskspace() const {
   uint64_t freeDiskspace = std::numeric_limits<uint64_t>::max();
 
-  for (path_list::const_iterator itr = m_indirectLinks.begin(), last = m_indirectLinks.end(); itr != last; ++itr) {
+  for (const auto& m_indirectLink : m_indirectLinks) {
     rak::fs_stat stat;
 
-    if (!stat.update(*itr))
+    if (!stat.update(m_indirectLink))
       continue;
 
     freeDiskspace = std::min<uint64_t>(freeDiskspace, stat.bytes_avail());
@@ -295,9 +292,7 @@ FileList::make_all_paths() {
   Path dummyPath;
   const Path* lastPath = &dummyPath;
 
-  for (iterator itr = begin(), last = end(); itr != last; ++itr) {
-    File* entry = *itr;
-
+  for (auto& entry : *this) {
     // No need to create directories if the entry has already been
     // opened.
     if (entry->is_open())
@@ -427,9 +422,9 @@ FileList::open(int flags) {
     }
 
   } catch (local_error& e) {
-    for (iterator itr2 = begin(), last = end(); itr2 != last; ++itr2) {
-      (*itr2)->unset_flags_protected(File::flag_active);
-      manager->file_manager()->close(*itr2);
+    for (auto& itr2 : *this) {
+      itr2->unset_flags_protected(File::flag_active);
+      manager->file_manager()->close(itr2);
     }
 
     if (itr == end()) {
@@ -469,9 +464,9 @@ FileList::close() {
 
   LT_LOG_FL(INFO, "Closing.", 0);
 
-  for (iterator itr = begin(), last = end(); itr != last; ++itr) {
-    (*itr)->unset_flags_protected(File::flag_active);
-    manager->file_manager()->close(*itr);
+  for (auto file : *this) {
+    file->unset_flags_protected(File::flag_active);
+    manager->file_manager()->close(file);
   }
 
   m_isOpen = false;
@@ -565,7 +560,7 @@ FileList::create_chunk(uint64_t offset, uint32_t length, int prot) {
   if (offset + length > m_torrentSize)
     throw internal_error("Tried to access chunk out of range in FileList", data()->hash());
 
-  std::unique_ptr<Chunk> chunk(new Chunk);
+  auto chunk = std::make_unique<Chunk>();
 
   auto itr = std::find_if(begin(), end(), [offset](File* file) { return file->is_valid_position(offset); });
 
@@ -660,14 +655,14 @@ FileList::update_completed() {
   m_data.update_wanted_chunks();
 
   if (bitfield()->is_all_set()) {
-    for (iterator itr = begin(), last = end(); itr != last; ++itr)
-      (*itr)->set_completed_protected((*itr)->size_chunks());
+    for (auto file : *this)
+      file->set_completed_protected(file->size_chunks());
 
   } else {
     // Clear any old progress data from the entries as we don't clear
     // this on close, etc.
-    for (iterator itr = begin(), last = end(); itr != last; ++itr)
-      (*itr)->set_completed_protected(0);
+    for (auto file : *this)
+      file->set_completed_protected(0);
 
     if (bitfield()->is_all_unset())
       return;

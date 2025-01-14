@@ -47,9 +47,8 @@ static void* dh_get_pub_key(const DiffieHellman::dh_ptr& dh) { return nullptr; }
 #endif
 
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-DiffieHellman::DiffieHellman(const unsigned char *prime, int primeLength,
-                             const unsigned char *generator, int generatorLength) :
-  m_dh(dh_new()), m_size(0) {
+DiffieHellman::DiffieHellman(const unsigned char* prime, int primeLength, const unsigned char* generator, int generatorLength) :
+    m_dh(dh_new()) {
 
 #ifdef USE_OPENSSL
   BIGNUM* dh_p = BN_bin2bn(prime, primeLength, nullptr);

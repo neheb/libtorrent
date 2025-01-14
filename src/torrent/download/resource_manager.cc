@@ -24,14 +24,6 @@ namespace torrent {
 const Rate* resource_manager_entry::up_rate() const { return m_download->info()->up_rate(); }
 const Rate* resource_manager_entry::down_rate() const { return m_download->info()->down_rate(); }
 
-ResourceManager::ResourceManager() :
-  m_currentlyUploadUnchoked(0),
-  m_currentlyDownloadUnchoked(0),
-  m_maxUploadUnchoked(0),
-  m_maxDownloadUnchoked(0)
-{
-}
-
 ResourceManager::~ResourceManager() {
   if (m_currentlyUploadUnchoked != 0)
     throw internal_error("ResourceManager::~ResourceManager() called but m_currentlyUploadUnchoked != 0.");
@@ -140,8 +132,8 @@ ResourceManager::push_group(const std::string& name) {
   choke_base_type::back()->down_queue()->set_slot_unchoke(std::bind(&ResourceManager::receive_download_unchoke, this, std::placeholders::_1));
   choke_base_type::back()->up_queue()->set_slot_can_unchoke(std::bind(&ResourceManager::retrieve_upload_can_unchoke, this));
   choke_base_type::back()->down_queue()->set_slot_can_unchoke(std::bind(&ResourceManager::retrieve_download_can_unchoke, this));
-  choke_base_type::back()->up_queue()->set_slot_connection(std::bind(&PeerConnectionBase::receive_upload_choke, std::placeholders::_1, std::placeholders::_2));
-  choke_base_type::back()->down_queue()->set_slot_connection(std::bind(&PeerConnectionBase::receive_download_choke, std::placeholders::_1, std::placeholders::_2));
+  choke_base_type::back()->up_queue()->set_slot_connection(&PeerConnectionBase::receive_upload_choke);
+  choke_base_type::back()->down_queue()->set_slot_connection(&PeerConnectionBase::receive_download_choke);
 }
 
 ResourceManager::iterator
@@ -295,13 +287,9 @@ ResourceManager::receive_tick() {
   m_currentlyUploadUnchoked   += balance_unchoked(choke_base_type::size(), m_maxUploadUnchoked, true);
   m_currentlyDownloadUnchoked += balance_unchoked(choke_base_type::size(), m_maxDownloadUnchoked, false);
 
-  unsigned int up_unchoked = std::accumulate(choke_base_type::begin(), choke_base_type::end(), 0,
-                                             std::bind(std::plus<unsigned int>(), std::placeholders::_1,
-                                                       std::bind(&choke_group::up_unchoked, std::placeholders::_2)));
+  auto up_unchoked = std::transform_reduce(choke_base_type::begin(), choke_base_type::end(), 0U, std::plus<>(), std::mem_fn(&choke_group::up_unchoked));
 
-  unsigned int down_unchoked = std::accumulate(choke_base_type::begin(), choke_base_type::end(), 0,
-                                               std::bind(std::plus<unsigned int>(), std::placeholders::_1,
-                                                         std::bind(&choke_group::down_unchoked, std::placeholders::_2)));
+  auto down_unchoked = std::transform_reduce(choke_base_type::begin(), choke_base_type::end(), 0U, std::plus<>(), std::mem_fn(&choke_group::down_unchoked));
 
   if (m_currentlyUploadUnchoked != up_unchoked)
     throw torrent::internal_error("m_currentlyUploadUnchoked != choke_base_type::back()->up_queue()->size_unchoked()");
@@ -313,7 +301,7 @@ ResourceManager::receive_tick() {
 unsigned int
 ResourceManager::total_weight() const {
   // TODO: This doesn't take into account inactive downloads.
-  return std::accumulate(begin(), end(), (unsigned int)0, [](unsigned int i, auto r){ return i + r.priority(); });
+  return std::transform_reduce(begin(), end(), 0U, std::plus<>(), std::mem_fn(&resource_manager_entry::priority));
 }
 
 int
@@ -343,33 +331,26 @@ ResourceManager::balance_unchoked(unsigned int weight, unsigned int max_unchoked
   // that won't work as they need to choke peers once their priority
   // is turned off.
 
-  choke_group* choke_groups[group_size()];
-  std::copy(choke_base_type::begin(), choke_base_type::end(), choke_groups);
+  auto choke_groups = std::vector<choke_group*>(group_size());
+  std::copy(choke_base_type::begin(), choke_base_type::end(), std::back_inserter(choke_groups));
 
   // Start with the group requesting fewest slots (relative to weight)
   // so that we only need to iterate through the list once allocating
   // slots. There will be no slots left unallocated unless all groups
   // have reached max slots allowed.
 
-  choke_group** group_first = choke_groups;
-  choke_group** group_last = choke_groups + group_size();
-
   if (is_up) {
-    std::sort(group_first, group_last, std::bind(std::less<uint32_t>(),
-                                                 std::bind(&choke_group::up_requested, std::placeholders::_1),
-                                                 std::bind(&choke_group::up_requested, std::placeholders::_2)));
+    std::sort(choke_groups.begin(), choke_groups.end(), [](auto lhs, auto rhs) { return lhs->up_requested() < rhs->up_requested(); });
 
     LT_LOG_THIS("balancing upload unchoked slots; current_unchoked:%u change:%i max_unchoked:%u", m_currentlyUploadUnchoked, change, max_unchoked);
   } else {
-    std::sort(group_first, group_last, std::bind(std::less<uint32_t>(),
-                                                 std::bind(&choke_group::down_requested, std::placeholders::_1),
-                                                 std::bind(&choke_group::down_requested, std::placeholders::_2)));
+    std::sort(choke_groups.begin(), choke_groups.end(), [](auto lhs, auto rhs) { return lhs->down_requested() < rhs->down_requested(); });
 
     LT_LOG_THIS("balancing download unchoked slots; current_unchoked:%u change:%i max_unchoked:%u", m_currentlyDownloadUnchoked, change, max_unchoked);
   }
 
-  while (group_first != group_last) {
-    choke_queue* cm = is_up ? (*group_first)->up_queue() : (*group_first)->down_queue();
+  for (const auto& group : choke_groups) {
+    choke_queue* cm = is_up ? group->up_queue() : group->down_queue();
 
     // change += cm->cycle(weight != 0 ? (quota * itr->priority()) / weight : 0);
     change += cm->cycle(weight != 0 ? quota / weight : 0);
@@ -377,7 +358,6 @@ ResourceManager::balance_unchoked(unsigned int weight, unsigned int max_unchoked
     quota -= cm->size_unchoked();
     // weight -= itr->priority();
     weight--;
-    group_first++;
   }
 
   if (weight != 0)

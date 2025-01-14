@@ -301,7 +301,6 @@ PollEPoll::remove_error(Event* event) {
 #else // USE_EPOLL
 
 PollEPoll* PollEPoll::create(int maxOpenSockets) { return NULL; }
-PollEPoll::~PollEPoll() {}
 
 int PollEPoll::poll(int msec) { throw internal_error("An PollEPoll function was called, but it is disabled."); }
 unsigned int PollEPoll::perform() { throw internal_error("An PollEPoll function was called, but it is disabled."); }

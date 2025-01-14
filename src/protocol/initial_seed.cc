@@ -52,10 +52,10 @@ PeerInfo* const InitialSeeding::chunk_unknown = (PeerInfo*) 1;
 PeerInfo* const InitialSeeding::chunk_done    = (PeerInfo*) 2;
 
 InitialSeeding::InitialSeeding(DownloadMain* download) :
-  m_nextChunk(0),
-  m_chunksLeft(download->file_list()->size_chunks()),
-  m_download(download),
-  m_peerChunks(new PeerInfo*[m_chunksLeft]) {
+
+    m_chunksLeft(download->file_list()->size_chunks()),
+    m_download(download),
+    m_peerChunks(new PeerInfo*[m_chunksLeft]) {
 
   memset(m_peerChunks, 0, m_chunksLeft * sizeof(m_peerChunks[0]));
 }
@@ -283,8 +283,8 @@ InitialSeeding::complete(PeerConnectionBase* pcb) {
 
 void
 InitialSeeding::unblock_all() {
-  for (PeerList::const_iterator itr = m_download->peer_list()->begin(); itr != m_download->peer_list()->end(); ++itr)
-    itr->second->unset_flags(PeerInfo::flag_blocked);
+  for (const auto& peer : *m_download->peer_list())
+    peer.second->unset_flags(PeerInfo::flag_blocked);
 }
 
 }

@@ -15,6 +15,7 @@
 #include <fstream>
 #include <functional>
 #include <memory>
+#include <mutex>
 
 #define GROUPFMT (group >= LOG_NON_CASCADING) ? ("%" PRIi32 " ") : ("%" PRIi32 " %c ")
 
@@ -36,6 +37,8 @@ struct log_cache_entry {
 struct log_gz_output {
   log_gz_output(const char* filename, bool append) { gz_file = gzopen(filename, append ? "a" : "w"); }
   ~log_gz_output() { if (gz_file != NULL) gzclose(gz_file); }
+  log_gz_output(const log_gz_output&) = delete;
+  log_gz_output& operator=(const log_gz_output&) = delete;
 
   bool is_valid() { return gz_file != Z_NULL; }
 
@@ -53,8 +56,7 @@ log_output_list log_outputs;
 log_child_list  log_children;
 log_cache_list  log_cache;
 log_group_list  log_groups;
-
-pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
+std::mutex      log_mutex;
 
 const char log_level_char[] = { 'C', 'E', 'W', 'N', 'I', 'D' };
 
@@ -97,11 +99,11 @@ log_rebuild_cache() {
   std::for_each(log_cache.begin(), log_cache.end(), std::mem_fn(&log_cache_entry::clear));
   log_cache.clear();
 
-  for (int idx = 0, last = log_groups.size(); idx != last; idx++) {
-    const log_group::outputs_type& use_outputs = log_groups[idx].cached_outputs();
+  for (auto& idx : log_groups) {
+    const log_group::outputs_type& use_outputs = idx.cached_outputs();
 
     if (use_outputs == 0) {
-      log_groups[idx].set_cached(NULL, NULL);
+      idx.set_cached(NULL, NULL);
       continue;
     }
 
@@ -122,7 +124,7 @@ log_rebuild_cache() {
       }
     }
 
-    log_groups[idx].set_cached(cache_itr->cache_first, cache_itr->cache_last);
+    idx.set_cached(cache_itr->cache_first, cache_itr->cache_last);
   }
 }
 
@@ -150,7 +152,7 @@ log_group::internal_print(const HashString* hash, const char* subsystem, const v
   if (count <= 0)
     return;
 
-  pthread_mutex_lock(&log_mutex);
+  auto lock = std::scoped_lock(log_mutex);
 
   std::for_each(m_first, m_last, std::bind(&log_slot::operator(),
                                            std::placeholders::_1,
@@ -164,8 +166,6 @@ log_group::internal_print(const HashString* hash, const char* subsystem, const v
                                              dump_size,
                                              -1));
   }
-
-  pthread_mutex_unlock(&log_mutex);
 }
 
 #define LOG_CASCADE(parent) LOG_CHILDREN_CASCADE(parent, parent)
@@ -188,7 +188,7 @@ log_group::internal_print(const HashString* hash, const char* subsystem, const v
 
 void
 log_initialize() {
-  pthread_mutex_lock(&log_mutex);
+  auto lock = std::scoped_lock(log_mutex);
 
   LOG_CASCADE(LOG_CRITICAL);
 
@@ -220,12 +220,11 @@ log_initialize() {
   std::sort(log_children.begin(), log_children.end());
 
   log_rebuild_cache();
-  pthread_mutex_unlock(&log_mutex);
 }
 
 void
 log_cleanup() {
-  pthread_mutex_lock(&log_mutex);
+  auto lock = std::scoped_lock(log_mutex);
 
   std::fill(log_groups.begin(), log_groups.end(), log_group());
 
@@ -234,8 +233,6 @@ log_cleanup() {
 
   std::for_each(log_cache.begin(), log_cache.end(), std::mem_fn(&log_cache_entry::clear));
   log_cache.clear();
-
-  pthread_mutex_unlock(&log_mutex);
 }
 
 log_output_list::iterator
@@ -250,14 +247,13 @@ log_find_output_name(const char* name) {
 }
 
 void
-log_open_output(const char* name, log_slot slot) {
-  pthread_mutex_lock(&log_mutex);
+log_open_output(const char* name, const log_slot& slot) {
+  auto lock = std::scoped_lock(log_mutex);
 
   if (log_outputs.size() >= log_group::max_size_outputs()) {
-    pthread_mutex_unlock(&log_mutex);
     throw input_error("Cannot open more than 64 log output handlers.");
   }
-  
+
   log_output_list::iterator itr = log_find_output_name(name);
 
   if (itr == log_outputs.end()) {
@@ -269,43 +265,35 @@ log_open_output(const char* name, log_slot slot) {
   }
 
   log_rebuild_cache();
-
-  pthread_mutex_unlock(&log_mutex);
 }
 
 void
 log_close_output(const char* name) {
-  pthread_mutex_lock(&log_mutex);
+  auto lock = std::scoped_lock(log_mutex);
 
   log_output_list::iterator itr = log_find_output_name(name);
 
   if (itr != log_outputs.end())
     log_outputs.erase(itr);
-
-  pthread_mutex_unlock(&log_mutex);
 }
 
 void
 log_add_group_output(int group, const char* name) {
-  pthread_mutex_lock(&log_mutex);
+  auto lock = std::scoped_lock(log_mutex);
 
   log_output_list::iterator itr = log_find_output_name(name);
   size_t index = std::distance(log_outputs.begin(), itr);
 
   if (itr == log_outputs.end()) {
-    pthread_mutex_unlock(&log_mutex);
     throw input_error("Log name not found.");
   }
 
   if (index >= log_group::max_size_outputs()) {
-    pthread_mutex_unlock(&log_mutex);
     throw input_error("Cannot add more log group outputs.");
   }
 
   log_groups[group].set_output_at(index, true);
   log_rebuild_cache();
-
-  pthread_mutex_unlock(&log_mutex);
 }
 
 void
@@ -316,7 +304,8 @@ log_remove_group_output(int group, const char* name) {
 // cache by crawling from child to parent.
 void
 log_add_child(int group, int child) {
-  pthread_mutex_lock(&log_mutex);
+  auto lock = std::scoped_lock(log_mutex);
+
   if (std::find(log_children.begin(), log_children.end(), std::make_pair(group, child)) != log_children.end())
     return;
 
@@ -324,7 +313,6 @@ log_add_child(int group, int child) {
   std::sort(log_children.begin(), log_children.end());
 
   log_rebuild_cache();
-  pthread_mutex_unlock(&log_mutex);
 }
 
 void
@@ -333,7 +321,7 @@ log_remove_child(int group, int child) {
 }
 
 void
-log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
+log_file_write(const std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
   // Add group name, data, etc as flags.
 
   // Normal groups are nul-terminated strings.
@@ -352,7 +340,7 @@ log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t
 }
 
 void
-log_gz_file_write(std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
+log_gz_file_write(const std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
   char buffer[64];
 
   // Normal groups are nul-terminated strings.

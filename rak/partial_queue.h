@@ -61,6 +61,8 @@ public:
 
   partial_queue() : m_data(NULL), m_maxLayerSize(0) {}
   ~partial_queue() { disable(); }
+  partial_queue(const partial_queue&) = delete;
+  partial_queue& operator=(const partial_queue&) = delete;
 
   bool                is_full() const                         { return m_ceiling == 0; }
   bool                is_layer_full(size_type l) const        { return m_layers[l].second >= m_maxLayerSize; }
@@ -95,9 +97,6 @@ public:
   mapped_type         pop();
 
 private:
-  partial_queue(const partial_queue&);
-  void operator = (const partial_queue&);
-
   static size_type    ceiling(size_type layer)                { return (2 << layer) - 1; }
 
   void                find_non_empty();

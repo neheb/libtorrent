@@ -58,31 +58,26 @@
 namespace torrent {
 
 TrackerList::TrackerList() :
-  m_info(NULL),
-  m_state(DownloadInfo::STOPPED),
-
-  m_key(0),
-  m_numwant(-1) {
-}
+    m_state(DownloadInfo::STOPPED) {}
 
 bool
 TrackerList::has_active() const {
-  return std::find_if(begin(), end(), std::mem_fn(&Tracker::is_busy)) != end();
+  return std::any_of(begin(), end(), std::mem_fn(&Tracker::is_busy));
 }
 
 bool
 TrackerList::has_active_not_scrape() const {
-  return std::find_if(begin(), end(), std::mem_fn(&Tracker::is_busy_not_scrape)) != end();
+  return std::any_of(begin(), end(), std::mem_fn(&Tracker::is_busy_not_scrape));
 }
 
 bool
 TrackerList::has_active_in_group(uint32_t group) const {
-  return std::find_if(begin_group(group), end_group(group), std::mem_fn(&Tracker::is_busy)) != end_group(group);
+  return std::any_of(begin_group(group), end_group(group), std::mem_fn(&Tracker::is_busy));
 }
 
 bool
 TrackerList::has_active_not_scrape_in_group(uint32_t group) const {
-  return std::find_if(begin_group(group), end_group(group), std::mem_fn(&Tracker::is_busy_not_scrape)) != end_group(group);
+  return std::any_of(begin_group(group), end_group(group), std::mem_fn(&Tracker::is_busy_not_scrape));
 }
 
 bool
@@ -102,19 +97,19 @@ TrackerList::count_usable() const {
 
 void
 TrackerList::close_all_excluding(int event_bitmap) {
-  for (iterator itr = begin(); itr != end(); itr++) {
-    if ((event_bitmap & (1 << (*itr)->latest_event())))
+  for (auto tracker : *this) {
+    if ((event_bitmap & (1 << tracker->latest_event())))
       continue;
 
-    (*itr)->close();
+    tracker->close();
   }
 }
 
 void
 TrackerList::disown_all_including(int event_bitmap) {
-  for (iterator itr = begin(); itr != end(); itr++) {
-    if ((event_bitmap & (1 << (*itr)->latest_event())))
-      (*itr)->disown();
+  for (auto& tracker : *this) {
+    if ((event_bitmap & (1 << tracker->latest_event())))
+      tracker->disown();
   }
 }
 

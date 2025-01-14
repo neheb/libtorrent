@@ -45,6 +45,8 @@ class InitialSeeding {
 public:
   InitialSeeding(DownloadMain* download);
   ~InitialSeeding();
+  InitialSeeding(const InitialSeeding&) = delete;
+  InitialSeeding& operator=(const InitialSeeding&) = delete;
 
   static const uint32_t no_offer = ~uint32_t();
 
@@ -74,7 +76,7 @@ private:
   void                complete(PeerConnectionBase* pcb);
   void                unblock_all();
 
-  uint32_t            m_nextChunk;
+  uint32_t               m_nextChunk{0};
   uint32_t            m_chunksLeft;
   DownloadMain*       m_download;
   PeerInfo**          m_peerChunks;

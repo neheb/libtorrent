@@ -45,17 +45,10 @@
 
 namespace torrent {
 
-DhtSearch::DhtSearch(const HashString& target, const DhtBucket& contacts)
-  : base_type(dht_compare_closer(target)),
-    m_pending(0),
-    m_contacted(0),
-    m_replied(0),
-    m_concurrency(3),
-    m_restart(false),
-    m_started(false),
+DhtSearch::DhtSearch(const HashString& target, const DhtBucket& contacts) :
+    base_type(dht_compare_closer(target)),
     m_next(end()),
     m_target(target) {
-
   add_contacts(contacts);
 }
 

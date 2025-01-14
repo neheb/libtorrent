@@ -63,6 +63,10 @@ public:
 
   Block();
   ~Block();
+  Block(const Block&) = delete;
+  Block& operator=(const Block&) = delete;
+  Block(Block&&) = default;
+  Block& operator=(Block&&) = delete;
 
   bool                      is_stalled() const                           { return m_notStalled == 0; }
   bool                      is_finished() const                          { return m_leader != NULL && m_leader->is_finished(); }
@@ -126,11 +130,6 @@ public:
   // block == NULL.
   static void               release(BlockTransfer* transfer);
 
-  // Only allow move constructions
-  Block(const Block&) = delete;
-  void operator = (const Block&) = delete;
-  Block(Block&&) = default;
-
 private:
 
   void                      invalidate_transfer(BlockTransfer* transfer) LIBTORRENT_NO_EXPORT;
@@ -140,24 +139,19 @@ private:
 
   BlockList*                m_parent;
   Piece                     m_piece;
-  
-  state_type                m_state;
-  uint32_t                  m_notStalled;
+
+  state_type                m_state{STATE_INCOMPLETE};
+  uint32_t                  m_notStalled{0};
 
   transfer_list_type        m_queued;
   transfer_list_type        m_transfers;
 
-  BlockTransfer*            m_leader;
+  BlockTransfer*            m_leader{};
 
-  BlockFailed*              m_failedList;
+  BlockFailed*              m_failedList{};
 };
 
-inline
-Block::Block() :
-  m_state(STATE_INCOMPLETE),
-  m_notStalled(0),
-  m_leader(NULL),
-  m_failedList(NULL) { }
+inline Block::Block() = default;
 
 inline BlockTransfer*
 Block::find(const PeerInfo* p) {

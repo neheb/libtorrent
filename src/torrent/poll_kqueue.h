@@ -53,7 +53,7 @@ public:
   static const uint32_t flag_error = (1 << 2);
 
   static PollKQueue*   create(int maxOpenSockets);
-  virtual ~PollKQueue();
+  virtual ~PollKQueue() = default;
 
   int                 poll(int msec);
   unsigned int        perform();

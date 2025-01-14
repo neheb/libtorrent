@@ -87,8 +87,6 @@ LIBS="$PTHREAD_LIBS $ZLIB_LIBS $LIBS"
 TORRENT_ARG_OPENSSL
 TORRENT_ARG_CYRUS_RC4
 
-AC_CHECK_FUNCS(posix_memalign)
-
 TORRENT_CHECK_MADVISE
 TORRENT_CHECK_CACHELINE
 TORRENT_CHECK_POPCOUNT
@@ -104,11 +102,6 @@ LIBTORRENT_CFLAGS=""
 AC_SUBST(LIBTORRENT_CFLAGS)
 
 AC_DEFINE(HAVE_CONFIG_H, 1, true if config.h was included)
-
-CC_ATTRIBUTE_UNUSED(
-  AC_DEFINE([__UNUSED], [__attribute__((unused))], [Wrapper around unused attribute]),
-  AC_DEFINE([__UNUSED], [], [Null-wrapper if unused attribute is unsupported])
-)
 
 AC_CONFIG_FILES([
 	libtorrent.pc

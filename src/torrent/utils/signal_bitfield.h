@@ -18,9 +18,10 @@ public:
 
   static const unsigned int max_size = 32;
 
-  signal_bitfield() : m_thread_id(std::this_thread::get_id()), m_size(0), m_bitfield(0) {}
+  signal_bitfield() :
+      m_thread_id(std::this_thread::get_id()), m_bitfield(0) {}
 
-  unsigned int  add_signal(slot_type slot);
+  unsigned int  add_signal(const slot_type& slot);
   bool          has_signal(unsigned int index) const { return m_bitfield & (1 << index); }
 
   void          signal(unsigned int index) { m_bitfield |= 1 << index; }
@@ -30,7 +31,7 @@ public:
 
 private:
   std::thread::id m_thread_id;
-  unsigned int    m_size;
+  unsigned int               m_size{0};
   slot_type       m_slots[max_size];
 
   std::atomic<bitfield_type> m_bitfield;

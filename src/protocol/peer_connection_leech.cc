@@ -64,14 +64,6 @@
 namespace torrent {
 
 template<Download::ConnectionType type>
-PeerConnection<type>::~PeerConnection() {
-//   if (m_download != NULL && m_down->get_state() != ProtocolRead::READ_BITFIELD)
-//     m_download->bitfield_counter().dec(m_peerChunks.bitfield()->bitfield());
-
-//   priority_queue_erase(&taskScheduler, &m_taskSendChoke);
-}
-
-template<Download::ConnectionType type>
 void
 PeerConnection<type>::initialize_custom() {
   if (type == Download::CONNECTION_INITIAL_SEED) {

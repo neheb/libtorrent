@@ -30,8 +30,10 @@ public:
   using base_type::front;
   using base_type::back;
 
-  Chunk() : m_chunkSize(0), m_prot(~0) {}
+  Chunk() = default;
   ~Chunk() { clear(); }
+  Chunk(const Chunk&) = delete;
+  Chunk& operator=(const Chunk&) = delete;
 
   bool                is_all_valid() const;
 
@@ -68,11 +70,8 @@ public:
   bool                compare_buffer(const void* buffer, uint32_t position, uint32_t length);
 
 private:
-  Chunk(const Chunk&);
-  void operator = (const Chunk&);
-
-  uint32_t            m_chunkSize;
-  int                 m_prot;
+  uint32_t m_chunkSize{0};
+  int      m_prot{~0};
 };
 
 inline Chunk::iterator
@@ -85,7 +84,7 @@ Chunk::at_position(uint32_t pos, iterator itr) {
 
 inline Chunk::iterator
 Chunk::find_address(void* ptr) {
-  return std::find_if(begin(), end(), [&](auto& part) { return part.has_address(ptr); });
+  return std::find(begin(), end(), ptr);
 }
 
 }

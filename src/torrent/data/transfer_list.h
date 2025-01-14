@@ -65,8 +65,10 @@ public:
   using base_type::rbegin;
   using base_type::rend;
 
-  TransferList();
+  TransferList() = default;
   ~TransferList();
+  TransferList(const TransferList&) = delete;
+  TransferList& operator=(const TransferList&) = delete;
 
   iterator            find(uint32_t index);
   const_iterator      find(uint32_t index) const;
@@ -99,9 +101,6 @@ public:
   slot_peer_info&     slot_corrupt()   { return m_slot_corrupt; }
 
 private:
-  TransferList(const TransferList&);
-  void operator = (const TransferList&);
-
   unsigned int        update_failed(BlockList* blockList, Chunk* chunk);
   void                mark_failed_peers(BlockList* blockList, Chunk* chunk);
 
@@ -114,8 +113,8 @@ private:
 
   completed_list_type m_completedList;
 
-  uint32_t            m_succeededCount;
-  uint32_t            m_failedCount;
+  uint32_t            m_succeededCount{0};
+  uint32_t            m_failedCount{0};
 };
 
 }

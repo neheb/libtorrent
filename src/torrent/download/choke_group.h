@@ -97,13 +97,13 @@ public:
 
 private:
   std::string             m_name;
-  tracker_mode_enum       m_tracker_mode;
+  tracker_mode_enum       m_tracker_mode{TRACKER_MODE_NORMAL};
 
   choke_queue             m_up_queue;
   choke_queue             m_down_queue;
 
-  resource_manager_entry* m_first;
-  resource_manager_entry* m_last;
+  resource_manager_entry* m_first{nullptr};
+  resource_manager_entry* m_last{nullptr};
 };
 
 }

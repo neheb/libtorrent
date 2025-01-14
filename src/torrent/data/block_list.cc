@@ -46,14 +46,9 @@
 namespace torrent {
 
 BlockList::BlockList(const Piece& piece, uint32_t blockLength) :
-  m_piece(piece),
-  m_priority(PRIORITY_OFF),
-  m_finished(0),
+    m_piece(piece)
 
-  m_failed(0),
-  m_attempt(0),
-
-  m_bySeeder(false) {
+{
 
   if (piece.length() == 0)
     throw internal_error("BlockList::BlockList(...) received zero length piece.");
@@ -72,10 +67,6 @@ BlockList::BlockList(const Piece& piece, uint32_t blockLength) :
   
   base_type::back().set_parent(this);
   base_type::back().set_piece(Piece(m_piece.index(), offset, (m_piece.length() % blockLength) ? m_piece.length() % blockLength : blockLength));
-}
-
-BlockList::~BlockList() {
-  // The default dtor's handles cleaning up the blocks and block transfers.
 }
 
 void

@@ -41,6 +41,8 @@
 #include <rak/address_info.h>
 #include <rak/socket_address.h>
 
+#include <utility>
+
 #include "net/listen.h"
 
 #include "connection_manager.h"
@@ -52,7 +54,7 @@ namespace torrent {
 
 // Fix TrackerUdp, etc, if this is made async.
 static ConnectionManager::slot_resolver_result_type*
-resolve_host(const char* host, int family, int socktype, ConnectionManager::slot_resolver_result_type slot) {
+resolve_host(const char* host, int family, int socktype, const ConnectionManager::slot_resolver_result_type& slot) {
   if (manager->main_thread_main()->is_current())
     thread_base::release_global_lock();
 
@@ -79,21 +81,9 @@ resolve_host(const char* host, int family, int socktype, ConnectionManager::slot
 }
 
 ConnectionManager::ConnectionManager() :
-  m_size(0),
-  m_maxSize(0),
-
-  m_priority(iptos_throughput),
-  m_sendBufferSize(0),
-  m_receiveBufferSize(0),
-  m_encryptionOptions(encryption_none),
-
-  m_listen(new Listen),
-  m_listen_port(0),
-  m_listen_backlog(SOMAXCONN),
-
-  m_block_ipv4(false),
-  m_block_ipv6(false),
-  m_prefer_ipv6(false) {
+    m_priority(iptos_throughput),
+    m_encryptionOptions(encryption_none),
+    m_listen(std::make_unique<Listen>()) {
 
   m_bindAddress = (new rak::socket_address())->c_sockaddr();
   m_localAddress = (new rak::socket_address())->c_sockaddr();
@@ -111,8 +101,6 @@ ConnectionManager::ConnectionManager() :
 }
 
 ConnectionManager::~ConnectionManager() {
-  delete m_listen;
-
   delete m_bindAddress;
   delete m_localAddress;
   delete m_proxyAddress;

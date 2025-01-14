@@ -55,8 +55,10 @@ public:
 
   static const int flag_active       = (1 << 0);
 
-  ChunkList() : m_data(NULL), m_manager(NULL), m_flags(0), m_chunk_size(0) {}
+  ChunkList() = default;
   ~ChunkList() { clear(); }
+  ChunkList(const ChunkList&) = delete;
+  ChunkList& operator=(const ChunkList&) = delete;
 
   int                 flags() const                       { return m_flags; }
 
@@ -109,12 +111,12 @@ private:
 
   std::pair<int,bool> sync_options(ChunkListNode* node, int flags);
 
-  download_data*      m_data;
-  ChunkManager*       m_manager;
+  download_data*         m_data{};
+  ChunkManager*          m_manager{};
   Queue               m_queue;
 
-  int                 m_flags;
-  uint32_t            m_chunk_size;
+  int                    m_flags{0};
+  uint32_t               m_chunk_size{0};
 
   slot_string         m_slot_storage_error;
   slot_chunk_index    m_slot_create_chunk;

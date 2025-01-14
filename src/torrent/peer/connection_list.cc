@@ -30,7 +30,7 @@ const int ConnectionList::disconnect_unwanted;
 const int ConnectionList::disconnect_delayed;
 
 ConnectionList::ConnectionList(DownloadMain* download) :
-  m_download(download), m_minSize(50), m_maxSize(100) {
+    m_download(download) {
 }
 
 void
@@ -151,14 +151,14 @@ ConnectionList::erase_seeders() {
 
 void
 ConnectionList::disconnect_queued() {
-  for (queue_type::const_iterator itr = m_disconnectQueue.begin(), last = m_disconnectQueue.end(); itr != last; itr++) {
-    ConnectionList::iterator conn_itr = find(m_disconnectQueue.back().c_str());
+  for (const auto& queue : m_disconnectQueue) {
+    auto conn_itr = find(queue.c_str());
 
     if (conn_itr != end())
       erase(conn_itr, 0);
   }
 
-  m_disconnectQueue = queue_type();
+  m_disconnectQueue.clear();
 }
 
 struct connection_list_less {

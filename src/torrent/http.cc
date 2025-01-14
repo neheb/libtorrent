@@ -11,9 +11,6 @@ namespace torrent {
 
 Http::slot_http Http::m_factory;
 
-Http::~Http() {
-}
-
 void
 Http::trigger_done() {
   if (signal_done().empty())

@@ -183,17 +183,17 @@ private:
   mutable Rate        m_downRate;
   mutable Rate        m_skipRate;
 
-  uint64_t            m_uploadedBaseline;
-  uint64_t            m_completedBaseline;
-  uint32_t            m_sizePex;
-  uint32_t            m_maxSizePex;
-  size_t              m_metadataSize;
+  uint64_t                    m_uploadedBaseline{0};
+  uint64_t                    m_completedBaseline{0};
+  uint32_t                    m_sizePex{0};
+  uint32_t                    m_maxSizePex{8};
+  size_t                      m_metadataSize{0};
 
-  uint32_t            m_creationDate;
+  uint32_t                    m_creationDate{0};
   uint32_t            m_loadDate;
 
-  uint32_t            m_upload_unchoked;
-  uint32_t            m_download_unchoked;
+  uint32_t                    m_upload_unchoked{0};
+  uint32_t                    m_download_unchoked{0};
 
   slot_stat_type      m_slotStatLeft;
   slot_stat_type      m_slotStatCompleted;
