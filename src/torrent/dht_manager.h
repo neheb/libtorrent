@@ -79,6 +79,8 @@ public:
 
   DhtManager() = default;
   ~DhtManager();
+  DhtManager(const DhtManager&) = delete;
+  DhtManager& operator=(const DhtManager&) = delete;
 
   void                initialize(const Object& dhtCache);
 

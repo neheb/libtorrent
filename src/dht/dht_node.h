@@ -60,6 +60,7 @@ public:
   DhtNode(const HashString& id, const rak::socket_address* sa);
   DhtNode(const std::string& id, const Object& cache);
 
+  ~DhtNode() = default;
   DhtNode(const DhtNode&) = delete;
   DhtNode& operator=(const DhtNode&) = delete;
 

@@ -27,6 +27,7 @@ public:
 
   SocketFile() : m_fd(invalid_fd) {}
   SocketFile(fd_type fd) : m_fd(fd) {}
+  ~SocketFile() = default;
   SocketFile(const SocketFile&) = delete;
   SocketFile& operator=(const SocketFile&) = delete;
 

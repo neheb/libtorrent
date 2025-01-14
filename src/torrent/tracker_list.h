@@ -88,6 +88,7 @@ public:
   using base_type::operator[];
 
   TrackerList();
+  ~TrackerList() = default;
   TrackerList(const TrackerList&) = delete;
   TrackerList& operator=(const TrackerList&) = delete;
 

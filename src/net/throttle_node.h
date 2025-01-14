@@ -56,6 +56,7 @@ public:
 
   ThrottleNode(uint32_t rateSpan) : m_rate(rateSpan)  { clear_quota(); }
 
+  ~ThrottleNode() = default;
   ThrottleNode(const ThrottleNode&) = delete;
   ThrottleNode& operator=(const ThrottleNode&) = delete;
 

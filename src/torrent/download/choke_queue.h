@@ -111,6 +111,8 @@ public:
 
        m_maxUnchoked(unlimited) {}
    ~choke_queue();
+   choke_queue(const choke_queue&) = delete;
+   choke_queue& operator=(const choke_queue&) = delete;
 
    bool     is_full() const { return !is_unlimited() && size_unchoked() >= m_maxUnchoked; }
    bool     is_unlimited() const { return m_maxUnchoked == unlimited; }

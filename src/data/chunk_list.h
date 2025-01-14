@@ -57,6 +57,8 @@ public:
 
   ChunkList() = default;
   ~ChunkList() { clear(); }
+  ChunkList(const ChunkList&) = delete;
+  ChunkList& operator=(const ChunkList&) = delete;
 
   int                 flags() const                       { return m_flags; }
 

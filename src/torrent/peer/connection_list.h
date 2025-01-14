@@ -96,6 +96,7 @@ public:
   static const int disconnect_unwanted  = (1 << 2);
   static const int disconnect_delayed   = (1 << 3);
 
+  ~ConnectionList() = default;
   ConnectionList(const ConnectionList&) = delete;
   ConnectionList& operator=(const ConnectionList&) = delete;
 

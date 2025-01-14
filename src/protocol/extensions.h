@@ -90,6 +90,8 @@ public:
 
   ProtocolExtension();
   ~ProtocolExtension() { delete [] m_read; }
+  ProtocolExtension(const ProtocolExtension&) = default;
+  ProtocolExtension& operator=(const ProtocolExtension&) = default;
 
   void                cleanup();
 

@@ -74,6 +74,8 @@ class MemoryChunk {
 
   MemoryChunk() { clear(); }
   ~MemoryChunk() { clear(); }
+  MemoryChunk(const MemoryChunk&) = default;
+  MemoryChunk& operator=(const MemoryChunk&) = default;
 
   // Doesn't allow ptr == NULL, use the default ctor instead.
   MemoryChunk(char* ptr, char* begin, char* end, int prot, int flags);
