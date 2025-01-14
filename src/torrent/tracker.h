@@ -45,6 +45,8 @@ public:
   static constexpr int max_normal_interval     = 8 * 3600;
 
   virtual ~Tracker() = default;
+  Tracker(const Tracker&) = delete;
+  Tracker& operator = (const Tracker&) = delete;
 
   int                 flags() const { return m_flags; }
 
@@ -105,8 +107,6 @@ public:
 
 protected:
   Tracker(TrackerList* parent, std::string  url, int flags = 0);
-  Tracker(const Tracker& t);
-  void operator = (const Tracker& t);
 
   virtual void        send_state(int state) = 0;
   virtual void        send_scrape();

@@ -32,6 +32,8 @@ public:
 
   Chunk() = default;
   ~Chunk() { clear(); }
+  Chunk(const Chunk&) = delete;
+  Chunk& operator=(const Chunk&) = delete;
 
   bool                is_all_valid() const;
 
@@ -68,9 +70,6 @@ public:
   bool                compare_buffer(const void* buffer, uint32_t position, uint32_t length);
 
 private:
-  Chunk(const Chunk&);
-  void operator = (const Chunk&);
-
   uint32_t m_chunkSize{0};
   int      m_prot{~0};
 };

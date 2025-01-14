@@ -39,6 +39,8 @@ public:
 
   DownloadMain();
   ~DownloadMain();
+  DownloadMain(const DownloadMain&) = delete;
+  DownloadMain& operator=(const DownloadMain&) = delete;
 
   void                open(int flags);
   void                close();
@@ -126,10 +128,6 @@ public:
   rak::priority_item& delay_disconnect_peers() { return m_delayDisconnectPeers; }
 
 private:
-  // Disable copy ctor and assignment.
-  DownloadMain(const DownloadMain&);
-  void operator = (const DownloadMain&);
-
   void                setup_start();
   void                setup_stop();
 

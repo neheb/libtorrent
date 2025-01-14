@@ -63,6 +63,8 @@ class LIBTORRENT_EXPORT Http {
 
   Http() = default;
   virtual ~Http();
+  Http(const Http&) = delete;
+  Http& operator=(const Http&) = delete;
 
   // Start must never throw on bad input. Calling start/stop on an
   // object in the wrong state should throw a torrent::internal_error.
@@ -107,9 +109,6 @@ protected:
   signal_string      m_signal_failed;
 
 private:
-  Http(const Http&);
-  void               operator = (const Http&);
-
   static slot_http   m_factory;
 };
 

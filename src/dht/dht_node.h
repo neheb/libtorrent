@@ -60,6 +60,9 @@ public:
   DhtNode(const HashString& id, const rak::socket_address* sa);
   DhtNode(const std::string& id, const Object& cache);
 
+  DhtNode(const DhtNode&) = delete;
+  DhtNode& operator=(const DhtNode&) = delete;
+
   const HashString&           id() const                 { return *this; }
   raw_string                  id_raw_string() const      { return raw_string(data(), size_data); }
   const rak::socket_address*  address() const            { return &m_socketAddress; }
@@ -94,8 +97,6 @@ public:
   Object*                     store_cache(Object* container) const;
 
 private:
-  DhtNode();
-
   void                        set_good();
   void                        set_bad();
 

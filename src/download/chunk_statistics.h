@@ -63,6 +63,8 @@ public:
 
   ChunkStatistics()  = default;
   ~ChunkStatistics() = default;
+  ChunkStatistics(const ChunkStatistics&) = delete;
+  ChunkStatistics& operator=(const ChunkStatistics&) = delete;
 
   size_type           complete() const              { return m_complete; }
   //size_type           incomplete() const;
@@ -102,9 +104,6 @@ public:
 
 private:
   inline bool         should_add(PeerChunks* pc);
-
-  ChunkStatistics(const ChunkStatistics&);
-  void operator = (const ChunkStatistics&);
 
   size_type m_complete{0};
   size_type m_accounted{0};

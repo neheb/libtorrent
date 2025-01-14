@@ -96,6 +96,9 @@ public:
   static const int disconnect_unwanted  = (1 << 2);
   static const int disconnect_delayed   = (1 << 3);
 
+  ConnectionList(const ConnectionList&) = delete;
+  ConnectionList& operator=(const ConnectionList&) = delete;
+
   ConnectionList(DownloadMain* download);
 
   // Make these protected?
@@ -142,9 +145,6 @@ protected:
   void                disconnect_queued() LIBTORRENT_NO_EXPORT;
 
 private:
-  ConnectionList(const ConnectionList&) LIBTORRENT_NO_EXPORT;
-  void operator = (const ConnectionList&) LIBTORRENT_NO_EXPORT;
-
   DownloadMain*       m_download;
 
   size_type           m_minSize{50};

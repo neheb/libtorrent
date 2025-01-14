@@ -52,6 +52,8 @@ public:
 
   Bitfield() = default;
   ~Bitfield()                                       { clear(); }
+  Bitfield(const Bitfield&) = delete;
+  Bitfield& operator=(const Bitfield&) = delete;
 
   bool                empty() const                 { return m_data == NULL; }
 
@@ -112,9 +114,6 @@ public:
   static value_type   mask_from(size_type idx)      { return (value_type)~0 >> idx; }
 
 private:
-  Bitfield(const Bitfield& bf);
-  Bitfield& operator = (const Bitfield& bf);
-
   size_type   m_size{0};
   size_type   m_set{0};
 

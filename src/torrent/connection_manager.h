@@ -108,6 +108,8 @@ public:
 
   ConnectionManager();
   ~ConnectionManager();
+  ConnectionManager(const ConnectionManager&) = delete;
+  ConnectionManager& operator=(const ConnectionManager&) = delete;
   
   // Check that we have not surpassed the max number of open sockets
   // and that we're allowed to connect to the socket address.
@@ -179,9 +181,6 @@ public:
   void                set_prefer_ipv6(bool v) { m_prefer_ipv6 = v; }
 
 private:
-  ConnectionManager(const ConnectionManager&);
-  void operator = (const ConnectionManager&);
-
   size_type           m_size{0};
   size_type           m_maxSize{0};
 

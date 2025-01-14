@@ -81,6 +81,8 @@ public:
 
   TrackerController(TrackerList* trackers);
   ~TrackerController();
+  TrackerController(const TrackerController&) = delete;
+  TrackerController& operator=(const TrackerController&) = delete;
 
   int                 flags() const               { return m_flags; }
 
@@ -139,9 +141,6 @@ private:
   void                update_timeout(uint32_t seconds_to_next);
 
   inline int          current_send_state() const;
-
-  TrackerController();
-  void operator = (const TrackerController&);
 
   int                 m_flags;
   TrackerList*        m_tracker_list;

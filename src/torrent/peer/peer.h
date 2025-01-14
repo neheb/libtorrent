@@ -54,6 +54,9 @@ class PeerConnectionBase;
 // date. 
 class LIBTORRENT_EXPORT Peer {
 public:
+  Peer(const Peer&) = delete;
+  Peer& operator=(const Peer&) = delete;
+
   // Does not check if it has been removed from the download.
   bool                 is_incoming() const                { return peer_info()->is_incoming(); }
   bool                 is_encrypted() const;
@@ -106,9 +109,6 @@ public:
 protected:
   Peer()          = default;
   virtual ~Peer() = default;
-
-  Peer(const Peer&);
-  void operator = (const Peer&);
 
   bool                 operator == (const Peer& p) const;
 
