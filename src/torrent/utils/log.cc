@@ -233,15 +233,9 @@ log_cleanup() {
   log_cache.clear();
 }
 
-log_output_list::iterator
+auto
 log_find_output_name(const char* name) {
-  log_output_list::iterator itr = log_outputs.begin();
-  log_output_list::iterator last = log_outputs.end();
-
-  while (itr != last && itr->first != name)
-    itr++;
-
-  return itr;
+  return std::find_if(log_outputs.begin(), log_outputs.end(), [name](const auto& l) { return l.first == name; });
 }
 
 void
@@ -252,7 +246,7 @@ log_open_output(const char* name, log_slot slot) {
     throw input_error("Cannot open more than 64 log output handlers.");
   }
 
-  log_output_list::iterator itr = log_find_output_name(name);
+  auto itr = log_find_output_name(name);
 
   if (itr == log_outputs.end()) {
     log_outputs.emplace_back(name, slot);
@@ -269,7 +263,7 @@ void
 log_close_output(const char* name) {
   auto lock = std::scoped_lock(log_mutex);
 
-  log_output_list::iterator itr = log_find_output_name(name);
+  auto itr = log_find_output_name(name);
 
   if (itr != log_outputs.end())
     log_outputs.erase(itr);
@@ -279,12 +273,13 @@ void
 log_add_group_output(int group, const char* name) {
   auto lock = std::scoped_lock(log_mutex);
 
-  log_output_list::iterator itr = log_find_output_name(name);
-  size_t index = std::distance(log_outputs.begin(), itr);
+  auto itr = log_find_output_name(name);
 
   if (itr == log_outputs.end()) {
     throw input_error("Log name not found.");
   }
+
+  size_t index = std::distance(log_outputs.begin(), itr);
 
   if (index >= log_group::max_size_outputs()) {
     throw input_error("Cannot add more log group outputs.");
