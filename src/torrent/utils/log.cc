@@ -314,7 +314,7 @@ log_remove_child(int group, int child) {
 }
 
 void
-log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
+log_file_write(const std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
   // Add group name, data, etc as flags.
 
   // Normal groups are nul-terminated strings.
@@ -333,7 +333,7 @@ log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t
 }
 
 void
-log_gz_file_write(std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
+log_gz_file_write(const std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
   char buffer[64];
 
   // Normal groups are nul-terminated strings.
@@ -363,7 +363,7 @@ log_open_file_output(const char* name, const char* filename, bool append) {
   std::ios_base::openmode mode = std::ofstream::out;
   if (append)
     mode |= std::ofstream::app;
-  std::shared_ptr<std::ofstream> outfile(new std::ofstream(filename, mode));
+  auto outfile = std::make_shared<std::ofstream>(filename, mode);
 
   if (!outfile->good())
     throw input_error("Could not open log file '" + std::string(filename) + "'.");
@@ -376,7 +376,7 @@ log_open_file_output(const char* name, const char* filename, bool append) {
 
 void
 log_open_gz_file_output(const char* name, const char* filename, bool append) {
-  std::shared_ptr<log_gz_output> outfile(new log_gz_output(filename, append));
+  auto outfile = std::make_shared<log_gz_output>(filename, append);
 
   if (!outfile->is_valid())
     throw input_error("Could not open log gzip file '" + std::string(filename) + "'.");

@@ -65,7 +65,7 @@ TrackerTest::new_tracker(torrent::TrackerList* parent, const std::string& url, i
     // .key = m_key
   };
 
-  return new torrent::Tracker(parent, std::shared_ptr<torrent::TrackerWorker>(new TrackerTest(tracker_info, flags)));
+  return new torrent::Tracker(parent, std::make_shared<TrackerTest>(tracker_info, flags));
 }
 
 inline TrackerTest*
