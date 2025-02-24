@@ -7,13 +7,13 @@
 #include "net/protocol_buffer.h"
 #include "net/socket_datagram.h"
 #include "torrent/connection_manager.h"
-#include "torrent/tracker.h"
+#include "tracker/tracker_worker.h"
 
 #include "globals.h"
 
 namespace torrent {
 
-class TrackerUdp : public SocketDatagram, public Tracker {
+class TrackerUdp : public SocketDatagram, public TrackerWorker {
 public:
   typedef std::array<char, 1024> hostname_type;
 
@@ -24,23 +24,28 @@ public:
 
   static const uint64_t magic_connection_id = 0x0000041727101980ll;
 
-  TrackerUdp(TrackerList* parent, const std::string& url, int flags);
+  static const uint32_t udp_timeout = 30;
+  static const uint32_t udp_tries = 2;
+
+  TrackerUdp(const TrackerInfo& info, int flags = 0);
   ~TrackerUdp();
 
-  const char*         type_name() const { return "tracker_udp"; }
+  const char*         type_name() const override { return "tracker_udp"; }
 
-  virtual bool        is_busy() const;
+  // TODO: Make sure TrackerWorker has all the virtual functions required.
+  bool                is_busy() const override;
 
-  virtual void        send_event(TrackerState::event_enum new_state);
+  void                send_event(tracker::TrackerState::event_enum new_state) override;
+  void                send_scrape() override;
 
-  virtual void        close();
-  virtual void        disown();
+  void                close() override;
+  void                disown() override;
 
-  virtual tracker_enum type() const;
+  tracker_enum        type() const override;
 
-  virtual void        event_read();
-  virtual void        event_write();
-  virtual void        event_error();
+  void                event_read() override;
+  void                event_write() override;
+  void                event_error() override;
 
 private:
   void                close_directly();

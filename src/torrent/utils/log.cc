@@ -233,15 +233,9 @@ log_cleanup() {
   log_cache.clear();
 }
 
-log_output_list::iterator
+auto
 log_find_output_name(const char* name) {
-  log_output_list::iterator itr = log_outputs.begin();
-  log_output_list::iterator last = log_outputs.end();
-
-  while (itr != last && itr->first != name)
-    itr++;
-
-  return itr;
+  return std::find_if(log_outputs.begin(), log_outputs.end(), [name](const auto& l) { return l.first == name; });
 }
 
 void
@@ -252,7 +246,7 @@ log_open_output(const char* name, log_slot slot) {
     throw input_error("Cannot open more than 64 log output handlers.");
   }
 
-  log_output_list::iterator itr = log_find_output_name(name);
+  auto itr = log_find_output_name(name);
 
   if (itr == log_outputs.end()) {
     log_outputs.emplace_back(name, slot);
@@ -269,7 +263,7 @@ void
 log_close_output(const char* name) {
   auto lock = std::scoped_lock(log_mutex);
 
-  log_output_list::iterator itr = log_find_output_name(name);
+  auto itr = log_find_output_name(name);
 
   if (itr != log_outputs.end())
     log_outputs.erase(itr);
@@ -279,12 +273,13 @@ void
 log_add_group_output(int group, const char* name) {
   auto lock = std::scoped_lock(log_mutex);
 
-  log_output_list::iterator itr = log_find_output_name(name);
-  size_t index = std::distance(log_outputs.begin(), itr);
+  auto itr = log_find_output_name(name);
 
   if (itr == log_outputs.end()) {
     throw input_error("Log name not found.");
   }
+
+  size_t index = std::distance(log_outputs.begin(), itr);
 
   if (index >= log_group::max_size_outputs()) {
     throw input_error("Cannot add more log group outputs.");
@@ -319,7 +314,7 @@ log_remove_child(int group, int child) {
 }
 
 void
-log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
+log_file_write(const std::shared_ptr<std::ofstream>& outfile, const char* data, size_t length, int group) {
   // Add group name, data, etc as flags.
 
   // Normal groups are nul-terminated strings.
@@ -338,7 +333,7 @@ log_file_write(std::shared_ptr<std::ofstream>& outfile, const char* data, size_t
 }
 
 void
-log_gz_file_write(std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
+log_gz_file_write(const std::shared_ptr<log_gz_output>& outfile, const char* data, size_t length, int group) {
   char buffer[64];
 
   // Normal groups are nul-terminated strings.
@@ -368,7 +363,7 @@ log_open_file_output(const char* name, const char* filename, bool append) {
   std::ios_base::openmode mode = std::ofstream::out;
   if (append)
     mode |= std::ofstream::app;
-  std::shared_ptr<std::ofstream> outfile(new std::ofstream(filename, mode));
+  auto outfile = std::make_shared<std::ofstream>(filename, mode);
 
   if (!outfile->good())
     throw input_error("Could not open log file '" + std::string(filename) + "'.");
@@ -381,7 +376,7 @@ log_open_file_output(const char* name, const char* filename, bool append) {
 
 void
 log_open_gz_file_output(const char* name, const char* filename, bool append) {
-  std::shared_ptr<log_gz_output> outfile(new log_gz_output(filename, append));
+  auto outfile = std::make_shared<log_gz_output>(filename, append);
 
   if (!outfile->is_valid())
     throw input_error("Could not open log gzip file '" + std::string(filename) + "'.");
