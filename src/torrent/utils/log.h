@@ -177,6 +177,7 @@ public:
   // Internal:
   //
 
+  [[gnu::format(printf, 6, 7)]]
   void                internal_print(const HashString* hash, const char* subsystem,
                                      const void* dump_data, size_t dump_size,
                                      const char* fmt, ...);
