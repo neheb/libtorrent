@@ -79,7 +79,7 @@ private:
   uint32_t            m_nextChunk{0};
   uint32_t            m_chunksLeft;
   DownloadMain*       m_download;
-  PeerInfo**          m_peerChunks;
+  std::unique_ptr<PeerInfo*[]> m_peerChunks;
 };
 
 }
