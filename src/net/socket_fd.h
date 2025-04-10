@@ -13,7 +13,7 @@ namespace torrent {
 
 class SocketFd {
 public:
-  typedef uint8_t priority_type;
+  using priority_type = uint8_t;
 
   SocketFd() = default;
   explicit SocketFd(int fd) : m_fd(fd) {}
