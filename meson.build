@@ -92,6 +92,7 @@ endif
 
 ssl_dep = dependency('libcrypto', required: get_option('openssl'))
 if ssl_dep.found()
+  cdata.set('USE_OPENSSL', 1)
   cdata.set('USE_OPENSSL_SHA', 1)
 else
   ssl_dep = [dependency('nss'), dependency('cyrus')]
