@@ -17,11 +17,11 @@ public:
   TrackerDht(const TrackerInfo& info, int flags = 0);
   ~TrackerDht();
 
-  typedef enum {
+  enum state_type {
     state_idle,
     state_searching,
     state_announcing,
-  } state_type;
+  };
 
   static const char* states[];
 
@@ -54,7 +54,7 @@ public:
 
 private:
   AddressList  m_peers;
-  state_type   m_dht_state;
+  state_type   m_dht_state{state_idle};
 
   int          m_replied;
   int          m_contacted;

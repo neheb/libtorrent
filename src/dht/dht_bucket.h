@@ -55,7 +55,7 @@ class DhtBucket : private std::vector<DhtNode*> {
 public:
   static const unsigned int num_nodes = 8;
 
-  typedef std::vector<DhtNode*>      base_type;
+  using base_type = std::vector<DhtNode*>;
 
   using base_type::const_iterator;
   using base_type::iterator;
@@ -125,15 +125,15 @@ private:
 
   void                build_full_cache();
 
-  DhtBucket*          m_parent;
-  DhtBucket*          m_child;
+  DhtBucket*          m_parent{};
+  DhtBucket*          m_child{};
   
-  int32_t             m_lastChanged;
+  int32_t             m_lastChanged{cachedTime.seconds()};
 
-  unsigned int        m_good;
-  unsigned int        m_bad;
+  unsigned int        m_good{0};
+  unsigned int        m_bad{0};
 
-  size_t              m_fullCacheLength;
+  size_t              m_fullCacheLength{0};
 
   // These are 40 bytes together, so might as well put them last.
   // m_end is const because it is used as key for the DhtRouter routing table

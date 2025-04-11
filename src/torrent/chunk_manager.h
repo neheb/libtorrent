@@ -11,8 +11,8 @@ namespace torrent {
 
 class LIBTORRENT_EXPORT ChunkManager : private std::vector<ChunkList*> {
 public:
-  typedef std::vector<ChunkList*> base_type;
-  typedef uint32_t                size_type;
+  using base_type = std::vector<ChunkList*>;
+  using size_type = uint32_t;
 
   using base_type::iterator;
   using base_type::reverse_iterator;
@@ -25,6 +25,8 @@ public:
 
   ChunkManager();
   ~ChunkManager();
+  ChunkManager(const ChunkManager&) = delete;
+  ChunkManager& operator=(const ChunkManager&) = delete;
 
   uint64_t            memory_usage() const                      { return m_memoryUsage; }
   uint64_t            sync_queue_memory_usage() const;
@@ -105,9 +107,6 @@ public:
   void                inc_stats_not_preloaded()                 { m_statsNotPreloaded++; }
 
 private:
-  ChunkManager(const ChunkManager&) = delete;
-  ChunkManager& operator=(const ChunkManager&) = delete;
-
   void                sync_all(int flags, uint64_t target) LIBTORRENT_NO_EXPORT;
 
   uint64_t            m_memoryUsage{0};

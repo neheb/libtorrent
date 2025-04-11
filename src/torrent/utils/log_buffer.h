@@ -27,8 +27,8 @@ struct log_entry {
 
 class LIBTORRENT_EXPORT log_buffer : private std::deque<log_entry> {
 public:
-  typedef std::deque<log_entry>  base_type;
-  typedef std::function<void ()> slot_void;
+  using base_type = std::deque<log_entry>;
+  using slot_void = std::function<void()>;
 
   using base_type::iterator;
   using base_type::const_iterator;
@@ -45,9 +45,6 @@ public:
   using base_type::empty;
   using base_type::size;
 
-  log_buffer() :
-      m_max_size(200) {}
-
   unsigned int        max_size() const { return m_max_size; }
 
   // Always lock before calling any function.
@@ -62,11 +59,11 @@ public:
 
 private:
   std::mutex          m_lock;
-  unsigned int        m_max_size;
+  unsigned int        m_max_size{200};
   slot_void           m_slot_update;
 };
 
-typedef std::unique_ptr<log_buffer, std::function<void (log_buffer*)>> log_buffer_ptr;
+using log_buffer_ptr = std::unique_ptr<log_buffer>;
 
 log_buffer_ptr log_open_log_buffer(const char* name) LIBTORRENT_EXPORT;
 

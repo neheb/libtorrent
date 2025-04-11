@@ -32,8 +32,8 @@ class InitialSeeding;
 
 class DownloadMain {
 public:
-  typedef std::deque<std::pair<rak::timer, uint32_t> > have_queue_type;
-  typedef std::vector<SocketAddressCompact>            pex_list;
+  using have_queue_type = std::deque<std::pair<rak::timer, uint32_t>>;
+  using pex_list        = std::vector<SocketAddressCompact>;
 
   DownloadMain();
   ~DownloadMain();
@@ -96,11 +96,11 @@ public:
   void                setup_delegator();
   void                setup_tracker();
 
-  typedef std::function<uint32_t(DownloadMain*)>                         slot_count_handshakes_type;
-  typedef std::function<void(ChunkHandle)>                               slot_hash_check_add_type;
+  using slot_count_handshakes_type = std::function<uint32_t(DownloadMain*)>;
+  using slot_hash_check_add_type   = std::function<void(ChunkHandle)>;
 
-  typedef std::function<void(const rak::socket_address&, DownloadMain*)> slot_start_handshake_type;
-  typedef std::function<void(DownloadMain*)>                             slot_stop_handshakes_type;
+  using slot_start_handshake_type = std::function<void(const rak::socket_address&, DownloadMain*)>;
+  using slot_stop_handshakes_type = std::function<void(DownloadMain*)>;
 
   void                slot_start_handshake(slot_start_handshake_type s) { m_slotStartHandshake = std::move(s); }
   void                slot_stop_handshakes(slot_stop_handshakes_type s) { m_slotStopHandshakes = std::move(s); }
@@ -137,7 +137,7 @@ private:
   tracker::TrackerControllerWrapper m_tracker_controller;
   TrackerList*                      m_tracker_list;
 
-  class choke_group*  m_choke_group;
+  class choke_group*  m_choke_group{};
 
   group_entry         m_up_group_entry;
   group_entry         m_down_group_entry;
@@ -148,7 +148,7 @@ private:
 
   Delegator           m_delegator;
   have_queue_type     m_haveQueue;
-  InitialSeeding*     m_initialSeeding;
+  InitialSeeding*     m_initialSeeding{};
 
   ConnectionList*     m_connectionList;
   FileList            m_fileList;
@@ -158,8 +158,8 @@ private:
   DataBuffer          m_ut_pex_initial;
   pex_list            m_ut_pex_list;
 
-  ThrottleList*       m_uploadThrottle;
-  ThrottleList*       m_downloadThrottle;
+  ThrottleList*       m_uploadThrottle{};
+  ThrottleList*       m_downloadThrottle{};
 
   slot_start_handshake_type m_slotStartHandshake;
   slot_stop_handshakes_type m_slotStopHandshakes;

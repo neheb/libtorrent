@@ -49,14 +49,13 @@ class SocketBase;
 
 class ThrottleNode {
 public:
-  typedef ThrottleList::iterator                  iterator;
-  typedef ThrottleList::const_iterator            const_iterator;
+  using iterator       = ThrottleList::iterator;
+  using const_iterator = ThrottleList::const_iterator;
 
-  typedef std::function<void ()> slot_void;
+  using slot_void = std::function<void()>;
 
   ThrottleNode(uint32_t rateSpan) : m_rate(rateSpan)  { clear_quota(); }
-  ThrottleNode(const ThrottleNode&) = delete;
-  ThrottleNode& operator=(const ThrottleNode&) = delete;
+  ~ThrottleNode() = default;
 
   Rate*               rate()                          { return &m_rate; }
   const Rate*         rate() const                    { return &m_rate; }

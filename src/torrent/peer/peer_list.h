@@ -2,6 +2,7 @@
 #define LIBTORRENT_PEER_LIST_H
 
 #include <map>
+#include <memory>
 #include <torrent/common.h>
 #include <torrent/net/socket_address_key.h>
 #include <torrent/utils/extents.h>
@@ -10,7 +11,7 @@ namespace torrent {
 
 class DownloadInfo;
 
-typedef extents<uint32_t, int> ipv4_table;
+using ipv4_table = extents<uint32_t, int>;
 
 class LIBTORRENT_EXPORT PeerList : private std::multimap<socket_address_key, PeerInfo*> {
 public:
@@ -19,8 +20,8 @@ public:
   friend class HandshakeManager;
   friend class ConnectionList;
 
-  typedef std::multimap<socket_address_key, PeerInfo*>        base_type;
-  typedef std::pair<base_type::iterator, base_type::iterator> range_type;
+  using base_type  = std::multimap<socket_address_key, PeerInfo*>;
+  using range_type = std::pair<base_type::iterator, base_type::iterator>;
 
   using base_type::value_type;
   using base_type::reference;
@@ -61,7 +62,7 @@ public:
 
   static ipv4_table*  ipv4_filter() { return &m_ipv4_table; }
 
-  AvailableList*      available_list()  { return m_available_list; }
+  const std::unique_ptr<AvailableList>& available_list() { return m_available_list; }
   uint32_t            available_list_size() const;
 
   uint32_t            cull_peers(int flags);
@@ -85,7 +86,7 @@ private:
   static ipv4_table   m_ipv4_table;
 
   DownloadInfo*       m_info;
-  AvailableList*      m_available_list;
+  std::unique_ptr<AvailableList> m_available_list;
 };
 
 }

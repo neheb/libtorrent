@@ -10,7 +10,7 @@ class LIBTORRENT_EXPORT File {
 public:
   friend class FileList;
 
-  typedef std::pair<uint32_t, uint32_t> range_type;
+  using range_type = std::pair<uint32_t, uint32_t>;
 
   static const int flag_active             = (1 << 0);
   static const int flag_create_queued      = (1 << 1);
@@ -25,6 +25,8 @@ public:
 
   File() =default;
   ~File();
+  File(const File&) = delete;
+  File& operator=(const File&) = delete;
 
   bool                is_created() const;
   bool                is_open() const                          { return m_fd != -1; }
@@ -56,8 +58,8 @@ public:
   uint32_t            range_first() const                      { return m_range.first; }
   uint32_t            range_second() const                     { return m_range.second; }
 
-  priority_t          priority() const                         { return m_priority; }
-  void                set_priority(priority_t t)               { m_priority = t; }
+  priority_enum       priority() const                         { return m_priority; }
+  void                set_priority(priority_enum t)            { m_priority = t; }
 
   const Path*         path() const                             { return &m_path; }
   Path*               mutable_path()                           { return &m_path; }
@@ -101,9 +103,6 @@ protected:
   void                set_match_depth_next(uint32_t l)         { m_match_depth_next = l; }
 
 private:
-  File(const File&) = delete;
-  File& operator=(const File&) = delete;
-
   bool                resize_file();
 
   int                 m_fd{-1};
@@ -120,7 +119,7 @@ private:
   range_type          m_range;
 
   uint32_t            m_completed{0};
-  priority_t          m_priority{PRIORITY_NORMAL};
+  priority_enum       m_priority{PRIORITY_NORMAL};
 
   uint32_t            m_match_depth_prev{0};
   uint32_t            m_match_depth_next{0};

@@ -62,10 +62,10 @@ struct static_map_entry_type {
 template <typename tmpl_key_type, size_t tmpl_length>
 class static_map_type {
 public:
-  typedef Object                  value_type;
-  typedef tmpl_key_type           key_type;
-  typedef static_map_entry_type   entry_type;
-  typedef static_map_mapping_type mapping_type;
+  using value_type   = Object;
+  using key_type     = tmpl_key_type;
+  using entry_type   = static_map_entry_type;
+  using mapping_type = static_map_mapping_type;
 
   typedef mapping_type    key_list_type[tmpl_length];
   typedef entry_type      value_list_type[tmpl_length];
@@ -102,15 +102,15 @@ struct static_map_stack_type {
   Object::type_type obj_type;
 };
 
-typedef std::pair<const static_map_mapping_type*, unsigned int> static_map_key_search_result;
+using static_map_key_search_result = std::pair<const static_map_mapping_type*, unsigned int>;
 
 // Note that the key for both functions must be null-terminated at
 // 'key_last'.
-const static_map_key_search_result
+static_map_key_search_result
 find_key_match(const static_map_mapping_type* first, const static_map_mapping_type* last,
                const char* key_first, const char* key_last) LIBTORRENT_EXPORT;
 
-inline const static_map_key_search_result
+inline static_map_key_search_result
 find_key_match(const static_map_mapping_type* first, const static_map_mapping_type* last,
                const char* key) {
   return find_key_match(first, last, key, key + strlen(key));

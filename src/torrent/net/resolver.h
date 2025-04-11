@@ -11,11 +11,13 @@ namespace torrent::net {
 
 class LIBTORRENT_EXPORT Resolver {
 public:
-  typedef std::function<void (c_sin_shared_ptr, c_sin6_shared_ptr, int)> both_callback;
-  typedef std::function<void (c_sa_shared_ptr, int)>                     single_callback;
+  using both_callback   = std::function<void(c_sin_shared_ptr, c_sin6_shared_ptr, int)>;
+  using single_callback = std::function<void(c_sa_shared_ptr, int)>;
 
   Resolver() = default;
   ~Resolver() = default;
+  Resolver(const Resolver&) = delete;
+  Resolver& operator=(const Resolver&) = delete;
 
   // May be called from any thread.
   void                resolve_both(void* requester, const std::string& hostname, int family, both_callback&& callback);
@@ -31,9 +33,6 @@ protected:
   void                init();
 
 private:
-  Resolver(const Resolver&) = delete;
-  Resolver& operator=(const Resolver&) = delete;
-
   torrent::utils::Thread* m_thread{nullptr};
 };
 

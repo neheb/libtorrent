@@ -12,7 +12,7 @@ namespace torrent {
 
 class SocketFile {
 public:
-  typedef int fd_type;
+  using fd_type = int;
 
   static const fd_type invalid_fd         = -1;
 
@@ -24,6 +24,7 @@ public:
   static const int flag_fallocate_blocking = (1 << 1);
 
   SocketFile() = default;
+  ~SocketFile() = default;
   SocketFile(fd_type fd) : m_fd(fd) {}
   SocketFile(const SocketFile&) = delete;
   SocketFile& operator=(const SocketFile&) = delete;

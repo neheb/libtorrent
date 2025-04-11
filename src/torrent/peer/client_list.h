@@ -44,8 +44,8 @@ namespace torrent {
 
 class LIBTORRENT_EXPORT ClientList : private std::vector<ClientInfo> {
 public:
-  typedef std::vector<ClientInfo> base_type;
-  typedef uint32_t                size_type;
+  using base_type = std::vector<ClientInfo>;
+  using size_type = uint32_t;
 
   using base_type::value_type;
   using base_type::reference;
@@ -63,6 +63,8 @@ public:
   
   ClientList();
   ~ClientList();
+  ClientList(const ClientList&) = delete;
+  ClientList& operator=(const ClientList&) = delete;
 
   iterator            insert(ClientInfo::id_type type, const char* key, const char* version, const char* upperVersion);
 

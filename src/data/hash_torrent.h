@@ -15,9 +15,9 @@ class ChunkList;
 
 class HashTorrent {
 public:
-  typedef ranges<uint32_t> Ranges;
+  using Ranges = ranges<uint32_t>;
 
-  typedef std::function<void (ChunkHandle)> slot_chunk_handle;
+  using slot_chunk_handle = std::function<void(ChunkHandle)>;
 
   HashTorrent(ChunkList* c);
   ~HashTorrent() { clear(); }
@@ -46,11 +46,11 @@ public:
 private:
   void                queue(bool quick);
 
-  unsigned int        m_position;
-  int                 m_outstanding;
+  unsigned int        m_position{0};
+  int                 m_outstanding{-1};
   Ranges              m_ranges;
 
-  int                 m_errno;
+  int                 m_errno{0};
 
   ChunkList*          m_chunk_list;
 

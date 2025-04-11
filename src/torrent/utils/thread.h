@@ -19,9 +19,9 @@ namespace torrent::utils {
 
 class LIBTORRENT_EXPORT Thread {
 public:
-  typedef void* (*pthread_func)(void*);
-  typedef std::function<void ()>     slot_void;
-  typedef std::function<uint64_t ()> slot_timer;
+  using pthread_func = void* (*)(void*);
+  using slot_void    = std::function<void()>;
+  using slot_timer   = std::function<uint64_t()>;
 
   enum state_type {
     STATE_UNKNOWN,
@@ -79,7 +79,7 @@ public:
   slot_void&          slot_do_work()      { return m_slot_do_work; }
   slot_timer&         slot_next_timeout() { return m_slot_next_timeout; }
 
-  static inline int   global_queue_size() { return m_global.waiting; }
+  static int   global_queue_size() { return m_global.waiting; }
 
   static inline void  acquire_global_lock();
   static inline bool  trylock_global_lock();

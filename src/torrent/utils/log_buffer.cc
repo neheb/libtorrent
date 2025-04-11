@@ -34,15 +34,10 @@ log_buffer::lock_and_push_log(const char* data, size_t length, int group) {
   unlock();
 }
 
-static void
-log_buffer_deleter(log_buffer* lb) {
-  delete lb;
-}
-
 log_buffer_ptr
 log_open_log_buffer(const char* name) {
   // TODO: Deregister when deleting.
-  auto buffer = log_buffer_ptr(new log_buffer, std::bind(&log_buffer_deleter, std::placeholders::_1));
+  auto buffer = std::make_unique<log_buffer>();
 
   log_open_output(name, [b = buffer.get()](auto d, auto l, auto g) { b->lock_and_push_log(d, l, g); });
   return buffer;

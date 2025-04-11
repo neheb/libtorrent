@@ -10,8 +10,8 @@ class File;
 
 class LIBTORRENT_EXPORT FileManager : private std::vector<File*> {
 public:
-  typedef std::vector<File*> base_type;
-  typedef uint32_t           size_type;
+  using base_type = std::vector<File*>;
+  using size_type = uint32_t;
 
   using base_type::value_type;
   using base_type::iterator;
@@ -24,6 +24,8 @@ public:
 
   FileManager() = default;
   ~FileManager();
+  FileManager(const FileManager&) = delete;
+  FileManager& operator=(const FileManager&) = delete;
 
   size_type           open_files() const              { return base_type::size(); }
 
@@ -44,9 +46,6 @@ public:
   uint64_t            files_failed_counter() const { return m_files_failed_counter; }
 
 private:
-  FileManager(const FileManager&) = delete;
-  FileManager& operator=(const FileManager&) = delete;
-
   size_type           m_max_open_files{0};
   bool                m_advise_random{false};
 

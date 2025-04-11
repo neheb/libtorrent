@@ -90,7 +90,7 @@ class DhtSearch : protected std::map<DhtNode*, DhtSearch*, dht_compare_closer> {
   friend class DhtTransactionSearch;
 
 public:
-  typedef std::map<DhtNode*, DhtSearch*, dht_compare_closer> base_type;
+  using base_type = std::map<DhtNode*, DhtSearch*, dht_compare_closer>;
 
   // Number of closest potential contact nodes to keep.
   static const unsigned int max_contacts = 18;
@@ -115,8 +115,8 @@ public:
     DhtSearch*                      search() const   { return (**this).second; }
   };
 
-  typedef accessor_wrapper<base_type::const_iterator>  const_accessor;
-  typedef accessor_wrapper<base_type::iterator>        accessor;
+  using const_accessor = accessor_wrapper<base_type::const_iterator>;
+  using accessor       = accessor_wrapper<base_type::iterator>;
 
   // Add a potential node to contact for the search.
   bool                 add_contact(const HashString& id, const rak::socket_address* sa);
@@ -151,13 +151,13 @@ protected:
   void                 set_node_active(const_accessor& n, bool active);
 
   // Statistics about contacted nodes.
-  unsigned int         m_pending;
-  unsigned int         m_contacted;
-  unsigned int         m_replied;
-  unsigned int         m_concurrency;
+  unsigned int         m_pending{0};
+  unsigned int         m_contacted{0};
+  unsigned int         m_replied{0};
+  unsigned int         m_concurrency{3};
 
-  bool                 m_restart;  // If true, trim nodes and reset m_next on the following get_contact call.
-  bool                 m_started;
+  bool                 m_restart{false};  // If true, trim nodes and reset m_next on the following get_contact call.
+  bool                 m_started{false};
 
   // Next node to return in get_contact, is end() if we have no more contactable nodes.
   const_accessor       m_next;
@@ -218,7 +218,7 @@ enum dht_keys {
 
 class DhtMessage : public static_map_type<dht_keys, key_LAST> {
 public:
-  typedef static_map_type<dht_keys, key_LAST> base_type;
+  using base_type = static_map_type<dht_keys, key_LAST>;
 
   DhtMessage() : data_end(data) {};
 
@@ -246,6 +246,8 @@ public:
     : m_sa(*s), m_id(-cachedTime.seconds()) { build_buffer(d); };
 
   ~DhtTransactionPacket()                               { delete[] m_data; }
+  DhtTransactionPacket(const DhtTransactionPacket&) = delete;
+  DhtTransactionPacket& operator=(const DhtTransactionPacket&) = delete;
 
   bool                        has_transaction() const   { return m_id >= -1; }
   bool                        has_failed() const        { return m_id == -1; }
@@ -281,18 +283,18 @@ public:
   DhtTransaction(const DhtTransaction&) = delete;
   DhtTransaction& operator=(const DhtTransaction&) = delete;
 
-  typedef enum {
+  enum transaction_type {
     DHT_PING,
     DHT_FIND_NODE,
     DHT_GET_PEERS,
     DHT_ANNOUNCE_PEER,
-  } transaction_type;
+  };
 
   virtual transaction_type    type() = 0;
   virtual bool                is_search()          { return false; }
 
   // Key to uniquely identify a transaction with given per-node transaction id.
-  typedef uint64_t key_type;
+  using key_type = uint64_t;
 
   key_type                    key(int id) const    { return key(&m_sa, id); }
   static key_type             key(const rak::socket_address* sa, int id);
@@ -328,7 +330,7 @@ private:
   rak::socket_address    m_sa;
   int                    m_timeout;
   int                    m_quickTimeout;
-  DhtTransactionPacket*  m_packet;
+  DhtTransactionPacket*  m_packet{};
 };
 
 class DhtTransactionSearch : public DhtTransaction {

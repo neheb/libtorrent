@@ -50,7 +50,7 @@ class ThrottleNode;
 
 class ThrottleList : private std::list<ThrottleNode*> {
 public:
-  typedef std::list<ThrottleNode*> base_type;
+  using base_type = std::list<ThrottleNode*>;
 
   using base_type::iterator;
   using base_type::const_iterator;
@@ -110,14 +110,14 @@ public:
 private:
   inline void         allocate_quota(ThrottleNode* node);
 
-  bool                m_enabled;
-  uint32_t            m_size;
+  bool                m_enabled{false};
+  uint32_t            m_size{0};
 
-  uint32_t            m_outstandingQuota;
-  uint32_t            m_unallocatedQuota;
-  uint32_t            m_unusedUnthrottledQuota;
+  uint32_t            m_outstandingQuota{0};
+  uint32_t            m_unallocatedQuota{0};
+  uint32_t            m_unusedUnthrottledQuota{0};
 
-  uint32_t            m_rateAdded;
+  uint32_t            m_rateAdded{0};
 
   uint32_t            m_minChunkSize;
   uint32_t            m_maxChunkSize;
