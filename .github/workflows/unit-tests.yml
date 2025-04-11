@@ -36,3 +36,94 @@ jobs:
     - name: Run Unit Tests
       run: |
         make check
+  MacOS:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install packages
+        run: |
+          brew install automake cppunit libtool
+
+      - name: Compile and Test
+        run: |
+          autoreconf -fiv
+          ./configure
+          make
+          make check
+  DragonflyBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/dragonflybsd-vm@v1
+        with:
+          prepare: |
+            pkg install -y automake autoconf cppunit libtool openssl pkgconf
+          run: |
+            autoreconf -fiv
+            ./configure
+            make
+            make check
+  FreeBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          prepare: |
+            pkg install -y automake autoconf cppunit libtool openssl pkgconf
+          run: |
+            autoreconf -fiv
+            ./configure
+            make
+            make check
+  NetBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/netbsd-vm@v1
+        with:
+          release: '10.0'
+          prepare: |
+            /usr/sbin/pkg_add automake autoconf cppunit libtool openssl pkgconf
+          run: |
+            autoreconf -fiv
+            ./configure
+            make
+            make check
+  OpenBSD:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/openbsd-vm@v1
+        with:
+          prepare: |
+            pkg_add automake autoconf-2.72p0 cppunit libtool openssl pkgconf
+          run: |
+            env AUTOCONF_VERSION=2.72 autoreconf -fiv
+            ./configure
+            make
+            make check
+  Alpine:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ['x86_64', 'x86', 'armhf', 'armv7', 'aarch64', 'ppc64le', 'riscv64', 's390x']
+    defaults:
+      run:
+        shell: alpine.sh {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jirutka/setup-alpine@v1
+        with:
+          branch: edge
+          arch: ${{matrix.platform}}
+          packages: >
+            build-base automake autoconf cppunit-dev libtool linux-headers openssl-dev pkgconf zlib-dev
+      - name: Compile and Test
+        run: |
+          autoreconf -fiv
+          ./configure
+          make
+          make check
