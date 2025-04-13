@@ -85,10 +85,10 @@ public:
   //
   // If try_lock is called by a thread that already owns the mutex, the behavior is undefined.
 
-  static inline void  acquire_global_lock();
-  static inline bool  trylock_global_lock();
-  static inline void  release_global_lock();
-  static inline void  waive_global_lock();
+  static void  acquire_global_lock();
+  static bool  trylock_global_lock();
+  static void  release_global_lock();
+  static void  waive_global_lock();
 
   static bool         should_handle_sigusr1();
 
@@ -147,29 +147,6 @@ Thread::send_event_signal(unsigned int index, bool do_interrupt) {
 
   if (do_interrupt)
     interrupt();
-}
-
-inline void
-Thread::acquire_global_lock() {
-  Thread::m_global.waiting++;
-  Thread::m_global.mutex.lock();
-  Thread::m_global.waiting--;
-}
-
-inline bool
-Thread::trylock_global_lock() {
-  return Thread::m_global.mutex.try_lock();
-}
-
-inline void
-Thread::release_global_lock() {
-  Thread::m_global.mutex.unlock();
-}
-
-inline void
-Thread::waive_global_lock() {
-  release_global_lock();
-  acquire_global_lock();
 }
 
 }
