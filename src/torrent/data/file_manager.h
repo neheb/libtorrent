@@ -13,10 +13,6 @@ public:
   using base_type = std::vector<File*>;
   using size_type = uint32_t;
 
-  using base_type::value_type;
-  using base_type::iterator;
-  using base_type::reverse_iterator;
-
   using base_type::begin;
   using base_type::end;
   using base_type::rbegin;
