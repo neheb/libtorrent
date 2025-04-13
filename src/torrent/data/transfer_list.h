@@ -16,10 +16,6 @@ public:
   using base_type::reference;
   using base_type::difference_type;
 
-  using base_type::iterator;
-  using base_type::const_iterator;
-  using base_type::reverse_iterator;
-  using base_type::const_reverse_iterator;
   using base_type::size;
   using base_type::empty;
 

@@ -536,7 +536,7 @@ DhtRouter::add_node_to_bucket(DhtNode* node) {
 
   while (itr->second->is_full()) {
     // Bucket is full. If there are any bad nodes, remove the oldest.
-    DhtBucket::iterator nodeItr = itr->second->find_replacement_candidate();
+    auto nodeItr = itr->second->find_replacement_candidate();
     if (nodeItr == itr->second->end())
       throw internal_error("DhtBucket::find_candidate returned no node.");
 
