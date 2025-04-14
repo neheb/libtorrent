@@ -26,7 +26,7 @@ public:
   };
 
   Block() = default;
-  ~Block() noexcept(false);
+  ~Block();
 
   // Only allow move constructions
   Block(const Block&) = delete;

@@ -117,7 +117,7 @@ PollSelect::create(int maxOpenSockets) {
   return p;
 }
 
-PollSelect::~PollSelect() noexcept(false) {
+PollSelect::~PollSelect() {
   m_readSet->prepare();
   m_writeSet->prepare();
   m_exceptSet->prepare();

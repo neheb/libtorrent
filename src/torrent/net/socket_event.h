@@ -10,7 +10,7 @@ namespace torrent {
 
 class LIBTORRENT_EXPORT socket_event : public Event {
 public:
-  ~socket_event() noexcept(false) override;
+  ~socket_event() override;
 
   const sockaddr* socket_address() const;
   uint16_t        socket_address_port() const;

@@ -109,7 +109,7 @@ public:
   choke_queue(int flags = 0) :
     m_flags(flags)
     {}
-  ~choke_queue() noexcept(false);
+  ~choke_queue();
   
   bool                is_full() const                         { return !is_unlimited() && size_unchoked() >= m_maxUnchoked; }
   bool                is_unlimited() const                    { return m_maxUnchoked == unlimited; }

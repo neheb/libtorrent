@@ -50,7 +50,7 @@
 
 namespace torrent {
 
-Block::~Block() noexcept(false) {
+Block::~Block() {
   if (m_state != STATE_INCOMPLETE && m_state != STATE_COMPLETED)
     throw internal_error("Block dtor with 'm_state != STATE_INCOMPLETE && m_state != STATE_COMPLETED'");
 

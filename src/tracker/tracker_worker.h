@@ -35,7 +35,7 @@ struct TrackerParameters {
 class TrackerWorker {
 public:
   TrackerWorker(TrackerInfo info, int flags = 0);
-  virtual ~TrackerWorker() noexcept(false) = default;
+  virtual ~TrackerWorker() = default;
 
   // Public members do not require locking:
 
