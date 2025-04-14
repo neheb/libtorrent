@@ -56,7 +56,7 @@ namespace torrent {
 
 // TODO: Derp if transfer list isn't cleared...
 
-TransferList::~TransferList() {
+TransferList::~TransferList() noexcept(false) {
   if (!base_type::empty())
     throw internal_error("TransferList::~TransferList() called on an non-empty object");
 }

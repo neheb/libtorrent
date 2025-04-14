@@ -98,7 +98,7 @@ PeerConnectionBase::PeerConnectionBase() :
   m_peerInfo = nullptr;
 }
 
-PeerConnectionBase::~PeerConnectionBase() {
+PeerConnectionBase::~PeerConnectionBase() noexcept(false) {
   delete m_up;
   delete m_down;
 

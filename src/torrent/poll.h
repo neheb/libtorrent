@@ -51,7 +51,7 @@ public:
   static const int      poll_worker_thread     = 0x1;
   static const uint32_t flag_waive_global_lock = 0x1;
 
-  virtual ~Poll() = default;
+  virtual ~Poll() noexcept(false) = default;
 
   uint32_t            flags() const { return m_flags; }
   void                set_flags(uint32_t flags) { m_flags = flags; }

@@ -41,7 +41,7 @@ TrackerUdp::TrackerUdp(const TrackerInfo& info, int flags) :
   m_task_timeout.slot() = [this] { receive_timeout(); };
 }
 
-TrackerUdp::~TrackerUdp() {
+TrackerUdp::~TrackerUdp() noexcept(false) {
   close_directly();
 }
 

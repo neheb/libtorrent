@@ -70,7 +70,7 @@ struct request_list_same_piece {
   Piece m_piece;
 };
 
-RequestList::~RequestList() {
+RequestList::~RequestList() noexcept(false) {
   if (m_transfer != NULL)
     throw internal_error("request dtor m_transfer != NULL");
 

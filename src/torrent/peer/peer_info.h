@@ -63,7 +63,7 @@ public:
   static const int mask_ip_table = flag_unwanted | flag_preferred;
 
   PeerInfo(const sockaddr* address);
-  ~PeerInfo();
+  ~PeerInfo() noexcept(false);
   PeerInfo(const PeerInfo&) = delete;
   PeerInfo& operator=(const PeerInfo&) = delete;
 

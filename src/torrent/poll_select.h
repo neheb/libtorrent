@@ -52,7 +52,7 @@ namespace torrent {
 class LIBTORRENT_EXPORT PollSelect : public Poll {
 public:
   static PollSelect*  create(int maxOpenSockets);
-  virtual ~PollSelect();
+  virtual ~PollSelect() noexcept(false);
   PollSelect(const PollSelect&) = delete;
   PollSelect& operator=(const PollSelect&) = delete;
 

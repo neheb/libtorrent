@@ -77,7 +77,7 @@ public:
   static const int timeout_process_unordered = 60;
 
   RequestList();
-  ~RequestList();
+  ~RequestList() noexcept(false);
 
   // Some parameters here, like how fast we are downloading and stuff
   // when we start considering those.

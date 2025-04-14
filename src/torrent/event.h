@@ -7,7 +7,7 @@ namespace torrent {
 
 class LIBTORRENT_EXPORT Event {
 public:
-  virtual ~Event() = default;
+  virtual ~Event() noexcept(false) = default;
 
   // TODO: Disable override.
   bool is_open() const;
