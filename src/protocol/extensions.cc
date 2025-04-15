@@ -162,7 +162,7 @@ ProtocolExtension::generate_handshake_message() {
   auto copy = new char[length];
   memcpy(copy, buffer, length);
 
-  return DataBuffer(copy, copy + length);
+  return {copy, copy + length};
 }
 
 inline DataBuffer
@@ -177,7 +177,7 @@ ProtocolExtension::build_bencode(size_t maxLength, const char* format, ...) {
   if (length > maxLength)
     throw internal_error("ProtocolExtension::build_bencode wrote past buffer.");
 
-  return DataBuffer(b, b + length);
+  return {b, b + length};
 }
 
 DataBuffer
@@ -191,7 +191,7 @@ ProtocolExtension::generate_toggle_message(MessageType t, bool on) {
 DataBuffer
 ProtocolExtension::generate_ut_pex_message(const PEXList& added, const PEXList& removed) {
   if (added.empty() && removed.empty())
-    return DataBuffer();
+    return {};
 
   int added_len   = added.size() * 6;
   int removed_len = removed.size() * 6;
@@ -212,7 +212,7 @@ ProtocolExtension::generate_ut_pex_message(const PEXList& added, const PEXList& 
   if (end - buffer > 32 + added_len + removed_len)
     throw internal_error("ProtocolExtension::ut_pex_message wrote beyond buffer.");
 
-  return DataBuffer(buffer, end);
+  return {buffer, end};
 }
 
 void

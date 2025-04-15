@@ -117,7 +117,7 @@ object_read_bencode_c_string(const char* first, const char* last) {
 		  || *first++ != ':')
     throw torrent::bencode_error("Invalid bencode data.");
   
-  return raw_string(first, length);
+  return {first, length};
 }
 
 // Could consider making this non-recursive, but they seldomly are
@@ -402,7 +402,7 @@ object_sha1(const Object* object) {
   object_write_bencode_c(&object_write_to_sha1, &sha, object_buffer_t(buffer, buffer + 1024), object);
   sha.final_c(buffer);
 
-  return std::string(buffer, 20);
+  return {buffer, 20};
 }
 
 std::istream&

@@ -112,7 +112,7 @@ public:
   raw_list    as_raw_list() const;
   raw_map     as_raw_map() const;
 
-  static raw_bencode from_c_str(const char* str) { return raw_bencode(str, std::strlen(str)); }
+  static raw_bencode from_c_str(const char* str) { return {str, static_cast<size_type>(std::strlen(str))}; }
 };
 
 class raw_string : protected raw_object {
@@ -123,10 +123,10 @@ public:
   raw_string() = default;
   raw_string(value_type* src_data, size_type src_size) : raw_object(src_data, src_size) {}
 
-  std::string as_string() const { return std::string(m_data, m_size); }
+  std::string as_string() const { return {m_data, m_size}; }
 
-  static raw_string from_c_str(const char* str) { return raw_string(str, std::strlen(str)); }
-  static raw_string from_string(const std::string& str) { return raw_string(str.data(), str.size()); }
+  static raw_string from_c_str(const char* str) { return {str, static_cast<size_type>(std::strlen(str))}; }
+  static raw_string from_string(const std::string& str) { return {str.data(), static_cast<size_type>(str.size())}; }
 };
 
 class raw_list : protected raw_object {
@@ -137,7 +137,7 @@ public:
   raw_list() = default;
   raw_list(value_type* src_data, size_type src_size) : raw_object(src_data, src_size) {}
 
-  static raw_list from_c_str(const char* str) { return raw_list(str, std::strlen(str)); }
+  static raw_list from_c_str(const char* str) { return {str, static_cast<size_type>(std::strlen(str))}; }
 };
 
 class raw_map : protected raw_object {
@@ -158,7 +158,7 @@ raw_bencode::as_value_string() const {
   if (!is_value())
     throw bencode_error("Wrong object type.");
 
-  return std::string(data() + 1, size() - 2);
+  return {data() + 1, size() - 2};
 }
 
 inline raw_string
@@ -171,7 +171,7 @@ raw_bencode::as_raw_string() const {
   if (itr == end())
     throw internal_error("Invalid bencode in raw_bencode.");
 
-  return raw_string(itr + 1, std::distance(itr + 1, end()));
+  return {itr + 1, static_cast<size_type>(std::distance(itr + 1, end()))};
 }
 
 inline raw_list
@@ -179,7 +179,7 @@ raw_bencode::as_raw_list() const {
   if (!is_raw_list())
     throw bencode_error("Wrong object type.");
 
-  return raw_list(m_data + 1, m_size - 2);
+  return {m_data + 1, m_size - 2};
 }
 
 inline raw_map
@@ -187,7 +187,7 @@ raw_bencode::as_raw_map() const {
   if (!is_raw_map())
     throw bencode_error("Wrong object type.");
 
-  return raw_map(m_data + 1, m_size - 2);
+  return {m_data + 1, m_size - 2};
 }
 
 //

@@ -551,13 +551,13 @@ FileList::create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t le
   // Check that offset != length of file.
 
   if (!(*itr)->prepare(prot))
-    return MemoryChunk();
+    return {};
 
 
   auto chunk = SocketFile((*itr)->file_descriptor()).create_chunk(offset, length, prot, MemoryChunk::map_shared);
 
   if (!chunk.is_valid())
-    return MemoryChunk();
+    return {};
 
 #ifdef USE_MADVISE
   // TODO: Update all uses of madvise to posix_madvise.

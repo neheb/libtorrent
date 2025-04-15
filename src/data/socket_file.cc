@@ -137,9 +137,9 @@ SocketFile::create_padding_chunk(uint32_t length, int prot, int flags) const {
   auto ptr = static_cast<char*>(mmap(NULL, length, prot, flags, -1, 0));
 
   if (ptr == MAP_FAILED)
-    return MemoryChunk();
+    return {};
 
-  return MemoryChunk(ptr, ptr, ptr + length, prot, flags);
+  return {ptr, ptr, ptr + length, prot, flags};
 }
 
 MemoryChunk
@@ -150,16 +150,16 @@ SocketFile::create_chunk(uint64_t offset, uint32_t length, int prot, int flags) 
   // For some reason mapping beyond the extent of the file does not
   // cause mmap to complain, so we need to check manually here.
   if (length == 0 || offset > size() || offset + length > size())
-    return MemoryChunk();
+    return {};
 
   uint64_t align = offset % MemoryChunk::page_size();
 
   auto ptr = static_cast<char*>(mmap(nullptr, length + align, prot, flags, m_fd, offset - align));
 
   if (ptr == MAP_FAILED)
-    return MemoryChunk();
+    return {};
 
-  return MemoryChunk(ptr, ptr + align, ptr + align + length, prot, flags);
+  return {ptr, ptr + align, ptr + align + length, prot, flags};
 }
 
 }
