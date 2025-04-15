@@ -82,7 +82,7 @@ chunk_list_address_info(void* address) {
       auto d_itr = manager->download_manager()->find_chunk_list(chunk);
 
       if (d_itr == manager->download_manager()->end())
-        return chunk_info_result();
+        return {};
 
       chunk_info_result ci;
       ci.download = Download(*d_itr);
@@ -98,7 +98,7 @@ chunk_list_address_info(void* address) {
     }
   }
 
-  return chunk_info_result();
+  return {};
 }
 
 }

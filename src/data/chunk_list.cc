@@ -152,7 +152,7 @@ ChunkList::get(size_type index, int flags) {
     node->inc_blocking();
   }
 
-  return ChunkHandle(node, flags & get_writable, flags & get_blocking);
+  return {node, static_cast<bool>(flags & get_writable), static_cast<bool>(flags & get_blocking)};
 }
 
 // The chunks in 'm_queue' have been modified and need to be synced
