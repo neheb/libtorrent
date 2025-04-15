@@ -97,7 +97,7 @@ DhtTracker::get_peers(unsigned int maxPeers) {
     last = first + maxPeers;
   }
 
-  return raw_list(first->bencode(), last->bencode() - first->bencode());
+  return {first->bencode(), static_cast<unsigned int>(last->bencode() - first->bencode())};
 }
 
 // Remove old announces.

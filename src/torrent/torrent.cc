@@ -194,7 +194,7 @@ download_add(Object* object, uint32_t tracker_key) {
   manager->initialize_download(download.get());
 
   download->set_bencode(object);
-  return Download(download.release());
+  return download.release();
 }
 
 void

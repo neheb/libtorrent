@@ -47,7 +47,7 @@ public:
 
   const value_type*   c_str() const                     { return m_data; }
 
-  std::string         str() const                       { return std::string(m_data, size_data); }
+  std::string         str() const                       { return {m_data, size_data}; }
 
   void                clear(int v = 0)                  { std::memset(data(), v, size()); }
 
