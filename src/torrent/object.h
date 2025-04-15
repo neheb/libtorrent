@@ -375,7 +375,7 @@ Object::create_empty(type_type t) {
   case TYPE_MAP:         return create_map();
   case TYPE_DICT_KEY:    return create_dict_key();
   case TYPE_NONE:
-  default: return torrent::Object();
+  default: return {};
   }
 }
 

@@ -173,7 +173,7 @@ DhtBucket::full_bucket() {
   if (!m_fullCacheLength)
     build_full_cache();
 
-  return raw_string(m_fullCache, m_fullCacheLength);
+  return {m_fullCache, static_cast<unsigned int>(m_fullCacheLength)};
 }
 
 inline const DhtBucket*

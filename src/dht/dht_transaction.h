@@ -77,7 +77,7 @@ struct dht_compare_closer {
   bool operator () (const DhtNode* one, const DhtNode* two) const;
 
   const HashString&               target() const   { return m_target; }
-  raw_string                      target_raw_string() const { return raw_string(m_target.data(), HashString::size_data); }
+  raw_string                      target_raw_string() const { return {m_target.data(), HashString::size_data}; }
 
   private:
   const HashString&    m_target;
@@ -133,7 +133,7 @@ public:
   bool                 complete() const                  { return m_started && !m_pending; }
 
   const HashString&    target() const                    { return m_target; }
-  raw_string           target_raw_string() const         { return raw_string(m_target.data(), HashString::size_data); }
+  raw_string           target_raw_string() const         { return {m_target.data(), HashString::size_data}; }
 
   virtual bool         is_announce() const               { return false; }
 
@@ -396,7 +396,7 @@ public:
   transaction_type type() override     { return DHT_ANNOUNCE_PEER; }
 
   const HashString&        info_hash() { return m_infoHash; }
-  raw_string               info_hash_raw_string() const { return raw_string(m_infoHash.data(), HashString::size_data); }
+  raw_string               info_hash_raw_string() const { return {m_infoHash.data(), HashString::size_data}; }
   raw_string               token()     { return m_token; }
 
 private:
