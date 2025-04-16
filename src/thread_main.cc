@@ -107,7 +107,7 @@ ThreadMain::next_timeout() {
   }
 
   if (m_slot_next_timeout) {
-    auto slot_timeout = std::max(m_slot_next_timeout(), uint64_t(0));
+    auto slot_timeout = std::max(m_slot_next_timeout(), static_cast<uint64_t>(0));
 
     timeout = std::min(timeout, std::chrono::microseconds(slot_timeout));
   }

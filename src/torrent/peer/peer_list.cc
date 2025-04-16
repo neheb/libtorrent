@@ -184,7 +184,7 @@ PeerList::insert_available(const void* al) {
         peerInfo->set_port(addr.port());
 
       if (peerInfo->connection() != NULL ||
-          peerInfo->last_handshake() + 600 > (uint32_t)cachedTime.seconds()) {
+          peerInfo->last_handshake() + 600 > static_cast<uint32_t>(cachedTime.seconds())) {
         updated++;
         continue;
       }
@@ -288,7 +288,7 @@ PeerList::connected(const sockaddr* sa, int flags) {
   }
 
   if (flags & connect_filter_recent &&
-      peerInfo->last_handshake() + 600 > (uint32_t)cachedTime.seconds())
+      peerInfo->last_handshake() + 600 > static_cast<uint32_t>(cachedTime.seconds()))
     return NULL;
 
   if (!(flags & connect_incoming))
