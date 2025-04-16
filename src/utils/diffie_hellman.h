@@ -27,12 +27,12 @@ public:
   unsigned int size() const         { return m_size; }
 
   const char*  c_str() const        { return m_secret.get(); }
-  std::string  secret_str() const   { return std::string(m_secret.get(), m_size); }
+  std::string  secret_str() const   { return {m_secret.get(), static_cast<size_t>(m_size)}; }
 
 private:
   dh_ptr       m_dh;
   secret_ptr   m_secret;
-  int          m_size;
+  int          m_size{0};
 };
 
 };

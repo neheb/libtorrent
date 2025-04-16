@@ -118,6 +118,12 @@ main_thread() {
   return thread_main();
 }
 
+void
+set_main_thread_slots(std::function<void()> do_work, std::function<uint64_t()> next_timeout) {
+  thread_main()->slot_do_work() = std::move(do_work);
+  thread_main()->slot_next_timeout() = std::move(next_timeout);
+}
+
 ChunkManager*      chunk_manager() { return manager->chunk_manager(); }
 ClientList*        client_list() { return manager->client_list(); }
 ConnectionManager* connection_manager() { return manager->connection_manager(); }
@@ -189,7 +195,7 @@ download_add(Object* object, uint32_t tracker_key) {
   manager->initialize_download(download.get());
 
   download->set_bencode(object);
-  return Download(download.release());
+  return download.release();
 }
 
 void
@@ -200,8 +206,7 @@ download_remove(Download d) {
 // Add all downloads to dlist. Make sure it's cleared.
 void
 download_list(DList& dlist) {
-  for (auto download : *manager->download_manager())
-    dlist.emplace_back(download);
+  dlist.insert(dlist.end(), manager->download_manager()->begin(), manager->download_manager()->end());
 }
 
 // Make sure you check that it's valid.
@@ -212,7 +217,7 @@ download_find(const std::string& infohash) {
 
 uint32_t
 download_priority(Download d) {
-  ResourceManager::iterator itr = manager->resource_manager()->find(d.ptr()->main());
+  auto itr = manager->resource_manager()->find(d.ptr()->main());
 
   if (itr == manager->resource_manager()->end())
     throw internal_error("torrent::download_priority(...) could not find the download in the resource manager.");
@@ -223,7 +228,7 @@ download_priority(Download d) {
 // TODO: Remove this.
 void
 download_set_priority(Download d, uint32_t pri) {
-  ResourceManager::iterator itr = manager->resource_manager()->find(d.ptr()->main());
+  auto itr = manager->resource_manager()->find(d.ptr()->main());
 
   if (itr == manager->resource_manager()->end())
     throw internal_error("torrent::download_set_priority(...) could not find the download in the resource manager.");

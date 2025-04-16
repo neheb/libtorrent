@@ -1,0 +1,2 @@
+option('openssl', type: 'feature')
+option('tests', type: 'feature')

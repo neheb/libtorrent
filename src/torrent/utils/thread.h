@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include <torrent/common.h>
+#include <torrent/utils/chrono.h>
 #include <torrent/utils/signal_bitfield.h>
 
 namespace torrent {
@@ -19,8 +20,6 @@ namespace torrent::utils {
 class LIBTORRENT_EXPORT Thread {
 public:
   using pthread_func = void* (*)(void*);
-  using slot_void    = std::function<void()>;
-  using slot_timer   = std::function<uint64_t()>;
 
   enum state_type {
     STATE_UNKNOWN,
@@ -31,8 +30,7 @@ public:
 
   static const int flag_do_shutdown  = 0x1;
   static const int flag_did_shutdown = 0x2;
-  static const int flag_no_timeout   = 0x4;
-  static const int flag_polling      = 0x8;
+  static const int flag_polling      = 0x4;
 
   static const int flag_main_thread  = 0x10;
 
@@ -49,7 +47,6 @@ public:
   bool                is_polling() const;
   bool                is_current() const;
 
-  bool                has_no_timeout()   const { return (flags() & flag_no_timeout); }
   bool                has_do_shutdown()  const { return (flags() & flag_do_shutdown); }
   bool                has_did_shutdown() const { return (flags() & flag_did_shutdown); }
 
@@ -66,6 +63,7 @@ public:
   class signal_bitfield* signal_bitfield() { return &m_signal_bitfield; }
 
   virtual void        init_thread() = 0;
+  void                init_thread_local();
 
   virtual void        start_thread();
   virtual void        stop_thread();
@@ -78,10 +76,7 @@ public:
   void                interrupt();
   void                send_event_signal(unsigned int index, bool interrupt = true);
 
-  slot_void&          slot_do_work()      { return m_slot_do_work; }
-  slot_timer&         slot_next_timeout() { return m_slot_next_timeout; }
-
-  static inline int   global_queue_size() { return m_global.waiting; }
+  static int          global_queue_size() { return m_global.waiting; }
 
   // Regarding try_lock used by acquire_global_lock:
   //
@@ -97,7 +92,7 @@ public:
 
   static bool         should_handle_sigusr1();
 
-  static void*        event_loop(Thread* thread);
+  void                event_loop();
 
 protected:
   struct global_lock_type {
@@ -105,14 +100,17 @@ protected:
     std::mutex      mutex;
   };
 
-  virtual void        call_events() = 0;
-  virtual int64_t     next_timeout_usec() = 0;
+  static void*        enter_event_loop(Thread* thread);
+
+  virtual void                      call_events() = 0;
+  virtual std::chrono::microseconds next_timeout() = 0;
 
   void                process_callbacks();
 
   static thread_local Thread*  m_self;
   static global_lock_type      m_global;
 
+  // TODO: Remove m_thread.
   pthread_t                    m_thread;
   std::atomic<std::thread::id> m_thread_id;
   std::atomic<state_type>      m_state{STATE_UNKNOWN};
@@ -123,9 +121,6 @@ protected:
   std::unique_ptr<Poll>             m_poll;
   std::unique_ptr<net::Resolver>    m_resolver;
   class signal_bitfield             m_signal_bitfield;
-
-  slot_void                         m_slot_do_work;
-  slot_timer                        m_slot_next_timeout;
 
   std::unique_ptr<thread_interrupt> m_interrupt_sender;
   std::unique_ptr<thread_interrupt> m_interrupt_receiver;

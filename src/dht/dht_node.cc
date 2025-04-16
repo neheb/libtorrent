@@ -53,10 +53,7 @@ namespace torrent {
 DhtNode::DhtNode(const HashString& id, const rak::socket_address* sa) :
   HashString(id),
   m_socketAddress(*sa),
-  m_lastSeen(0),
-  m_recentlyActive(false),
-  m_recentlyInactive(0),
-  m_bucket(NULL) {
+  m_lastSeen(0) {
 
   // TODO: Change this to use the id hash similar to how peer info
   // hash'es are logged.
@@ -68,10 +65,7 @@ DhtNode::DhtNode(const HashString& id, const rak::socket_address* sa) :
 }
 
 DhtNode::DhtNode(const std::string& id, const Object& cache) :
-  HashString(*HashString::cast_from(id.c_str())),
-  m_recentlyActive(false),
-  m_recentlyInactive(0),
-  m_bucket(NULL) {
+  HashString(*HashString::cast_from(id.c_str())) {
 
   // TODO: Check how DHT handles inet6.
   rak::socket_address_inet* sa = m_socketAddress.sa_inet();
@@ -104,7 +98,7 @@ DhtNode::store_cache(Object* container) const {
     // which is effectively equivalent to this. Note that we need to specify
     // int64_t explicitly here because a zero constant is special in C++ and
     // thus we need an explicit match.
-    container->insert_key("i", int64_t(0));
+    container->insert_key("i", static_cast<int64_t>(0));
     container->insert_key("p", m_socketAddress.sa_inet6()->port());
 
   } else {

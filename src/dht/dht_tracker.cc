@@ -84,8 +84,8 @@ DhtTracker::get_peers(unsigned int maxPeers) {
   if (sizeof(BencodeAddress) != 8)
     throw internal_error("DhtTracker::BencodeAddress is packed incorrectly.");
 
-  PeerList::iterator first = m_peers.begin();
-  PeerList::iterator last = m_peers.end();
+  auto first = m_peers.begin();
+  auto last  = m_peers.end();
 
   // If we have more than max_peers, randomly return block of peers.
   // The peers in overlapping blocks get picked twice as often, but
@@ -97,7 +97,7 @@ DhtTracker::get_peers(unsigned int maxPeers) {
     last = first + maxPeers;
   }
 
-  return raw_list(first->bencode(), last->bencode() - first->bencode());
+  return {first->bencode(), static_cast<unsigned int>(last->bencode() - first->bencode())};
 }
 
 // Remove old announces.

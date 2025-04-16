@@ -27,14 +27,6 @@ public:
   using slot_value       = std::function<uint64_t()>;
   using slot_string      = std::function<void(const std::string&)>;
 
-  using base_type::value_type;
-  using base_type::reference;
-  using base_type::difference_type;
-
-  using base_type::iterator;
-  using base_type::reverse_iterator;
-  using base_type::const_iterator;
-
   using base_type::begin;
   using base_type::end;
   using base_type::size;

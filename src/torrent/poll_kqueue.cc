@@ -88,11 +88,8 @@ PollKQueue::create(int maxOpenSockets) {
 }
 
 PollKQueue::PollKQueue(int fd, int maxEvents, int maxOpenSockets) :
-  m_fd(fd),
-  m_maxEvents(maxEvents),
-  m_waitingEvents(0),
-  m_changedEvents(0),
-  m_stdinEvent(NULL) {
+    m_fd(fd),
+    m_maxEvents(maxEvents) {
 
   m_events = new struct kevent[m_maxEvents];
   m_changes = new struct kevent[maxOpenSockets];
@@ -191,7 +188,7 @@ PollKQueue::perform() {
     if ((flags() & flag_waive_global_lock) && utils::Thread::global_queue_size() != 0)
       utils::Thread::waive_global_lock();
 
-    Table::iterator evItr = m_table.begin() + itr->ident;
+    auto evItr = m_table.begin() + itr->ident;
 
     if ((itr->flags & EV_ERROR) && evItr->second != NULL) {
       if (evItr->first & flag_error)
@@ -220,7 +217,7 @@ PollKQueue::perform() {
 
 unsigned int
 PollKQueue::do_poll(int64_t timeout_usec, int flags) {
-  rak::timer timeout = rak::timer(timeout_usec);
+  auto timeout = rak::timer(timeout_usec);
   timeout += 10;
 
   if (!(flags & poll_worker_thread)) {

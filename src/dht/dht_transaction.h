@@ -38,6 +38,7 @@
 #define LIBTORRENT_DHT_TRANSACTION_H
 
 #include <map>
+#include <memory>
 #include <rak/socket_address.h>
 
 #include "dht/dht_node.h"
@@ -76,7 +77,7 @@ struct dht_compare_closer {
   bool operator () (const DhtNode* one, const DhtNode* two) const;
 
   const HashString&               target() const   { return m_target; }
-  raw_string                      target_raw_string() const { return raw_string(m_target.data(), HashString::size_data); }
+  raw_string                      target_raw_string() const { return {m_target.data(), HashString::size_data}; }
 
   private:
   const HashString&    m_target;
@@ -132,7 +133,7 @@ public:
   bool                 complete() const                  { return m_started && !m_pending; }
 
   const HashString&    target() const                    { return m_target; }
-  raw_string           target_raw_string() const         { return raw_string(m_target.data(), HashString::size_data); }
+  raw_string           target_raw_string() const         { return {m_target.data(), HashString::size_data}; }
 
   virtual bool         is_announce() const               { return false; }
 
@@ -149,13 +150,13 @@ protected:
   void                 set_node_active(const_accessor& n, bool active);
 
   // Statistics about contacted nodes.
-  unsigned int         m_pending;
-  unsigned int         m_contacted;
-  unsigned int         m_replied;
-  unsigned int         m_concurrency;
+  unsigned int         m_pending{0};
+  unsigned int         m_contacted{0};
+  unsigned int         m_replied{0};
+  unsigned int         m_concurrency{3};
 
-  bool                 m_restart;  // If true, trim nodes and reset m_next on the following get_contact call.
-  bool                 m_started;
+  bool                 m_restart{false};  // If true, trim nodes and reset m_next on the following get_contact call.
+  bool                 m_started{false};
 
   // Next node to return in get_contact, is end() if we have no more contactable nodes.
   const_accessor       m_next;
@@ -246,7 +247,7 @@ public:
   DhtTransactionPacket(const rak::socket_address* s, const DhtMessage& d)
     : m_sa(*s), m_id(-cachedTime.seconds()) { build_buffer(d); };
 
-  ~DhtTransactionPacket()                               { delete[] m_data; }
+  ~DhtTransactionPacket() = default;
 
   bool                        has_transaction() const   { return m_id >= -1; }
   bool                        has_failed() const        { return m_id == -1; }
@@ -255,7 +256,7 @@ public:
   const rak::socket_address*  address() const           { return &m_sa; }
   rak::socket_address*        address()                 { return &m_sa; }
 
-  const char*                 c_str() const             { return m_data; }
+  const char*                 c_str() const             { return m_data.get(); }
   size_t                      length() const            { return m_length; }
 
   int                         id() const                { return m_id; }
@@ -269,11 +270,11 @@ private:
 
   void                        build_buffer(const DhtMessage& data);
 
-  rak::socket_address   m_sa;
-  char*                 m_data;
-  size_t                m_length;
-  int                   m_id;
-  DhtTransaction*       m_transaction{};
+  rak::socket_address     m_sa;
+  std::unique_ptr<char[]> m_data;
+  size_t                  m_length;
+  int                     m_id;
+  DhtTransaction*         m_transaction{};
 };
 
 // DHT Transaction classes. DhtTransaction and DhtTransactionSearch
@@ -333,7 +334,7 @@ private:
   rak::socket_address    m_sa;
   int                    m_timeout;
   int                    m_quickTimeout;
-  DhtTransactionPacket*  m_packet;
+  DhtTransactionPacket*  m_packet{};
 };
 
 class DhtTransactionSearch : public DhtTransaction {
@@ -398,7 +399,7 @@ public:
   virtual transaction_type type()      { return DHT_ANNOUNCE_PEER; }
 
   const HashString&        info_hash() { return m_infoHash; }
-  raw_string               info_hash_raw_string() const { return raw_string(m_infoHash.data(), HashString::size_data); }
+  raw_string               info_hash_raw_string() const { return {m_infoHash.data(), HashString::size_data}; }
   raw_string               token()     { return m_token; }
 
 private:
@@ -410,7 +411,7 @@ inline bool
 DhtSearch::is_closer(const HashString& one, const HashString& two, const HashString& target) {
   for (unsigned int i=0; i<one.size(); i++)
     if (one[i] != two[i])
-      return (uint8_t)(one[i] ^ target[i]) < (uint8_t)(two[i] ^ target[i]);
+      return static_cast<uint8_t>(one[i] ^ target[i]) < static_cast<uint8_t>(two[i] ^ target[i]);
 
   return false;
 }
@@ -427,7 +428,7 @@ dht_compare_closer::operator () (const DhtNode* one, const DhtNode* two) const {
 
 inline DhtTransaction::key_type
 DhtTransaction::key(const rak::socket_address* sa, int id) {
-  return ((uint64_t)sa->sa_inet()->address_n() << 32) + id;
+  return (static_cast<uint64_t>(sa->sa_inet()->address_n()) << 32) + id;
 }
 
 inline bool

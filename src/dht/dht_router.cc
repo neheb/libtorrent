@@ -28,9 +28,7 @@ HashString DhtRouter::zero_id;
 
 DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
   DhtNode(zero_id, sa),  // actual ID is set later
-  m_server(this),
-  m_contacts(NULL),
-  m_numRefresh(0),
+
   m_curToken(random()),
   m_prevToken(random()) {
 
@@ -186,7 +184,7 @@ DhtRouter::get_node(const HashString& id) {
 
 DhtRouter::DhtBucketList::iterator
 DhtRouter::find_bucket(const HashString& id) {
-  DhtBucketList::iterator itr = m_routingTable.lower_bound(id);
+  auto itr = m_routingTable.lower_bound(id);
 
 #ifdef USE_EXTRA_DEBUG
   if (itr == m_routingTable.end())
@@ -439,7 +437,7 @@ DhtRouter::receive_timeout() {
 
   // If bucket isn't full yet or hasn't received replies/queries from
   // its nodes for a while, try to find new nodes now.
-  for (DhtBucketList::const_iterator itr = m_routingTable.begin(); itr != m_routingTable.end(); ++itr) {
+  for (auto itr = m_routingTable.begin(); itr != m_routingTable.end(); ++itr) {
     itr->second->update();
 
     if (!itr->second->is_full() || itr->second == bucket() || itr->second->age() > timeout_bucket_bootstrap)
@@ -517,7 +515,7 @@ DhtRouter::split_bucket(const DhtBucketList::iterator& itr, DhtNode* node) {
     throw internal_error("DhtRouter::split_bucket router ID ended up in wrong bucket.");
 
   // Insert new bucket with iterator hint = just before current bucket.
-  DhtBucketList::iterator other = m_routingTable.emplace_hint(itr, newBucket->id_range_end(), newBucket);
+  auto other = m_routingTable.emplace_hint(itr, newBucket->id_range_end(), newBucket);
 
   // Check that the bucket we're not adding the node to isn't empty.
   if (other->second->is_in_range(node->id())) {
@@ -536,11 +534,11 @@ DhtRouter::split_bucket(const DhtBucketList::iterator& itr, DhtNode* node) {
 
 bool
 DhtRouter::add_node_to_bucket(DhtNode* node) {
-  DhtBucketList::iterator itr = find_bucket(node->id());
+  auto itr = find_bucket(node->id());
 
   while (itr->second->is_full()) {
     // Bucket is full. If there are any bad nodes, remove the oldest.
-    DhtBucket::iterator nodeItr = itr->second->find_replacement_candidate();
+    auto nodeItr = itr->second->find_replacement_candidate();
     if (nodeItr == itr->second->end())
       throw internal_error("DhtBucket::find_candidate returned no node.");
 
@@ -582,7 +580,7 @@ DhtRouter::bootstrap() {
   // Contact up to 8 nodes from the contact list (newest first).
   for (int count = 0; count < 8 && !m_contacts->empty(); count++) {
     // Currently discarding SOCK_DGRAM.
-    thread_self()->resolver()->resolve_specific(this, m_contacts->back().first.c_str(), (int)rak::socket_address::pf_inet,
+    thread_self()->resolver()->resolve_specific(this, m_contacts->back().first.c_str(), rak::socket_address::pf_inet,
                                                 [this](c_sa_shared_ptr sa, [[maybe_unused]] int err) {
                                                   if (sa != nullptr)
                                                     contact(sa.get(), m_contacts->back().second);
@@ -607,7 +605,7 @@ DhtRouter::bootstrap() {
   if (m_routingTable.size() < 2)
     return;
 
-  DhtBucketList::iterator itr = m_routingTable.begin();
+  auto itr = m_routingTable.begin();
   std::advance(itr, random() % m_routingTable.size());
 
   if (itr->second != bucket() && itr != m_routingTable.end())

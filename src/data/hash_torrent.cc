@@ -15,11 +15,8 @@
 namespace torrent {
 
 HashTorrent::HashTorrent(ChunkList* c) :
-  m_position(0),
-  m_outstanding(-1),
-  m_errno(0),
-
-  m_chunk_list(c) {
+  m_chunk_list(c)
+{
 }
 
 bool
@@ -118,7 +115,7 @@ HashTorrent::queue(bool quick) {
       return;
 
     // Not very efficient, but this is seldomly done.
-    Ranges::iterator itr = m_ranges.find(m_position);
+    auto itr = m_ranges.find(m_position);
 
     if (itr == m_ranges.end()) {
       m_position = m_chunk_list->size();

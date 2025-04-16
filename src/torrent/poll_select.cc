@@ -76,7 +76,7 @@ struct poll_mark {
     if (s->file_descriptor() < 0)
       throw internal_error("poll_mark: s->fd < 0");
 
-    *m_max = std::max(*m_max, (unsigned int)s->file_descriptor());
+    *m_max = std::max(*m_max, static_cast<unsigned int>(s->file_descriptor()));
 
     FD_SET(s->file_descriptor(), m_set);
   }
@@ -102,9 +102,9 @@ PollSelect::create(int maxOpenSockets) {
   };
 
   rak::cacheline_allocator<Block*> cl_alloc;
-  block_type* block = new (cl_alloc) block_type;
+  auto block = new (cl_alloc) block_type;
 
-  PollSelect* p = new (&block->t1) PollSelect;
+  auto p = new (&block->t1) PollSelect;
 
   p->m_readSet = new (&block->t2) SocketSet;
   p->m_writeSet = new (&block->t3) SocketSet;
@@ -184,18 +184,18 @@ PollSelect::perform(fd_set* readSet, fd_set* writeSet, fd_set* exceptSet) {
 
 unsigned int
 PollSelect::do_poll(int64_t timeout_usec, int flags) {
-  rak::timer timeout = rak::timer(timeout_usec);
+  auto timeout = rak::timer(timeout_usec);
 
   timeout += 10;
 
-  uint32_t set_size = open_max();
+  const uint32_t set_size = open_max();
 
   char read_set_buffer[set_size];
   char write_set_buffer[set_size];
   char error_set_buffer[set_size];
-  fd_set* read_set = (fd_set*)read_set_buffer;
-  fd_set* write_set = (fd_set*)write_set_buffer;
-  fd_set* error_set = (fd_set*)error_set_buffer;
+  auto read_set = reinterpret_cast<fd_set*>(read_set_buffer);
+  auto write_set = reinterpret_cast<fd_set*>(write_set_buffer);
+  auto error_set = reinterpret_cast<fd_set*>(error_set_buffer);
   std::memset(read_set_buffer, 0, set_size);
   std::memset(write_set_buffer, 0, set_size);
   std::memset(error_set_buffer, 0, set_size);
@@ -247,7 +247,7 @@ void
 PollSelect::open(Event* event) {
   LT_LOG_EVENT(event, DEBUG, "Open event.", 0);
 
-  if ((uint32_t)event->file_descriptor() >= m_readSet->max_size())
+  if (static_cast<uint32_t>(event->file_descriptor()) >= m_readSet->max_size())
     throw internal_error("Tried to add a socket to PollSelect that is larger than PollSelect::get_open_max()");
 
   if (in_read(event) || in_write(event) || in_error(event))
@@ -258,7 +258,7 @@ void
 PollSelect::close(Event* event) {
   LT_LOG_EVENT(event, DEBUG, "Close event.", 0);
 
-  if ((uint32_t)event->file_descriptor() >= m_readSet->max_size())
+  if (static_cast<uint32_t>(event->file_descriptor()) >= m_readSet->max_size())
     throw internal_error("PollSelect::close(...) called with an invalid file descriptor");
 
   if (in_read(event) || in_write(event) || in_error(event))

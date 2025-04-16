@@ -96,7 +96,7 @@ PollEPoll::PollEPoll(int fd, int max_events, int max_open_sockets) :
 
   try {
     m_table.resize(max_open_sockets);
-  } catch (std::bad_alloc) {
+  } catch (const std::bad_alloc&) {
     char errmsg[1024];
     snprintf(errmsg, sizeof(errmsg),
              "PollEPoll::PollEPoll(...): Error allocating m_table array: too much space requested: max_open_sockets:%d", max_open_sockets);
@@ -132,13 +132,13 @@ PollEPoll::perform() {
   unsigned int count = 0;
 
   for (epoll_event *itr = m_events, *last = m_events + m_waitingEvents; itr != last; ++itr) {
-    if (itr->data.fd < 0 || (size_t)itr->data.fd >= m_table.size())
+    if (itr->data.fd < 0 || static_cast<size_t>(itr->data.fd) >= m_table.size())
       continue;
 
     if ((flags() & flag_waive_global_lock) && utils::Thread::global_queue_size() != 0)
       utils::Thread::waive_global_lock();
 
-    Table::iterator evItr = m_table.begin() + itr->data.fd;
+    auto evItr = m_table.begin() + itr->data.fd;
 
     // Each branch must check for data.ptr != NULL to allow the socket
     // to remove itself between the calls.
@@ -168,7 +168,7 @@ PollEPoll::perform() {
 
 unsigned int
 PollEPoll::do_poll(int64_t timeout_usec, int flags) {
-  rak::timer timeout = rak::timer(timeout_usec);
+  auto timeout = rak::timer(timeout_usec);
 
   timeout += 10;
 

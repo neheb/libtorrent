@@ -93,12 +93,12 @@ ChunkManager::estimate_max_memory_usage() {
 #endif
     return rlp.rlim_cur;
 
-  return (uint64_t)DEFAULT_ADDRESS_SPACE_SIZE << 20;
+  return static_cast<uint64_t>(DEFAULT_ADDRESS_SPACE_SIZE) << 20;
 }
 
 uint64_t
 ChunkManager::safe_free_diskspace() const {
-  return m_memoryUsage + ((uint64_t)512 << 20);
+  return m_memoryUsage + (static_cast<uint64_t>(512) << 20);
 }
 
 void
@@ -113,7 +113,7 @@ ChunkManager::erase(ChunkList* chunkList) {
   if (chunkList->queue_size() != 0)
     throw internal_error("ChunkManager::erase(...) chunkList->queue_size() != 0.");
 
-  iterator itr = std::find(base_type::begin(), base_type::end(), chunkList);
+  auto itr = std::find(base_type::begin(), base_type::end(), chunkList);
 
   if (itr == base_type::end())
     throw internal_error("ChunkManager::erase(...) itr == base_type::end().");
@@ -164,7 +164,7 @@ ChunkManager::deallocate(uint32_t size, int flags) {
   m_memoryBlockCount--;
 
   instrumentation_update(INSTRUMENTATION_MEMORY_CHUNK_COUNT, -1);
-  instrumentation_update(INSTRUMENTATION_MEMORY_CHUNK_USAGE, -(int64_t)size);
+  instrumentation_update(INSTRUMENTATION_MEMORY_CHUNK_USAGE, -static_cast<int64_t>(size));
 }
 
 void
@@ -200,7 +200,7 @@ ChunkManager::sync_all(int flags, uint64_t target) {
   // syncing the same torrent.
   m_lastFreed = m_lastFreed % base_type::size() + 1;
 
-  iterator itr = base_type::begin() + m_lastFreed;
+  auto itr = base_type::begin() + m_lastFreed;
 
   do {
     if (itr == base_type::end())

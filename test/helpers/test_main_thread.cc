@@ -21,18 +21,17 @@ TestMainThread::init_thread() {
   if (!torrent::Poll::slot_create_poll())
     throw torrent::internal_error("ThreadMain::init_thread(): Poll::slot_create_poll() not valid.");
 
-  m_self = this;
-
   m_poll = std::unique_ptr<torrent::Poll>(torrent::Poll::slot_create_poll()());
   m_poll->set_flags(torrent::Poll::flag_waive_global_lock);
+
   m_resolver = std::make_unique<torrent::net::Resolver>();
 
   m_state = STATE_INITIALIZED;
-  m_thread = pthread_self();
-  m_thread_id = std::this_thread::get_id();
   m_flags |= flag_main_thread;
 
   //m_instrumentation_index = INSTRUMENTATION_POLLING_DO_POLL_MAIN - INSTRUMENTATION_POLLING_DO_POLL;
+
+  init_thread_local();
 }
 
 void
@@ -59,12 +58,12 @@ TestMainThread::call_events() {
   process_callbacks();
 }
 
-int64_t
-TestMainThread::next_timeout_usec() {
+std::chrono::microseconds
+TestMainThread::next_timeout() {
   torrent::cachedTime = rak::timer::current();
 
   if (!torrent::taskScheduler.empty())
-    return std::max(torrent::taskScheduler.top()->time() - torrent::cachedTime, rak::timer()).usec();
+    return std::chrono::microseconds(std::max(torrent::taskScheduler.top()->time() - torrent::cachedTime, rak::timer()).usec());
   else
-    return rak::timer::from_seconds(60).usec();
+    return std::chrono::microseconds(10min);
 }

@@ -64,7 +64,7 @@ public:
   DhtNode& operator=(const DhtNode&) = delete;
 
   const HashString&           id() const                 { return *this; }
-  raw_string                  id_raw_string() const      { return raw_string(data(), size_data); }
+  raw_string                  id_raw_string() const      { return {data(), size_data}; }
   const rak::socket_address*  address() const            { return &m_socketAddress; }
   void                        set_address(const rak::socket_address* sa) { m_socketAddress = *sa; }
 
@@ -102,9 +102,9 @@ private:
 
   rak::socket_address m_socketAddress;
   unsigned int        m_lastSeen;
-  bool                m_recentlyActive;
-  unsigned int        m_recentlyInactive;
-  DhtBucket*          m_bucket;
+  bool                m_recentlyActive{};
+  unsigned int        m_recentlyInactive{};
+  DhtBucket*          m_bucket{};
 };
 
 inline void
