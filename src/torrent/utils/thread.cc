@@ -43,6 +43,29 @@ Thread::self() {
 }
 
 void
+Thread::acquire_global_lock() {
+  Thread::m_global.waiting++;
+  Thread::m_global.mutex.lock();
+  Thread::m_global.waiting--;
+}
+
+bool
+Thread::trylock_global_lock() {
+  return Thread::m_global.mutex.try_lock();
+}
+
+void
+Thread::release_global_lock() {
+  Thread::m_global.mutex.unlock();
+}
+
+void
+Thread::waive_global_lock() {
+  release_global_lock();
+  acquire_global_lock();
+}
+
+void
 Thread::start_thread() {
   if (m_poll == nullptr)
     throw internal_error("No poll object for thread defined.");

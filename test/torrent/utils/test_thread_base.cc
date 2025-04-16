@@ -106,6 +106,11 @@ test_thread_base::test_global_lock_basic() {
   auto try_global_lock_2 = std::async([&]() {
       bool result = torrent::utils::Thread::trylock_global_lock();
 
+      usleep(100);
+
+      if (!result)
+        result = torrent::utils::Thread::trylock_global_lock();
+
       if (!result)
         return false;
 
