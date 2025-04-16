@@ -3,7 +3,7 @@ project(
   'c',
   'cpp',
   version: '0.15.2',
-  default_options: ['cpp_std=c++20', 'warning_level=1'],
+  default_options: ['cpp_std=c++17', 'warning_level=1'],
 )
 
 if get_option('b_ndebug') not in ['true', 'if-release']
