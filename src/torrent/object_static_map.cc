@@ -36,8 +36,6 @@
 
 #include "config.h"
 
-#include <rak/algorithm.h>
-
 #include "object_static_map.h"
 
 namespace torrent {
@@ -49,7 +47,8 @@ find_key_match(const static_map_mapping_type* first, const static_map_mapping_ty
   const static_map_mapping_type* itr = first;
 
   while (itr != last) {
-    unsigned int base = rak::count_base(key_first, key_last, itr->key, itr->key + itr->max_key_size);
+    auto mis = std::mismatch(key_first, key_last, itr->key, itr->key + itr->max_key_size);
+    auto base = std::distance(key_first, mis.first);
 
     if (key_first[base] != '\0') {
       // Return not found here if we know the entry won't come after

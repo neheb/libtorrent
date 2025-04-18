@@ -5,8 +5,6 @@
 #include <limits>
 #include <stdexcept>
 
-#include <rak/algorithm.h>
-
 #include "utils/sha1.h"
 
 #include "object.h"
@@ -783,8 +781,8 @@ static_map_write_bencode_c_values(object_write_data_t* output,
 
     // Compare the keys to see if they are part of the same
     // dictionaries/lists.
-    unsigned int base_size = rak::count_base(first_key->key, first_key->key + stack_itr->next_key,
-                                             prev_key, prev_key + stack_itr->next_key);
+    auto mis = std::mismatch(first_key->key, first_key->key + stack_itr->next_key, prev_key, prev_key + stack_itr->next_key);
+    auto base_size = std::distance(first_key->key, mis.first);
 
     while (base_size < stack_itr->next_key) {
       object_write_bencode_c_char(output, 'e');
