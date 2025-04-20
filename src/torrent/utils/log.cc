@@ -222,7 +222,7 @@ void
 log_cleanup() {
   auto lock = std::scoped_lock(log_mutex);
 
-  std::fill(log_groups.begin(), log_groups.end(), log_group());
+  log_groups = {};
 
   log_outputs.clear();
   log_children.clear();
