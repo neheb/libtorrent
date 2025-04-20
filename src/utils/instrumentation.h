@@ -88,7 +88,7 @@ void instrumentation_reset();
 
 inline void
 instrumentation_initialize() {
-  std::fill(instrumentation_values.begin(), instrumentation_values.end(), int64_t());
+  std::fill(instrumentation_values.begin(), instrumentation_values.end(), 0);
 }
 
 inline void
