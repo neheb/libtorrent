@@ -2,14 +2,15 @@
 #define LIBTORRENT_TRANSFER_LIST_H
 
 #include <functional>
+#include <memory>
 #include <vector>
 #include <torrent/common.h>
 
 namespace torrent {
 
-class LIBTORRENT_EXPORT TransferList : public std::vector<BlockList*> {
+class LIBTORRENT_EXPORT TransferList : public std::vector<std::unique_ptr<BlockList>> {
 public:
-  using base_type           = std::vector<BlockList*>;
+  using base_type           = std::vector<std::unique_ptr<BlockList>>;
   using completed_list_type = std::vector<std::pair<int64_t, uint32_t>>;
 
   using base_type::value_type;
@@ -24,7 +25,7 @@ public:
   using base_type::rbegin;
   using base_type::rend;
 
-  TransferList() = default;
+  TransferList();
   ~TransferList();
   TransferList(const TransferList&) = delete;
   TransferList& operator=(const TransferList&) = delete;

@@ -269,7 +269,7 @@ Download::bytes_done() const {
 
   Delegator* d = m_ptr->main()->delegator();
 
-  for (auto itr1 : *d->transfer_list())
+  for (const auto& itr1 : *d->transfer_list())
     for (const auto& itr2 : *itr1)
       if (itr2.is_finished())
         a += itr2.piece().length();

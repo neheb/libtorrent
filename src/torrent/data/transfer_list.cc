@@ -56,6 +56,8 @@ namespace torrent {
 
 // TODO: Derp if transfer list isn't cleared...
 
+TransferList::TransferList() = default;
+
 TransferList::~TransferList() {
   if (!base_type::empty())
     throw internal_error("TransferList::~TransferList() called on an non-empty object");
@@ -63,21 +65,18 @@ TransferList::~TransferList() {
 
 TransferList::iterator
 TransferList::find(uint32_t index) {
-  return std::find_if(begin(), end(), [index](BlockList* b) { return index == b->index(); });
+  return std::find_if(begin(), end(), [index](const auto& b) { return index == b->index(); });
 }
 
 TransferList::const_iterator
 TransferList::find(uint32_t index) const {
-  return std::find_if(begin(), end(), [index](BlockList* b) { return index == b->index(); });
+  return std::find_if(begin(), end(), [index](const auto& b) { return index == b->index(); });
 }
 
 void
 TransferList::clear() {
   for (const auto& block_list : *this) {
     m_slot_canceled(block_list->index());
-  }
-  for (const auto& block_list : *this) {
-    delete block_list;
   }
 
   base_type::clear();
@@ -88,11 +87,11 @@ TransferList::insert(const Piece& piece, uint32_t blockSize) {
   if (find(piece.index()) != end())
     throw internal_error("Delegator::new_chunk(...) received an index that is already delegated.");
 
-  auto blockList = new BlockList(piece, blockSize);
+  auto blockList = std::make_unique<BlockList>(piece, blockSize);
 
   m_slot_queued(piece.index());
 
-  return base_type::insert(end(), blockList);
+  return base_type::insert(end(), std::move(blockList));
 }
 
 // TODO: Create a destructor to ensure all blocklists have been cleared/invaldiated?
@@ -101,8 +100,6 @@ TransferList::iterator
 TransferList::erase(iterator itr) {
   if (itr == end())
     throw internal_error("TransferList::erase(...) itr == m_chunks.end().");
-
-  delete *itr;
 
   return base_type::erase(itr);
 }
@@ -130,7 +127,7 @@ TransferList::hash_succeeded(uint32_t index, Chunk* chunk) {
   // gets priority for syncing back to disk.
 
   if ((*blockListItr)->failed() != 0)
-    mark_failed_peers(*blockListItr, chunk);
+    mark_failed_peers(blockListItr->get(), chunk);
 
   // Add to a list of finished chunks indices with timestamps. This is
   // mainly used for torrent resume data on which chunks need to be
@@ -182,12 +179,12 @@ TransferList::hash_failed(uint32_t index, Chunk* chunk) {
   // list.
 
   if ((*blockListItr)->attempt() == 0) {
-    unsigned int promoted = update_failed(*blockListItr, chunk);
+    unsigned int promoted = update_failed(blockListItr->get(), chunk);
 
     if (promoted > 0 || promoted < (*blockListItr)->size()) {
       // Retry with the most popular blocks.
       (*blockListItr)->set_attempt(1);
-      retry_most_popular(*blockListItr, chunk);
+      retry_most_popular(blockListItr->get(), chunk);
 
       // Also consider various other schemes, like using blocks from
       // only/mainly one peer.

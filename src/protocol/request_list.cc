@@ -331,7 +331,7 @@ RequestList::transfer_dissimilar() {
 bool
 RequestList::is_interested_in_active() const {
   auto list = m_delegator->transfer_list();
-  return std::any_of(list->begin(), list->end(), [this](auto transfer) { return m_peerChunks->bitfield()->get(transfer->index()); });
+  return std::any_of(list->begin(), list->end(), [this](const auto& transfer) { return m_peerChunks->bitfield()->get(transfer->index()); });
 }
 
 uint32_t
