@@ -71,7 +71,7 @@ InitialSeeding::clear_peer(PeerInfo* peer) {
   if (!valid_peer(peer))
     return;
 
-  peer->unset_flags(PeerInfo::flag_blocked);
+  peer->unset_flags(PeerInfo::flag::blocked);
 
   // If peer is still connected, offer new piece right away.
   if (peer->connection() != NULL)
@@ -121,7 +121,7 @@ void
 InitialSeeding::new_peer(PeerConnectionBase* pcb) {
   PeerInfo* peer = pcb->mutable_peer_info();
   if (peer->is_blocked())
-    peer->set_flags(PeerInfo::flag_restart);
+    peer->set_flags(PeerInfo::flag::restart);
 
   // We don't go through the peer's entire bitfield here. This eliminates
   // cheating by sending a bogus bitfield if it figures out we are initial
@@ -158,14 +158,14 @@ InitialSeeding::chunk_offer(PeerConnectionBase* pcb, uint32_t chunkDone) {
   if (peer->is_blocked() && chunkDone != no_offer && m_peerChunks[chunkDone] == peer &&
       m_download->choke_group()->up_queue()->size_total() * 10 < 9 * m_download->choke_group()->up_queue()->max_unchoked()) {
     m_peerChunks[chunkDone] = chunk_unknown;
-    peer->unset_flags(PeerInfo::flag_blocked);
+    peer->unset_flags(PeerInfo::flag::blocked);
 
   // Otherwise check if we can offer a chunk normally.
   } else if (peer->is_blocked()) {
     if (!peer->is_restart())
       return no_offer;
 
-    peer->unset_flags(PeerInfo::flag_restart);
+    peer->unset_flags(PeerInfo::flag::restart);
 
     // Re-connection of a peer we already sent a chunk.
     // Offer the same chunk again.
@@ -202,7 +202,7 @@ InitialSeeding::chunk_offer(PeerConnectionBase* pcb, uint32_t chunkDone) {
   // cannot be unblocked, but when initial seeding completes
   // everyone is unblocked anyway.
   if (m_chunksLeft == 1 && valid_peer(m_peerChunks[index])) {
-    peer->set_flags(PeerInfo::flag_blocked);
+    peer->set_flags(PeerInfo::flag::blocked);
     return index;
   }
 
@@ -213,7 +213,7 @@ InitialSeeding::chunk_offer(PeerConnectionBase* pcb, uint32_t chunkDone) {
     return no_offer;
 
   m_peerChunks[index] = peer;
-  peer->set_flags(PeerInfo::flag_blocked);
+  peer->set_flags(PeerInfo::flag::blocked);
   find_next(secondary, pcb);
   return index;
 }
@@ -280,7 +280,7 @@ InitialSeeding::complete(PeerConnectionBase* pcb) {
 void
 InitialSeeding::unblock_all() {
   for (const auto& peer : *m_download->peer_list())
-    peer.second->unset_flags(PeerInfo::flag_blocked);
+    peer.second->unset_flags(PeerInfo::flag::blocked);
 }
 
 }

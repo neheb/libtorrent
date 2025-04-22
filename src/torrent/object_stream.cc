@@ -120,8 +120,8 @@ object_read_bencode(std::istream* input, Object* object, uint32_t depth) {
       // The unordered flag is inherited also from list elements who
       // have been marked as unordered, though e.g. unordered strings
       // in the list itself does not cause this flag to be set.
-      if (itr->flags() & Object::flag_unordered)
-        object->set_internal_flags(Object::flag_unordered);
+      if (itr->flags() & Object::flag::unordered)
+        object->set_internal_flags(Object::flag::unordered);
     }
 
     break;
@@ -146,17 +146,17 @@ object_read_bencode(std::istream* input, Object* object, uint32_t depth) {
       if (!object_read_string(input, str))
 	break;
 
-      // We do not set flag_unordered if the first key was zero
+      // We do not set flag::unordered if the first key was zero
       // length, while multiple zero length keys will trigger the
       // unordered_flag.
       if (str <= last && !object->as_map().empty())
-        object->set_internal_flags(Object::flag_unordered);
+        object->set_internal_flags(Object::flag::unordered);
 
       Object* value = &object->as_map()[str];
       object_read_bencode(input, value, depth);
 
-      if (value->flags() & Object::flag_unordered)
-        object->set_internal_flags(Object::flag_unordered);
+      if (value->flags() & Object::flag::unordered)
+        object->set_internal_flags(Object::flag::unordered);
 
       str.swap(last);
     }
@@ -211,8 +211,8 @@ object_read_bencode_c(const char* first, const char* last, Object* object, uint3
       // The unordered flag is inherited also from list elements who
       // have been marked as unordered, though e.g. unordered strings
       // in the list itself does not cause this flag to be set.
-      if (itr->flags() & Object::flag_unordered)
-        object->set_internal_flags(Object::flag_unordered);
+      if (itr->flags() & Object::flag::unordered)
+        object->set_internal_flags(Object::flag::unordered);
     }
 
     break;
@@ -235,17 +235,17 @@ object_read_bencode_c(const char* first, const char* last, Object* object, uint3
 
       Object::string_type str = raw_str.as_string();
 
-      // We do not set flag_unordered if the first key was zero
+      // We do not set flag::unordered if the first key was zero
       // length, while multiple zero length keys will trigger the
       // unordered_flag.
       if (str <= prev && !object->as_map().empty())
-        object->set_internal_flags(Object::flag_unordered);
+        object->set_internal_flags(Object::flag::unordered);
 
       Object* value = &object->as_map()[str];
       first = object_read_bencode_c(first, last, value, depth);
 
-      if (value->flags() & Object::flag_unordered)
-        object->set_internal_flags(Object::flag_unordered);
+      if (value->flags() & Object::flag::unordered)
+        object->set_internal_flags(Object::flag::unordered);
 
       str.swap(prev);
     }

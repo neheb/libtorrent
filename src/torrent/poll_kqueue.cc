@@ -27,9 +27,11 @@ class PollInternal {
 public:
   using Table = std::vector<std::pair<uint32_t, Event*>>;
 
-  static constexpr uint32_t flag_read  = (1 << 0);
-  static constexpr uint32_t flag_write = (1 << 1);
-  static constexpr uint32_t flag_error = (1 << 2);
+  enum flag : uint32_t {
+    read  = (1 << 0),
+    write = (1 << 1),
+    error = (1 << 2),
+  };
 
   inline uint32_t     event_mask(Event* e);
   inline void         set_event_mask(Event* e, uint32_t m);

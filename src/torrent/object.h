@@ -76,12 +76,14 @@ public:
   static constexpr uint32_t mask_internal = 0xffff;
   static constexpr uint32_t mask_public   = ~mask_internal;
 
-  static constexpr uint32_t flag_unordered    = 0x100;    // bencode dictionary was not sorted
-  static constexpr uint32_t flag_static_data  = 0x010000;  // Object does not change across sessions.
-  static constexpr uint32_t flag_session_data = 0x020000;  // Object changes between sessions.
-  static constexpr uint32_t flag_function     = 0x040000;  // A function object.
-  static constexpr uint32_t flag_function_q1  = 0x080000;  // A quoted function object.
-  static constexpr uint32_t flag_function_q2  = 0x100000;  // A double-quoted function object.
+  enum flag : uint32_t {
+    unordered    = 0x100,    // bencode dictionary was not sorted
+    static_data  = 0x010000,  // Object does not change across sessions.
+    session_data = 0x020000,  // Object changes between sessions.
+    function     = 0x040000,  // A function object.
+    function_q1  = 0x080000,  // A quoted function object.
+    function_q2  = 0x100000,  // A double-quoted function object.
+  };
 
   static constexpr uint32_t mask_function     = 0x1C0000;  // Mask for function objects.
 
@@ -239,7 +241,7 @@ public:
   // Only map entries are merged.
   Object&             merge_move(Object& object, uint32_t maxDepth = ~uint32_t());
   Object&             merge_copy(const Object& object,
-                                 uint32_t skip_mask = flag_static_data,
+                                 uint32_t skip_mask = flag::static_data,
                                  uint32_t maxDepth = ~uint32_t());
 
   // Internal:
