@@ -239,7 +239,7 @@ PeerList::connected(const sockaddr* sa, int flags) {
 
   // We should also remove any PeerInfo objects already for this
   // address.
-  if ((filter_value & PeerInfo::flag_unwanted)) {
+  if ((filter_value & PeerInfo::flag::unwanted)) {
     LT_LOG_EVENTS("connecting peer rejected, flagged as unwanted: " LT_LOG_SA_FMT, address->address_str().c_str(), address->port());
     return NULL;
   }
@@ -293,11 +293,11 @@ PeerList::connected(const sockaddr* sa, int flags) {
     peerInfo->set_listen_port(address->port());
 
   if (flags & connect_incoming)
-    peerInfo->set_flags(PeerInfo::flag_incoming);
+    peerInfo->set_flags(PeerInfo::flag::incoming);
   else
-    peerInfo->unset_flags(PeerInfo::flag_incoming);
+    peerInfo->unset_flags(PeerInfo::flag::incoming);
 
-  peerInfo->set_flags(PeerInfo::flag_connected);
+  peerInfo->set_flags(PeerInfo::flag::connected);
   peerInfo->set_last_handshake(this_thread::cached_seconds().count());
 
   return peerInfo;
@@ -338,7 +338,7 @@ PeerList::disconnected(iterator itr, int flags) {
                   itr->second->transfer_counter(), itr->second->id_hex());
   }
 
-  itr->second->unset_flags(PeerInfo::flag_connected);
+  itr->second->unset_flags(PeerInfo::flag::connected);
 
   // Replace the socket address port with the listening port so that
   // future outgoing connections will connect to the right port.

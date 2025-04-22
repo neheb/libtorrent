@@ -225,8 +225,8 @@ Object object_create_normal(const raw_list& obj) {
     // The unordered flag is inherited also from list elements who
     // have been marked as unordered, though e.g. unordered strings
     // in the list itself does not cause this flag to be set.
-    if (new_entry->flags() & Object::flag_unordered)
-      result.set_internal_flags(Object::flag_unordered);
+    if (new_entry->flags() & Object::flag::unordered)
+      result.set_internal_flags(Object::flag::unordered);
   }
 
   return result;
@@ -250,13 +250,13 @@ Object object_create_normal(const raw_map& obj) {
     // length, while multiple zero length keys will trigger the
     // unordered_flag.
     if (key_str <= prev && !result.as_map().empty())
-      result.set_internal_flags(Object::flag_unordered);
+      result.set_internal_flags(Object::flag::unordered);
 
     Object* value = &result.as_map()[key_str];
     first = object_read_bencode_c(first, last, value, 128);
 
-    if (value->flags() & Object::flag_unordered)
-      result.set_internal_flags(Object::flag_unordered);
+    if (value->flags() & Object::flag::unordered)
+      result.set_internal_flags(Object::flag::unordered);
 
     key_str.swap(prev);
   }

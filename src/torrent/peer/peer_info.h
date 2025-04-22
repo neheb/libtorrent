@@ -52,28 +52,30 @@ public:
   friend class PeerList;
   friend class ProtocolExtension;
 
-  static constexpr int flag_connected = (1 << 0);
-  static constexpr int flag_incoming  = (1 << 1);
-  static constexpr int flag_handshake = (1 << 2);
-  static constexpr int flag_blocked   = (1 << 3);   // For initial seeding.
-  static constexpr int flag_restart   = (1 << 4);
-  static constexpr int flag_unwanted  = (1 << 5);
-  static constexpr int flag_preferred = (1 << 6);
+  enum flag {
+    connected = (1 << 0),
+    incoming  = (1 << 1),
+    handshake = (1 << 2),
+    blocked   = (1 << 3),   // For initial seeding.
+    restart   = (1 << 4),
+    unwanted  = (1 << 5),
+    preferred = (1 << 6),
+  };
 
-  static constexpr int mask_ip_table = flag_unwanted | flag_preferred;
+  static constexpr int mask_ip_table = flag::unwanted | flag::preferred;
 
   PeerInfo(const sockaddr* address);
   ~PeerInfo();
   PeerInfo(const PeerInfo&) = delete;
   PeerInfo& operator=(const PeerInfo&) = delete;
 
-  bool                is_connected() const                  { return m_flags & flag_connected; }
-  bool                is_incoming() const                   { return m_flags & flag_incoming; }
-  bool                is_handshake() const                  { return m_flags & flag_handshake; }
-  bool                is_blocked() const                    { return m_flags & flag_blocked; }
-  bool                is_restart() const                    { return m_flags & flag_restart; }
-  bool                is_unwanted() const                   { return m_flags & flag_unwanted; }
-  bool                is_preferred() const                  { return m_flags & flag_preferred; }
+  bool                is_connected() const                  { return m_flags & flag::connected; }
+  bool                is_incoming() const                   { return m_flags & flag::incoming; }
+  bool                is_handshake() const                  { return m_flags & flag::handshake; }
+  bool                is_blocked() const                    { return m_flags & flag::blocked; }
+  bool                is_restart() const                    { return m_flags & flag::restart; }
+  bool                is_unwanted() const                   { return m_flags & flag::unwanted; }
+  bool                is_preferred() const                  { return m_flags & flag::preferred; }
 
   int                 flags() const                         { return m_flags; }
 

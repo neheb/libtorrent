@@ -25,9 +25,11 @@ class PollInternal {
 public:
   using Table = std::vector<std::pair<uint32_t, Event*>>;
 
-  static constexpr uint32_t flag_read  = (1 << 0);
-  static constexpr uint32_t flag_write = (1 << 1);
-  static constexpr uint32_t flag_error = (1 << 2);
+  enum flag : uint32_t {
+    read  = (1 << 0),
+    write = (1 << 1),
+    error = (1 << 2),
+  };
 
   inline uint32_t     event_mask(Event* e);
   inline void         set_event_mask(Event* e, uint32_t m);
@@ -183,7 +185,7 @@ Poll::process() {
     auto evItr = m_internal->m_table.begin() + itr->ident;
 
     if ((itr->flags & EV_ERROR) && evItr->second != nullptr) {
-      if (evItr->first & PollInternal::flag_error)
+      if (evItr->first & PollInternal::flag::error)
         evItr->second->event_error();
 
       count++;
@@ -194,12 +196,12 @@ Poll::process() {
 
     // Also check current mask.
 
-    if (itr->filter == EVFILT_READ && evItr->second != nullptr && evItr->first & PollInternal::flag_read) {
+    if (itr->filter == EVFILT_READ && evItr->second != nullptr && evItr->first & PollInternal::flag::read) {
       count++;
       evItr->second->event_read();
     }
 
-    if (itr->filter == EVFILT_WRITE && evItr->second != nullptr && evItr->first & PollInternal::flag_write) {
+    if (itr->filter == EVFILT_WRITE && evItr->second != nullptr && evItr->first & PollInternal::flag::write) {
       count++;
       evItr->second->event_write();
     }
@@ -267,38 +269,38 @@ Poll::closed(Event* event) {
 
 bool
 Poll::in_read(Event* event) {
-  return m_internal->event_mask(event) & PollInternal::flag_read;
+  return m_internal->event_mask(event) & PollInternal::flag::read;
 }
 
 bool
 Poll::in_write(Event* event) {
-  return m_internal->event_mask(event) & PollInternal::flag_write;
+  return m_internal->event_mask(event) & PollInternal::flag::write;
 }
 
 bool
 Poll::in_error(Event* event) {
-  return m_internal->event_mask(event) & PollInternal::flag_error;
+  return m_internal->event_mask(event) & PollInternal::flag::error;
 }
 
 void
 Poll::insert_read(Event* event) {
-  if (m_internal->event_mask(event) & PollInternal::flag_read)
+  if (m_internal->event_mask(event) & PollInternal::flag::read)
     return;
 
   LT_LOG_EVENT(event, DEBUG, "insert read", 0);
 
-  m_internal->set_event_mask(event, m_internal->event_mask(event) | PollInternal::flag_read);
+  m_internal->set_event_mask(event, m_internal->event_mask(event) | PollInternal::flag::read);
   m_internal->modify(event, EV_ADD, EVFILT_READ);
 }
 
 void
 Poll::insert_write(Event* event) {
-  if (m_internal->event_mask(event) & PollInternal::flag_write)
+  if (m_internal->event_mask(event) & PollInternal::flag::write)
     return;
 
   LT_LOG_EVENT(event, DEBUG, "insert write", 0);
 
-  m_internal->set_event_mask(event, m_internal->event_mask(event) | PollInternal::flag_write);
+  m_internal->set_event_mask(event, m_internal->event_mask(event) | PollInternal::flag::write);
   m_internal->modify(event, EV_ADD, EVFILT_WRITE);
 }
 
@@ -309,23 +311,23 @@ Poll::insert_error(Event* event) {
 
 void
 Poll::remove_read(Event* event) {
-  if (!(m_internal->event_mask(event) & PollInternal::flag_read))
+  if (!(m_internal->event_mask(event) & PollInternal::flag::read))
     return;
 
   LT_LOG_EVENT(event, DEBUG, "remove read", 0);
 
-  m_internal->set_event_mask(event, m_internal->event_mask(event) & ~PollInternal::flag_read);
+  m_internal->set_event_mask(event, m_internal->event_mask(event) & ~PollInternal::flag::read);
   m_internal->modify(event, EV_DELETE, EVFILT_READ);
 }
 
 void
 Poll::remove_write(Event* event) {
-  if (!(m_internal->event_mask(event) & PollInternal::flag_write))
+  if (!(m_internal->event_mask(event) & PollInternal::flag::write))
     return;
 
   LT_LOG_EVENT(event, DEBUG, "remove write", 0);
 
-  m_internal->set_event_mask(event, m_internal->event_mask(event) & ~PollInternal::flag_write);
+  m_internal->set_event_mask(event, m_internal->event_mask(event) & ~PollInternal::flag::write);
   m_internal->modify(event, EV_DELETE, EVFILT_WRITE);
 }
 

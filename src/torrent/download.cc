@@ -48,10 +48,10 @@ Download::open(int flags) {
   // should be allowed to pass a flag that will keep the old settings,
   // although loading resume data should really handle everything
   // properly.
-  int fileFlags = File::flag_create_queued | File::flag_resize_queued;
+  int fileFlags = File::flag::create_queued | File::flag::resize_queued;
 
   if (flags & open_enable_fallocate)
-    fileFlags |= File::flag_fallocate;
+    fileFlags |= File::flag::fallocate;
 
   for (auto& file : *m_ptr->main()->file_list())
     file->set_flags(fileFlags);
@@ -186,7 +186,7 @@ Download::set_pex_enabled(bool enabled) {
   if (enabled)
     m_ptr->info()->set_pex_enabled();
   else
-    m_ptr->info()->unset_flags(DownloadInfo::flag_pex_enabled);
+    m_ptr->info()->unset_flags(DownloadInfo::flag::pex_enabled);
 }
 
 Object*
