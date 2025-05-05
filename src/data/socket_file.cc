@@ -121,8 +121,11 @@ SocketFile::allocate(uint64_t size, int flags) const {
 //       throw internal_error("hack: fcntl failed" + std::string(strerror(errno)));
 
     if (fcntl(m_fd, F_PREALLOCATE, &fstore) == -1) {
-      LT_LOG_ERROR("fcntl(,F_PREALLOCATE,) failed : %s", strerror(errno));
-      return false;
+      fstore.fst_flags = F_ALLOCATEALL;
+      if (fcntl(m_fd, F_PREALLOCATE, &fstore) == -1) {
+        LT_LOG_ERROR("fcntl(,F_PREALLOCATE,) failed : %s", strerror(errno));
+        return false;
+      }
     }
 
     return true;
