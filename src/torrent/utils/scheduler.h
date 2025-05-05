@@ -6,7 +6,6 @@
 #include <thread>
 #include <vector>
 #include <torrent/common.h>
-#include <torrent/utils/chrono.h>
 
 namespace torrent::utils {
 
@@ -17,13 +16,16 @@ public:
 
   using base_type::begin;
   using base_type::end;
+  using base_type::front;
   using base_type::size;
   using base_type::empty;
   using base_type::clear;
 
   ~Scheduler() = default;
 
-  // time_type is milliseconds since unix epoch.
+  // time_type is microseconds since unix epoch.
+
+  time_type           next_timeout() const;
 
   void                wait_until(SchedulerEntry* entry, time_type time);
   void                wait_for(SchedulerEntry* entry, time_type time);
@@ -78,6 +80,14 @@ private:
   slot_type           m_slot;
   Scheduler*          m_scheduler{};
   time_type           m_time{};
+};
+
+class LIBTORRENT_EXPORT ExternalScheduler : public Scheduler {
+public:
+  void                external_perform(time_type time)           { perform(time); }
+
+  void                external_set_thread_id(std::thread::id id) { set_thread_id(id); }
+  void                external_set_cached_time(time_type t)      { set_cached_time(t); }
 };
 
 } // namespace torrent::utils
