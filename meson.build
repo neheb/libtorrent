@@ -61,8 +61,6 @@ endif
 
 if get_option('posix_fallocate') and cc.has_function('posix_fallocate')
   cdata.set('USE_POSIX_FALLOCATE', 1)
-elif host_machine.system() == 'darwin'
-  cdata.set('SYS_DARWIN', 1)
 elif cc.has_function('fallocate')
   cdata.set('USE_FALLOCATE', 1)
 endif
