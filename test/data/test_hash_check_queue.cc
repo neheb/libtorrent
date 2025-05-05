@@ -86,7 +86,7 @@ test_hash_check_queue::test_single() {
   torrent::HashCheckQueue hash_queue;
 
   done_chunks_type done_chunks;
-  hash_queue.slot_chunk_done() = std::bind(&chunk_done, &done_chunks, std::placeholders::_1, std::placeholders::_2);
+  hash_queue.slot_chunk_done() = [&done_chunks](auto h, const auto& s){ chunk_done(&done_chunks, h, s); };
 
   torrent::ChunkHandle handle_0 = chunk_list->get(0, torrent::ChunkList::get_blocking);
 
@@ -113,7 +113,7 @@ test_hash_check_queue::test_multiple() {
   torrent::HashCheckQueue hash_queue;
 
   done_chunks_type done_chunks;
-  hash_queue.slot_chunk_done() = std::bind(&chunk_done, &done_chunks, std::placeholders::_1, std::placeholders::_2);
+  hash_queue.slot_chunk_done() = [&done_chunks](auto h, const auto& s){ chunk_done(&done_chunks, h, s); };
 
   handle_list handles;
 
@@ -146,7 +146,7 @@ test_hash_check_queue::test_erase() {
   // torrent::HashCheckQueue hash_queue;
 
   // done_chunks_type done_chunks;
-  // hash_queue.slot_chunk_done() = std::bind(&chunk_done, &done_chunks, std::placeholders::_1, std::placeholders::_2);
+  // hash_queue.slot_chunk_done() = std::bind(&chunk_done, done_chunks, std::placeholders::_1, std::placeholders::_2);
 
   // handle_list handles;
 
@@ -181,7 +181,7 @@ test_hash_check_queue::test_thread_interrupt() {
   torrent::HashCheckQueue* hash_queue = torrent::thread_disk()->hash_check_queue();
 
   done_chunks_type done_chunks;
-  hash_queue->slot_chunk_done() = std::bind(&chunk_done, &done_chunks, std::placeholders::_1, std::placeholders::_2);
+  hash_queue->slot_chunk_done() = [&done_chunks](auto h, const auto& s){ chunk_done(&done_chunks, h, s); };
 
   for (int i = 0; i < 1000; i++) {
     pthread_mutex_lock(&done_chunks_lock);
@@ -193,7 +193,7 @@ test_hash_check_queue::test_thread_interrupt() {
     hash_queue->push_back(new torrent::HashChunk(handle_0));
     torrent::thread_disk()->interrupt();
 
-    CPPUNIT_ASSERT(wait_for_true(std::bind(&verify_hash, &done_chunks, 0, hash_for_index(0))));
+    CPPUNIT_ASSERT(wait_for_true([&done_chunks]{ return verify_hash(&done_chunks, 0, hash_for_index(0));}));
     chunk_list->release(&handle_0);
   }
 
