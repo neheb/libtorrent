@@ -43,6 +43,8 @@ Thread::Thread() :
 Thread::~Thread() {
   // Disown m_poll instead of deleting it as we don't properly clean up all the sockets.
   m_poll.release();
+  if (m_thread.joinable())
+    m_thread.join();
 }
 
 Thread*
@@ -58,8 +60,7 @@ Thread::start_thread() {
   if (!is_initialized())
     throw internal_error("Called Thread::start_thread on an uninitialized object.");
 
-  if (pthread_create(&m_thread, NULL, reinterpret_cast<pthread_func>(&Thread::enter_event_loop), this))
-    throw internal_error("Failed to create thread.");
+  m_thread = std::thread(&Thread::enter_event_loop, this);
 
   while (m_state != STATE_ACTIVE)
     usleep(100);
@@ -76,7 +77,7 @@ void
 Thread::stop_thread_wait() {
   stop_thread();
 
-  pthread_join(m_thread, NULL);
+  m_thread.join();
   assert(is_inactive());
 }
 
@@ -202,7 +203,6 @@ Thread::init_thread_local() {
 #endif
 
   m_self = this;
-  m_thread = pthread_self();
   m_thread_id = std::this_thread::get_id();
 
   m_scheduler->set_thread_id(m_thread_id);

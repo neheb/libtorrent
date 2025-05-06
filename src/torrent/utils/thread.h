@@ -55,7 +55,6 @@ public:
   bool                has_do_shutdown()  const { return (flags() & flag_do_shutdown); }
   bool                has_did_shutdown() const { return (flags() & flag_did_shutdown); }
 
-  pthread_t           pthread()         { return m_thread; }
   std::thread::id     thread_id()       { return m_thread_id; }
 
   state_type          state() const { return m_state; }
@@ -112,7 +111,7 @@ protected:
   static thread_local Thread*  m_self;
 
   // TODO: Remove m_thread.
-  pthread_t                    m_thread{};
+  std::thread                  m_thread{};
   std::atomic<std::thread::id> m_thread_id;
   std::atomic<state_type>      m_state{STATE_UNKNOWN};
   std::atomic_int              m_flags{0};
@@ -145,7 +144,7 @@ Thread::is_polling() const {
 
 inline bool
 Thread::is_current() const {
-  return m_thread == pthread_self();
+  return m_thread_id == std::this_thread::get_id();
 }
 
 inline void
