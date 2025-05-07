@@ -25,7 +25,7 @@ public:
   bool                start(bool try_quick);
   void                clear();
 
-  bool                is_checking()                          { return m_outstanding >= 0; }
+  bool                is_checking() const                          { return m_outstanding >= 0; }
   bool                is_checked();
 
   void                confirm_checked();

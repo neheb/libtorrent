@@ -28,7 +28,7 @@ public:
 
   std::vector<BlockTransfer*> delegate(PeerChunks* peerChunks, uint32_t affinity, uint32_t maxPieces);
 
-  bool               get_aggressive()                     { return m_aggressive; }
+  bool               get_aggressive() const                     { return m_aggressive; }
   void               set_aggressive(bool a)               { m_aggressive = a; }
 
   slot_peer_chunk&   slot_chunk_find()                    { return m_slot_chunk_find; }

@@ -126,8 +126,8 @@ public:
   const_accessor       get_contact();
 
   // Search statistics.
-  int                  num_contacted()                   { return m_contacted; }
-  int                  num_replied()                     { return m_replied; }
+  int                  num_contacted() const                   { return m_contacted; }
+  int                  num_replied() const                     { return m_replied; }
 
   bool                 start()                           { m_started = true; return m_pending; }
   bool                 complete() const                  { return m_started && !m_pending; }
@@ -302,9 +302,9 @@ public:
   const HashString&           id()                 { return m_id; }
   const rak::socket_address*  address()            { return &m_sa; }
 
-  int                         timeout()            { return m_timeout; }
-  int                         quick_timeout()      { return m_quickTimeout; }
-  bool                        has_quick_timeout()  { return m_hasQuickTimeout; }
+  int                         timeout() const            { return m_timeout; }
+  int                         quick_timeout() const      { return m_quickTimeout; }
+  bool                        has_quick_timeout() const  { return m_hasQuickTimeout; }
 
   DhtTransactionPacket*       packet()             { return m_packet; }
   void                        set_packet(DhtTransactionPacket* p) { m_packet = p; }

@@ -143,7 +143,7 @@ protected:
 private:
   bool                open_file(File* node, const Path& lastPath, int flags) LIBTORRENT_NO_EXPORT;
   void                make_directory(Path::const_iterator pathBegin, Path::const_iterator pathEnd, Path::const_iterator startItr) LIBTORRENT_NO_EXPORT;
-  MemoryChunk         create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t length, int prot) LIBTORRENT_NO_EXPORT;
+  MemoryChunk         create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t length, int prot) const LIBTORRENT_NO_EXPORT;
 
   download_data       m_data;
 

@@ -144,8 +144,8 @@ public:
   void                receive_upload_unchoke(int num);
   void                receive_download_unchoke(int num);
 
-  int                 retrieve_upload_can_unchoke();
-  int                 retrieve_download_can_unchoke();
+  int                 retrieve_upload_can_unchoke() const;
+  int                 retrieve_download_can_unchoke() const;
 
   void                receive_tick();
 

@@ -66,12 +66,12 @@ public:
   
   size_t              length() const                { return m_addrinfo.ai_addrlen; }
 
-  socket_address*     address()                     { return reinterpret_cast<socket_address*>(m_addrinfo.ai_addr); }
+  socket_address*     address() const                     { return reinterpret_cast<socket_address*>(m_addrinfo.ai_addr); }
 
   addrinfo*           c_addrinfo()                  { return &m_addrinfo; }
   const addrinfo*     c_addrinfo() const            { return &m_addrinfo; }
 
-  address_info*       next()                        { return reinterpret_cast<address_info*>(m_addrinfo.ai_next); }
+  address_info*       next() const                        { return reinterpret_cast<address_info*>(m_addrinfo.ai_next); }
 
   static int          get_address_info(const char* node, int domain, int type, address_info** ai);
 

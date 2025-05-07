@@ -51,7 +51,7 @@ test_constants::destroy<int>([[maybe_unused]] int& obj) {
 struct test_queue_bucket_compare {
   test_queue_bucket_compare(int v) : m_v(v) {}
 
-  bool operator () (int obj) {
+  bool operator () (int obj) const {
     return m_v == obj;
   }
 

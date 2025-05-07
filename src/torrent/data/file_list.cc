@@ -538,7 +538,7 @@ FileList::open_file(File* node, const Path& lastPath, int flags) {
 }
 
 MemoryChunk
-FileList::create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t length, int prot) {
+FileList::create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t length, int prot) const {
   offset -= (*itr)->offset();
   length = std::min<uint64_t>(length, (*itr)->size_bytes() - offset);
 
