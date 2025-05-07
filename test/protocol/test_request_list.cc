@@ -53,11 +53,11 @@ struct RequestListGuard {
 #define SETUP_DELEGATOR(fpc_prefix)                                     \
   auto delegator = std::make_unique<torrent::Delegator>();              \
   delegator->slot_chunk_find() = std::bind(&fpc_prefix ## _find_peer_chunk, std::placeholders::_1, std::placeholders::_2); \
-  delegator->slot_chunk_size() = std::bind(&chunk_index_size, std::placeholders::_1); \
-  delegator->transfer_list()->slot_canceled()  = std::bind(&transfer_list_void); \
-  delegator->transfer_list()->slot_queued()    = std::bind(&transfer_list_void); \
+  delegator->slot_chunk_size() = &chunk_index_size; \
+  delegator->transfer_list()->slot_canceled()  = [](auto){ transfer_list_void(); };\
+  delegator->transfer_list()->slot_queued()    = [](auto){ transfer_list_void(); }; \
   delegator->transfer_list()->slot_completed() = std::bind(&transfer_list_completed, delegator->transfer_list(), std::placeholders::_1); \
-  delegator->transfer_list()->slot_corrupt()   = std::bind(&transfer_list_void);
+  delegator->transfer_list()->slot_corrupt()   = [](auto){ transfer_list_void(); };
 
 // Set bitfield size...
 #define SETUP_PEER_CHUNKS()                                             \

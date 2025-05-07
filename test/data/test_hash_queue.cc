@@ -61,7 +61,7 @@ fill_queue() {
 #define SETUP_HASH_QUEUE()                                              \
   done_chunks_type done_chunks;                                         \
   auto hash_queue = new torrent::HashQueue();                           \
-  hash_queue->slot_has_work() = std::bind(&fill_queue);                 \
+  hash_queue->slot_has_work() = [](auto){ fill_queue(); };              \
                                                                         \
   torrent::thread_disk()->hash_check_queue()->slot_chunk_done() = [&](auto hc, const auto& hv) { \
       hash_queue->chunk_done(hc, hv);                                   \

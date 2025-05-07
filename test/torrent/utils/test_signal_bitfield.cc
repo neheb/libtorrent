@@ -123,7 +123,7 @@ test_signal_bitfield::test_threaded() {
   }
 
   thread->stop_thread();
-  CPPUNIT_ASSERT(wait_for_true(std::bind(&test_thread::is_state, thread.get(), test_thread::STATE_INACTIVE)));
+  CPPUNIT_ASSERT(wait_for_true([t = thread.get()] { return t->is_state(test_thread::STATE_INACTIVE); }));
 }
 
 // Test invalid signal added.
