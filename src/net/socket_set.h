@@ -53,12 +53,12 @@ namespace torrent {
 
 // Propably should rename to EventSet...
 
-class SocketSet : private std::vector<Event*, rak::cacheline_allocator<Event*> > {
+class SocketSet : private std::vector<Event*> {
 public:
   using size_type = uint32_t;
 
-  using base_type = std::vector<Event*, rak::cacheline_allocator<Event*>>;
-  using Table     = std::vector<size_type, rak::cacheline_allocator<size_type>>;
+  using base_type = std::vector<Event*>;
+  using Table     = std::vector<size_type>;
 
   static constexpr auto npos = ~size_type{0};
 

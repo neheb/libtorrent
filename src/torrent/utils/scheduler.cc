@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include "torrent/exceptions.h"
+#include "torrent/utils/chrono.h"
 
 namespace torrent::utils {
 
@@ -16,6 +17,14 @@ SchedulerEntry::~SchedulerEntry() {
   m_slot = nullptr;
   m_scheduler = nullptr;
   m_time = time_type{};
+}
+
+
+Scheduler::time_type
+Scheduler::next_timeout() const {
+  assert(!empty());
+
+  return std::max(front()->time() - m_cached_time, Scheduler::time_type());
 }
 
 inline void
