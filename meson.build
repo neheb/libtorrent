@@ -32,7 +32,6 @@ else
   cdata.set('LT_SMP_CACHE_BYTES', '128')
 endif
 
-cdata.set('lt_cacheline_aligned', 'alignas(LT_SMP_CACHE_BYTES)')
 if cc.sizeof('void*') == 8
   cdata.set('DEFAULT_ADDRESS_SPACE_SIZE', 4096)
 else
@@ -45,25 +44,25 @@ foreach h : ['epoll', 'inotify']
   endif
 endforeach
 
-foreach f : ['madvise', 'mincore']
-  if cc.has_header_symbol('sys/mman.h', f, required: get_option(f))
-    cdata.set('USE_@0@'.format(f.to_upper()), 1)
-  endif
-endforeach
+#foreach f : ['madvise', 'mincore']
+#  if cc.has_header_symbol('sys/mman.h', f, required: get_option(f))
+#    cdata.set('USE_@0@'.format(f.to_upper()), 1)
+#  endif
+#endforeach
 
 if cc.has_function('__builtin_popcount')
   cdata.set('USE_BUILTIN_POPCOUNT', 1)
 endif
 
-if cc.has_function('posix_fadvise')
-  cdata.set('USE_POSIX_FADVISE', 1)
-endif
+#if cc.has_function('posix_fadvise')
+#  cdata.set('USE_POSIX_FADVISE', 1)
+#endif
 
-if get_option('posix_fallocate') and cc.has_function('posix_fallocate')
-  cdata.set('USE_POSIX_FALLOCATE', 1)
-elif cc.has_function('fallocate')
-  cdata.set('USE_FALLOCATE', 1)
-endif
+#if get_option('posix_fallocate') and cc.has_function('posix_fallocate')
+#  cdata.set('USE_POSIX_FALLOCATE', 1)
+#elif cc.has_function('fallocate')
+#  cdata.set('USE_FALLOCATE', 1)
+#endif
 
 if cdata.has('USE_MINCORE')
   if cc.compiles('#include <sys/mman.h>\nint main(){mincore(0,0,(unsigned char*)0);}', werror: true)
@@ -73,11 +72,11 @@ if cdata.has('USE_MINCORE')
   endif
 endif
 
-if cc.compiles('#include <pthread.h>\nint main(){pthread_setname_np("foo");}')
-  cdata.set('HAS_PTHREAD_SETNAME_NP_DARWIN', 1)
-elif cc.compiles('#include <pthread.h>\nint main(){pthread_t t;pthread_setname_np(t,"foo");}')
-  cdata.set('HAS_PTHREAD_SETNAME_NP_GENERIC', 1)
-endif
+#if cc.compiles('#include <pthread.h>\nint main(){pthread_setname_np("foo");}')
+#  cdata.set('HAS_PTHREAD_SETNAME_NP_DARWIN', 1)
+#elif cc.compiles('#include <pthread.h>\nint main(){pthread_t t;pthread_setname_np(t,"foo");}')
+#  cdata.set('HAS_PTHREAD_SETNAME_NP_GENERIC', 1)
+#endif
 
 if cc.has_header('sys/statvfs.h', required: get_option('statvfs'))
   cdata.set('HAVE_SYS_STATVFS_H', 1)
