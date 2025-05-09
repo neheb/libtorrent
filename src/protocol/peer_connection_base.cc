@@ -126,7 +126,7 @@ PeerConnectionBase::initialize(DownloadMain* download, PeerInfo* peerInfo, Socke
   m_peerInfo = peerInfo;
   m_download = download;
 
-  m_encryption = *encryptionInfo;
+  m_encryption = encryptionInfo;
   m_extensions = extensions;
 
   m_extensions->set_connection(this);
@@ -535,7 +535,7 @@ PeerConnectionBase::down_chunk() {
     data.second = read_stream_throws(data.first, data.second);
 
     if (is_encrypted())
-      m_encryption.decrypt(data.first, data.second);
+      m_encryption->decrypt(data.first, data.second);
 
     bytesTransfered += data.second;
 
@@ -581,7 +581,7 @@ PeerConnectionBase::down_chunk_skip() {
   throttle->node_used(m_peerChunks.download_throttle(), length);
 
   if (is_encrypted())
-    m_encryption.decrypt(m_nullBuffer, length);
+    m_encryption->decrypt(m_nullBuffer, length);
 
   if (down_chunk_skip_process(m_nullBuffer, length) != length)
     throw internal_error("PeerConnectionBase::down_chunk_skip() down_chunk_skip_process(m_nullBuffer, length) != length.");
@@ -695,7 +695,7 @@ PeerConnectionBase::down_extension() {
     m_down->throttle()->node_used_unthrottled(bytes);
     
     if (is_encrypted())
-      m_encryption.decrypt(m_extensions->read_position(), bytes);
+      m_encryption->decrypt(m_extensions->read_position(), bytes);
 
     m_extensions->read_move(bytes);
   }
@@ -733,7 +733,7 @@ PeerConnectionBase::up_chunk_encrypt(uint32_t quota) {
   }
 
   m_upChunk.chunk()->to_buffer(m_encryptBuffer->end(), m_upPiece.offset() + m_encryptBuffer->remaining(), quota);
-  m_encryption.encrypt(m_encryptBuffer->end(), quota);
+  m_encryption->encrypt(m_encryptBuffer->end(), quota);
   m_encryptBuffer->move_end(quota);
 
   return m_encryptBuffer->remaining();
@@ -794,12 +794,12 @@ bool
 PeerConnectionBase::up_extension() {
   if (m_extensionOffset == extension_must_encrypt) {
     if (m_extensionMessage.owned()) {
-      m_encryption.encrypt(m_extensionMessage.data(), m_extensionMessage.length());
+      m_encryption->encrypt(m_extensionMessage.data(), m_extensionMessage.length());
 
     } else {
       auto buffer = new char[m_extensionMessage.length()];
 
-      m_encryption.encrypt(m_extensionMessage.data(), buffer, m_extensionMessage.length());
+      m_encryption->encrypt(m_extensionMessage.data(), buffer, m_extensionMessage.length());
       m_extensionMessage.set(buffer, buffer + m_extensionMessage.length(), true);
     }
 

@@ -53,7 +53,7 @@ PeerConnectionMetadata::receive_keepalive() {
     m_up->write_keepalive();
 
     if (is_encrypted())
-      m_encryption.encrypt(old_end, m_up->buffer()->end() - old_end);
+      m_encryption->encrypt(old_end, m_up->buffer()->end() - old_end);
   }
 
   return true;
@@ -205,7 +205,7 @@ PeerConnectionMetadata::event_read() {
           m_down->throttle()->node_used_unthrottled(length);
 
           if (is_encrypted())
-            m_encryption.decrypt(m_down->buffer()->end(), length);
+            m_encryption->decrypt(m_down->buffer()->end(), length);
 
           m_down->buffer()->move_end(length);
         }
@@ -291,7 +291,7 @@ PeerConnectionMetadata::fill_write_buffer() {
   }
 
   if (is_encrypted())
-    m_encryption.encrypt(old_end, m_up->buffer()->end() - old_end);
+    m_encryption->encrypt(old_end, m_up->buffer()->end() - old_end);
 }
 
 void

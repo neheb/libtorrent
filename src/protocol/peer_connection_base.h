@@ -69,8 +69,8 @@ public:
   bool                is_seeder() const               { return m_peerChunks.is_seeder(); }
   bool                is_not_seeder() const           { return !m_peerChunks.is_seeder(); }
 
-  bool                is_encrypted() const            { return m_encryption.is_encrypted(); }
-  bool                is_obfuscated() const           { return m_encryption.is_obfuscated(); }
+  bool                is_encrypted() const            { return m_encryption->is_encrypted(); }
+  bool                is_obfuscated() const           { return m_encryption->is_obfuscated(); }
 
   PeerInfo*           mutable_peer_info()             { return m_peerInfo; }
 
@@ -196,7 +196,7 @@ protected:
   uint32_t            m_extensionOffset;
 
   EncryptBuffer*      m_encryptBuffer{};
-  EncryptionInfo      m_encryption;
+  EncryptionInfo*     m_encryption{};
   ProtocolExtension*  m_extensions{};
 
   bool m_incoreContinous{false};

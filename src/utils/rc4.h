@@ -39,47 +39,43 @@
 
 #include "config.h"
 
+#include <memory>
+
 #include <openssl/evp.h>
 
 namespace torrent {
 
 class RC4 {
 public:
-  RC4();
   ~RC4();
-
   RC4(const unsigned char key[], int len);
 
   void crypt(const void* indata, void* outdata, unsigned int length);
   void crypt(void* data, unsigned int length);
 
 private:
-  EVP_CIPHER_CTX* m_ctx{};
+  std::unique_ptr<EVP_CIPHER_CTX, decltype(&EVP_CIPHER_CTX_free)> m_ctx;
 };
 
-inline RC4::RC4() = default;
-
-inline RC4::~RC4() {
-  EVP_CIPHER_CTX_free(m_ctx);
-}
+inline RC4::~RC4() = default;
 
 inline RC4::RC4(const unsigned char key[], int len) :
-    m_ctx(EVP_CIPHER_CTX_new()) {
-  EVP_EncryptInit_ex(m_ctx, EVP_rc4(), nullptr, nullptr, nullptr);
-  EVP_CIPHER_CTX_set_key_length(m_ctx, len);
-  EVP_EncryptInit_ex(m_ctx, EVP_rc4(), nullptr, key, nullptr);
+    m_ctx(EVP_CIPHER_CTX_new(), EVP_CIPHER_CTX_free) {
+  EVP_EncryptInit_ex(m_ctx.get(), EVP_rc4(), nullptr, nullptr, nullptr);
+  EVP_CIPHER_CTX_set_key_length(m_ctx.get(), len);
+  EVP_EncryptInit_ex(m_ctx.get(), EVP_rc4(), nullptr, key, nullptr);
 }
 
 inline void
 RC4::crypt(const void* indata, void* outdata, unsigned int length) {
   int outlen;
-  EVP_EncryptUpdate(m_ctx, static_cast<unsigned char*>(outdata), &outlen, static_cast<const unsigned char*>(indata), length);
+  EVP_EncryptUpdate(m_ctx.get(), static_cast<unsigned char*>(outdata), &outlen, static_cast<const unsigned char*>(indata), length);
 }
 
 inline void
 RC4::crypt(void* data, unsigned int length) {
   int outlen;
-  EVP_EncryptUpdate(m_ctx, static_cast<unsigned char*>(data), &outlen, static_cast<unsigned char*>(data), length);
+  EVP_EncryptUpdate(m_ctx.get(), static_cast<unsigned char*>(data), &outlen, static_cast<unsigned char*>(data), length);
 }
 } // namespace torrent
 
