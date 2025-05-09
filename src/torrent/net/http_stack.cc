@@ -7,7 +7,6 @@
 #include "net/curl_get.h"
 #include "net/curl_stack.h"
 #include "net/thread_net.h"
-#include "torrent/exceptions.h"
 #include "torrent/net/http_get.h"
 #include "torrent/utils/thread.h"
 
