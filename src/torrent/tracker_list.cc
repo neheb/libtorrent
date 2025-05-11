@@ -23,8 +23,8 @@
 
 namespace torrent {
 
-TrackerList::TrackerList() :
-  m_state(DownloadInfo::STOPPED) {
+TrackerList::TrackerList() {
+  m_state = DownloadInfo::STOPPED;
 }
 
 TrackerList::~TrackerList() {
