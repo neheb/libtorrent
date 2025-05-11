@@ -202,7 +202,7 @@ TestTrackerListFeatures::test_count_active() {
 
 
 bool
-verify_did_internal_error(std::function<void ()> func, bool should_throw) {
+verify_did_internal_error(const std::function<void ()>& func, bool should_throw) {
   bool did_throw = false;
 
   try {

@@ -187,7 +187,7 @@ ObjectStaticMapTest::test_read_extensions() {
 }
 
 template <typename map_type>
-bool static_map_write_bencode(map_type map, const char* original) {
+bool static_map_write_bencode(const map_type& map, const char* original) {
   try {
     char buffer[1023];
     char* last = torrent::static_map_write_bencode_c(&torrent::object_write_to_buffer,

@@ -84,8 +84,8 @@ public:
   tracker_controller.slot_tracker_enabled() = std::bind(&increment_value_void, &enabled_counter); \
   tracker_controller.slot_tracker_disabled() = std::bind(&increment_value_void, &disabled_counter); \
                                                                         \
-  tracker_list.slot_success() = [&tracker_controller](const auto& t, auto l){ return tracker_controller.receive_success(t, l); }; \
-  tracker_list.slot_failure() = [&tracker_controller](const auto& t, auto l){ return tracker_controller.receive_failure(t, l); }; \
+  tracker_list.slot_success() = [&tracker_controller](const auto& t, const auto& l){ return tracker_controller.receive_success(t, l); }; \
+  tracker_list.slot_failure() = [&tracker_controller](const auto& t, const auto& l){ return tracker_controller.receive_failure(t, l); }; \
   tracker_list.slot_tracker_enabled()  = [&tracker_controller](const auto& tb){ return tracker_controller.receive_tracker_enabled(tb); }; \
   tracker_list.slot_tracker_disabled() = [&tracker_controller](const auto& tb){ return tracker_controller.receive_tracker_disabled(tb); };
 

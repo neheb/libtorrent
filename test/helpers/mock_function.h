@@ -141,12 +141,12 @@ void
 mock_redirect(R fn(Args...), std::function<R (Args...)> func) {
   typedef mock_function_map<R, Args...> mock_map;
   std::lock_guard<std::mutex> lock(mock_map::mutex);
-  mock_map::redirects[reinterpret_cast<void*>(fn)] = func;
+  mock_map::redirects[reinterpret_cast<void*>(fn)] = std::move(func);
 }
 
 template<typename R, typename... Args>
 auto
-mock_call_direct(std::string name, R fn(Args...), Args... args) -> decltype(fn(args...)) {
+mock_call_direct(const std::string& name, R fn(Args...), Args... args) -> decltype(fn(args...)) {
   typedef mock_function_type<R, Args...> mock_type;
 
   std::lock_guard<std::mutex> lock(mock_type::type::mutex);
@@ -164,13 +164,13 @@ mock_call_direct(std::string name, R fn(Args...), Args... args) -> decltype(fn(a
 
 template<typename R, typename... Args>
 auto
-mock_call(std::string name, R fn(Args...), Args... args) -> decltype(fn(args...)) {
+mock_call(const std::string& name, R fn(Args...), Args... args) -> decltype(fn(args...)) {
   typedef mock_function_type<R, Args...> mock_type;
 
   if (mock_type::has_redirect(reinterpret_cast<void*>(fn)))
     return mock_type::call_redirect(reinterpret_cast<void*>(fn), args...);
 
-  return mock_call_direct(name, fn, args...);
+  return mock_call_direct(std::move(name), fn, args...);
 }
 
 #endif

@@ -149,7 +149,7 @@ constexpr ai_flags_enum operator | (ai_flags_enum a, ai_flags_enum b) {
 
 template <ai_flags_enum ai_flags>
 inline bool
-test_valid_ai_ref(test_ai_ref ftor, uint16_t port = 0) {
+test_valid_ai_ref(const test_ai_ref& ftor, uint16_t port = 0) {
   torrent::ai_unique_ptr ai;
 
   if (int err = ftor(ai)) {
@@ -173,7 +173,7 @@ test_valid_ai_ref(test_ai_ref ftor, uint16_t port = 0) {
 }
 
 inline bool
-test_valid_ai_ref_err(test_ai_ref ftor, int expect_err) {
+test_valid_ai_ref_err(const test_ai_ref& ftor, int expect_err) {
   torrent::ai_unique_ptr ai;
   int err = ftor(ai);
 
