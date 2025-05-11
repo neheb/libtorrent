@@ -11,7 +11,7 @@ dump_failure_log(const failure_type& failure) {
   if (failure.log->empty())
     return;
 
-  std::cout << std::endl << failure.name << std::endl;
+  std::cout << '\n' << failure.name << '\n';
 
   // Doesn't print dump messages as log_buffer drops them.
   std::for_each(failure.log->begin(), failure.log->end(), [](const torrent::log_entry& entry) {
@@ -26,15 +26,15 @@ dump_failures(const failure_list_type& failures) {
   if (failures.empty())
     return;
 
-  std::cout << std::endl
-            << "=================" << std::endl
-            << "Failed Test Logs:" << std::endl
-            << "=================" << std::endl;
+  std::cout << '\n'
+            << "=================" << '\n'
+            << "Failed Test Logs:" << '\n'
+            << "=================" << '\n';
 
   std::for_each(failures.begin(), failures.end(), [](const failure_type& failure) {
       dump_failure_log(failure);
     });
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 static

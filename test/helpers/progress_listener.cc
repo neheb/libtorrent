@@ -46,7 +46,7 @@ progress_listener::addFailure(const CppUnit::TestFailure &failure) {
 
 void
 progress_listener::endTest(CppUnit::Test *test) {
-  std::cout << (m_last_test_failed ? "" : " : OK") << std::endl;
+  std::cout << (m_last_test_failed ? "" : " : OK") << '\n';
 
   m_current_log_buffer.reset();
   torrent::log_cleanup();
@@ -57,7 +57,7 @@ progress_listener::startSuite(CppUnit::Test *suite) {
   m_test_path.push_back(suite);
 
   if (suite->countTestCases() > 0)
-    std::cout << std::endl << get_test_path(m_test_path) << suite->getName() << ":" << std::endl;
+    std::cout << '\n' << get_test_path(m_test_path) << suite->getName() << ":" << '\n';
 }
 
 void
