@@ -34,7 +34,7 @@ class TestHttp : public torrent::Http {
 public:
   static const int flag_active = 0x1;
 
-  TestHttp(bool *destroyed = NULL) : m_flags(0), m_destroyed(destroyed) {}
+  TestHttp(bool *destroyed = nullptr) :  m_destroyed(destroyed) {}
   ~TestHttp() override { if (m_destroyed) *m_destroyed = true; }
   
   void start() override { m_flags |= flag_active; }
@@ -44,7 +44,7 @@ public:
   bool trigger_signal_failed();
 
 private:
-  int m_flags;
+  int m_flags{};
   bool* m_destroyed;
 };
 
