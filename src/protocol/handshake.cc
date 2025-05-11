@@ -3,7 +3,7 @@
 #include "handshake.h"
 
 #include <cassert>
-#include <stdio.h>
+#include <cstdio>
 
 #include "globals.h"
 #include "manager.h"
