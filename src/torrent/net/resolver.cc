@@ -20,7 +20,7 @@ Resolver::init() {
 void
 Resolver::resolve_both(void* requester, const std::string& hostname, int family, both_callback&& callback) {
   thread_net()->callback(requester, [this, requester, hostname, family, callback = std::move(callback)]() {
-      thread_net()->udns()->resolve(requester, hostname, family, [this, requester, callback = callback](sin_shared_ptr sin, sin6_shared_ptr sin6, int err) {
+      thread_net()->udns()->resolve(requester, hostname, family, [this, requester, callback = callback](const sin_shared_ptr& sin, const sin6_shared_ptr& sin6, int err) {
           m_thread->callback(requester, [sin, sin6, err, callback = callback]() {
               callback(sin, sin6, err);
             });
@@ -34,7 +34,7 @@ Resolver::resolve_preferred(void* requester, const std::string& hostname, int fa
     throw internal_error("Invalid preferred family.");
 
   thread_net()->callback(requester, [this, requester, hostname, family, preferred, callback = std::move(callback)]() {
-      thread_net()->udns()->resolve(requester, hostname, family, [this, requester, preferred, callback = callback](sin_shared_ptr sin, sin6_shared_ptr sin6, int err) {
+      thread_net()->udns()->resolve(requester, hostname, family, [this, requester, preferred, callback = callback](const sin_shared_ptr& sin, const sin6_shared_ptr& sin6, int err) {
           sa_shared_ptr result;
 
           if (err == 0) {
@@ -62,7 +62,7 @@ Resolver::resolve_preferred(void* requester, const std::string& hostname, int fa
 void
 Resolver::resolve_specific(void* requester, const std::string& hostname, int family, single_callback&& callback) {
   thread_net()->callback(requester, [this, requester, hostname, family, callback = std::move(callback)]() {
-      thread_net()->udns()->resolve(requester, hostname, family, [this, requester, family, callback = callback](sin_shared_ptr sin, sin6_shared_ptr sin6, int err) {
+      thread_net()->udns()->resolve(requester, hostname, family, [this, requester, family, callback = callback](const sin_shared_ptr& sin, const sin6_shared_ptr& sin6, int err) {
           sa_shared_ptr result;
 
           if(err == 0) {
