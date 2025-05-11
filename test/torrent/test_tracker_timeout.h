@@ -11,7 +11,7 @@ class test_tracker_timeout : public test_fixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void setUp();
+  void setUp() override;
 
   static void test_set_timeout();
 

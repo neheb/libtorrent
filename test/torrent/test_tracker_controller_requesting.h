@@ -22,8 +22,8 @@ class test_tracker_controller_requesting : public test_fixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void setUp();
-  void tearDown();
+  void setUp() override;
+  void tearDown() override;
 
   static void test_hammering_basic_success();
   static void test_hammering_basic_success_long_timeout();

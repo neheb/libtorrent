@@ -12,8 +12,8 @@ class RangesTest : public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void setUp() {}
-  void tearDown() {}
+  void setUp() override {}
+  void tearDown() override {}
 
   static void test_basic();
   static void test_intersect();

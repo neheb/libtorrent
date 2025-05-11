@@ -25,7 +25,7 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(test_http, "torrent");
 class StringStream : public std::stringstream {
 public:
   StringStream(bool *destroyed) : m_destroyed(destroyed) {}
-  ~StringStream() { *m_destroyed = true; }
+  ~StringStream() override { *m_destroyed = true; }
 private:
   bool* m_destroyed;
 };
@@ -35,10 +35,10 @@ public:
   static const int flag_active = 0x1;
 
   TestHttp(bool *destroyed = NULL) : m_flags(0), m_destroyed(destroyed) {}
-  virtual ~TestHttp() { if (m_destroyed) *m_destroyed = true; }
+  ~TestHttp() override { if (m_destroyed) *m_destroyed = true; }
   
-  virtual void start() { m_flags |= flag_active; }
-  virtual void close() { m_flags &= ~flag_active; }
+  void start() override { m_flags |= flag_active; }
+  void close() override { m_flags &= ~flag_active; }
 
   bool trigger_signal_done();
   bool trigger_signal_failed();

@@ -12,8 +12,8 @@ class AllocatorsTest : public CppUnit::TestFixture {
 public:
   typedef std::vector<char, rak::cacheline_allocator<char> > aligned_vector_type;
 
-  void setUp() {}
-  void tearDown() {}
+  void setUp() override {}
+  void tearDown() override {}
 
   static void testAlignment();
 };

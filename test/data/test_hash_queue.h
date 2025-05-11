@@ -11,8 +11,8 @@ class test_hash_queue : public test_fixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void setUp();
-  void tearDown();
+  void setUp() override;
+  void tearDown() override;
 
   static void test_single();
   static void test_multiple();

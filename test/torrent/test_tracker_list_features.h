@@ -14,8 +14,8 @@ class test_tracker_list_features : public test_fixture {
   CPPUNIT_TEST_SUITE_END();
 
 public:
-  void setUp();
-  void tearDown();
+  void setUp() override;
+  void tearDown() override;
 
   static void test_new_peers();
   static void test_has_active();

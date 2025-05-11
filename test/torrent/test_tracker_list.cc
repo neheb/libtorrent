@@ -12,12 +12,12 @@ CPPUNIT_TEST_SUITE_REGISTRATION(test_tracker_list);
 
 class http_get : public torrent::Http {
 public:
-  ~http_get() = default;
+  ~http_get() override = default;
 
   // Start must never throw on bad input. Calling start/stop on an
   // object in the wrong state should throw a torrent::internal_error.
-  void       start() { }
-  void       close() { }
+  void       start() override { }
+  void       close() override { }
 };
 
 torrent::Http* http_factory() { return new http_get; }
