@@ -3,7 +3,7 @@
 #include "test_hash_queue.h"
 
 #include <functional>
-#include <signal.h>
+#include <csignal>
 
 #include "globals.h"
 #include "data/hash_queue.h"
