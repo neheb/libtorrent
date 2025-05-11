@@ -61,8 +61,6 @@ public:
 
   Handshake(SocketFd fd, HandshakeManager* m, int encryption_options);
   ~Handshake() override;
-  Handshake(const Handshake&) = delete;
-  Handshake& operator=(const Handshake&) = delete;
 
   const char*         type_name() const override    { return "handshake"; }
 
