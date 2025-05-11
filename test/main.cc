@@ -31,7 +31,7 @@ void
 do_test_panic(int signum) {
   signal(signum, SIG_DFL);
 
-  std::cout << std::endl << std::endl << "Caught " << strsignal(signum) << ", dumping stack:" << std::endl << std::endl;
+  std::cout << '\n' << '\n' << "Caught " << strsignal(signum) << ", dumping stack:" << '\n' << '\n';
 
 #ifdef HAVE_BACKTRACE
   void* stackPtrs[20];
@@ -41,13 +41,13 @@ do_test_panic(int signum) {
   char** stackStrings = backtrace_symbols(stackPtrs, stackSize);
 
   for (int i = 0; i < stackSize; ++i)
-    std::cout << stackStrings[i] << std::endl;
+    std::cout << stackStrings[i] << '\n';
 
 #else
   std::cout << "Stack dump not enabled." << std::endl;
 #endif
 
-  std::cout << std::endl;
+  std::cout << '\n';
   torrent::log_cleanup();
   std::abort();
 }
@@ -60,7 +60,7 @@ register_signal_handlers() {
   sa.sa_handler = &do_test_panic;
 
   if (sigaction(SIGSEGV, &sa, NULL) == -1) {
-    std::cout << "Could not register signal handlers." << std::endl;
+    std::cout << "Could not register signal handlers." << '\n';
     exit(-1);
   }
 }
@@ -93,7 +93,7 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
     outputter.write();
 
   } catch ( std::invalid_argument &e ) { // Test path not resolved
-    std::cerr  <<  std::endl <<  "ERROR: "  <<  e.what() << std::endl;
+    std::cerr  <<  '\n' <<  "ERROR: "  <<  e.what() << '\n';
     return 1;
   }
 
