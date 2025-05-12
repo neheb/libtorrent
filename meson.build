@@ -26,11 +26,11 @@ cdata.set('IS_@0@_ENDIAN'.format(host_machine.endian().to_upper()), 1)
 
 cdata.set('LT_INSTRUMENTATION', 1)
 
-if cc.has_header_symbol('new', 'std::hardware_constructive_interference_size')
-  cdata.set('LT_SMP_CACHE_BYTES', 'std::hardware_constructive_interference_size')
-else
+#if cc.has_header_symbol('new', 'std::hardware_constructive_interference_size')
+#  cdata.set('LT_SMP_CACHE_BYTES', 'std::hardware_constructive_interference_size')
+#else
   cdata.set('LT_SMP_CACHE_BYTES', '128')
-endif
+#endif
 
 cdata.set('lt_cacheline_aligned', 'alignas(LT_SMP_CACHE_BYTES)')
 if cc.sizeof('void*') == 8
@@ -73,11 +73,11 @@ if cdata.has('USE_MINCORE')
   endif
 endif
 
-if cc.compiles('#include <pthread.h>\nint main(){pthread_setname_np("foo");}')
-  cdata.set('HAS_PTHREAD_SETNAME_NP_DARWIN', 1)
-elif cc.compiles('#include <pthread.h>\nint main(){pthread_t t;pthread_setname_np(t,"foo");}')
-  cdata.set('HAS_PTHREAD_SETNAME_NP_GENERIC', 1)
-endif
+#if cc.compiles('#include <pthread.h>\nint main(){pthread_setname_np("foo");}')
+#  cdata.set('HAS_PTHREAD_SETNAME_NP_DARWIN', 1)
+#elif cc.compiles('#include <pthread.h>\nint main(){pthread_t t;pthread_setname_np(t,"foo");}')
+#  cdata.set('HAS_PTHREAD_SETNAME_NP_GENERIC', 1)
+#endif
 
 if cc.has_header('sys/statvfs.h', required: get_option('statvfs'))
   cdata.set('HAVE_SYS_STATVFS_H', 1)
