@@ -46,23 +46,14 @@ namespace torrent {
 
 class Sha1 {
 public:
-  Sha1();
-  ~Sha1();
-
   void init();
   void update(const void* data, unsigned int length);
 
   void final_c(void* buffer);
 
 private:
-  std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> m_ctx;
+  std::unique_ptr<EVP_MD_CTX, decltype(&EVP_MD_CTX_free)> m_ctx{EVP_MD_CTX_new(), EVP_MD_CTX_free};
 };
-
-inline Sha1::Sha1() :
-    m_ctx(EVP_MD_CTX_new(), EVP_MD_CTX_free) {
-}
-
-inline Sha1::~Sha1() = default;
 
 inline void
 Sha1::init() {
@@ -77,6 +68,7 @@ Sha1::update(const void* data, unsigned int length) {
 inline void
 Sha1::final_c(void* buffer) {
   EVP_DigestFinal_ex(m_ctx.get(), static_cast<unsigned char*>(buffer), nullptr);
+  EVP_MD_CTX_reset(m_ctx.get());
 }
 
 inline void

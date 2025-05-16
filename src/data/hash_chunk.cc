@@ -45,8 +45,8 @@ namespace torrent {
 
 HashChunk::~HashChunk() = default;
 
-HashChunk::HashChunk(ChunkHandle h) {
-  m_hash = std::make_unique<Sha1>();
+HashChunk::HashChunk(ChunkHandle h) :
+    m_hash(std::make_unique<Sha1>()) {
   set_chunk(h);
 }
 
