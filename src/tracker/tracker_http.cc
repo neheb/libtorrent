@@ -235,7 +235,7 @@ TrackerHttp::disown() {
   m_get->signal_failed().clear();
 
   // Allocate this dynamically, so that we don't need to do this here.
-  m_get = std::unique_ptr<Http>(Http::slot_factory()());
+  m_get = Http::slot_factory()();
   m_data.reset();
 }
 

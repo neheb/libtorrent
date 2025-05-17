@@ -160,7 +160,7 @@ void
 TestTrackerList::test_can_scrape() {
   TRACKER_LIST_SETUP();
 
-  torrent::Http::slot_factory() = std::bind(&http_factory);
+  torrent::Http::slot_factory() = []{ return std::make_unique<http_get>(); };
 
   tracker_list.insert_url(0, "http://example.com/announce");
   CPPUNIT_ASSERT(tracker_list.back().is_scrapable());
