@@ -19,14 +19,15 @@
 
 namespace torrent::utils {
 
-thread_local Thread*     Thread::m_self{nullptr};
-Thread::global_lock_type Thread::m_global;
+thread_local Thread* Thread::m_self{nullptr};
 
 class ThreadInternal {
 public:
-  static Poll*          poll()      { return Thread::m_self->m_poll.get(); }
-  static Scheduler*     scheduler() { return Thread::m_self->m_scheduler.get(); }
-  static net::Resolver* resolver()  { return Thread::m_self->m_resolver.get(); }
+  static std::chrono::microseconds cached_time()    { return Thread::m_self->m_cached_time; }
+  static std::chrono::seconds      cached_seconds() { return cast_seconds(Thread::m_self->m_cached_time); }
+  static Poll*                     poll()           { return Thread::m_self->m_poll.get(); }
+  static Scheduler*                scheduler()      { return Thread::m_self->m_scheduler.get(); }
+  static net::Resolver*            resolver()       { return Thread::m_self->m_resolver.get(); }
 };
 
 Thread::Thread() :
@@ -64,6 +65,7 @@ Thread::start_thread() {
     usleep(100);
 }
 
+// Each thread needs to check flag_do_shutdown in call_events() and decide how to cleanly shut down.
 void
 Thread::stop_thread() {
   m_flags |= flag_do_shutdown;
@@ -74,14 +76,8 @@ void
 Thread::stop_thread_wait() {
   stop_thread();
 
-  if ((m_flags & flag_main_thread))
-    release_global_lock();
-
   pthread_join(m_thread, NULL);
   assert(is_inactive());
-
-  if ((m_flags & flag_main_thread))
-    acquire_global_lock();
 }
 
 void
@@ -96,6 +92,18 @@ Thread::callback(void* target, std::function<void ()>&& fn) {
 }
 
 void
+Thread::callback_interrupt_pollling(void* target, std::function<void ()>&& fn) {
+  {
+    auto lock = std::scoped_lock(m_callbacks_lock);
+
+    m_interrupt_callbacks.emplace(target, std::move(fn));
+    m_callbacks_should_interrupt_polling = true;
+  }
+
+  interrupt();
+}
+
+void
 Thread::cancel_callback(void* target) {
   if (target == nullptr)
     throw internal_error("Thread::cancel_callback called with a null pointer target.");
@@ -103,6 +111,7 @@ Thread::cancel_callback(void* target) {
   auto lock = std::scoped_lock(m_callbacks_lock);
 
   m_callbacks.erase(target);
+  m_interrupt_callbacks.erase(target);
 }
 
 void
@@ -139,7 +148,7 @@ Thread::enter_event_loop(Thread* thread) {
 
 void
 Thread::event_loop() {
-  lt_log_print(torrent::LOG_THREAD_NOTICE, "%s : starting thread event loop", name());
+  lt_log_print(LOG_THREAD_NOTICE, "%s : starting thread event loop", name());
 
   try {
 
@@ -154,17 +163,15 @@ Thread::event_loop() {
       // race-conditions with flag_polling.
       process_events();
 
-      auto timeout = next_timeout();
-
       instrumentation_update(INSTRUMENTATION_POLLING_DO_POLL, 1);
       instrumentation_update(instrumentation_enum(INSTRUMENTATION_POLLING_DO_POLL + m_instrumentation_index), 1);
 
-      int poll_flags = 0;
+      auto timeout = std::max(next_timeout(), std::chrono::microseconds(0));
 
-      if (!(flags() & flag_main_thread))
-        poll_flags = torrent::Poll::poll_worker_thread;
+      if (!m_scheduler->empty())
+        timeout = std::min(timeout, m_scheduler->next_timeout());
 
-      int event_count = m_poll->do_poll(timeout.count(), poll_flags);
+      int event_count = m_poll->do_poll(timeout.count());
 
       instrumentation_update(INSTRUMENTATION_POLLING_EVENTS, event_count);
       instrumentation_update(instrumentation_enum(INSTRUMENTATION_POLLING_EVENTS + m_instrumentation_index), event_count);
@@ -172,11 +179,12 @@ Thread::event_loop() {
       m_flags &= ~flag_polling;
     }
 
-    m_poll->remove_read(m_interrupt_receiver.get());
-
-  } catch (torrent::shutdown_exception& e) {
-    lt_log_print(torrent::LOG_THREAD_NOTICE, "%s: Shutting down thread.", name());
+  } catch (shutdown_exception& e) {
+    lt_log_print(LOG_THREAD_NOTICE, "%s: Shutting down thread.", name());
   }
+
+  // Some test, and perhaps other code, segfaults on this.
+  // m_poll->remove_read(m_interrupt_receiver.get());
 
   auto previous_state = STATE_ACTIVE;
 
@@ -197,11 +205,10 @@ Thread::init_thread_local() {
   m_thread = pthread_self();
   m_thread_id = std::this_thread::get_id();
 
-  m_cached_time = time_since_epoch();
-  m_scheduler->set_cached_time(m_cached_time);
   m_scheduler->set_thread_id(m_thread_id);
-
   m_signal_bitfield.handover(m_thread_id);
+
+  set_cached_time(time_since_epoch());
 
   if (m_resolver)
     m_resolver->init();
@@ -213,33 +220,51 @@ Thread::init_thread_local() {
 }
 
 void
+Thread::set_cached_time(std::chrono::microseconds t) {
+  m_cached_time = t;
+  m_scheduler->set_cached_time(t);
+}
+
+void
 Thread::process_events() {
-  m_cached_time = time_since_epoch();
-  m_scheduler->set_cached_time(m_cached_time);
+  // TODO: We should call process_callbacks() here before and after call_events, however due to the
+  // many different cached times in the code, we need to let each thread manage this themselves.
+
+  set_cached_time(time_since_epoch());
 
   call_events();
-
   m_signal_bitfield.work();
 
-  m_cached_time = time_since_epoch();
-  m_scheduler->set_cached_time(m_cached_time);
+  set_cached_time(time_since_epoch());
 
+  m_scheduler->perform(m_cached_time);
+}
+
+// Used for testing.
+void
+Thread::process_events_without_cached_time() {
+  call_events();
+  m_signal_bitfield.work();
   m_scheduler->perform(m_cached_time);
 }
 
 // TODO: This should be called in process_events.
 void
-Thread::process_callbacks() {
+Thread::process_callbacks(bool only_interrupt) {
+  m_callbacks_should_interrupt_polling = false;
+
   while (true) {
     std::function<void ()> callback;
 
     {
       auto lock = std::scoped_lock(m_callbacks_lock);
 
-      if (m_callbacks.empty())
+      if (!m_interrupt_callbacks.empty())
+        callback = m_interrupt_callbacks.extract(m_interrupt_callbacks.begin()).mapped();
+      else if (!only_interrupt && !m_callbacks.empty())
+        callback = m_callbacks.extract(m_callbacks.begin()).mapped();
+      else
         break;
-
-      callback = m_callbacks.extract(m_callbacks.begin()).mapped();
 
       // The 'm_callbacks_processing_lock' is used by 'cancel_callback_and_wait' as a way to wait
       // for the processing of the callbacks to finish.
@@ -258,8 +283,10 @@ Thread::process_callbacks() {
 
 namespace torrent::this_thread {
 
-LIBTORRENT_EXPORT Poll*             poll()      { return utils::ThreadInternal::poll(); }
-LIBTORRENT_EXPORT net::Resolver*    resolver()  { return utils::ThreadInternal::resolver(); }
-LIBTORRENT_EXPORT utils::Scheduler* scheduler() { return utils::ThreadInternal::scheduler(); }
+LIBTORRENT_EXPORT std::chrono::microseconds cached_time()    { return utils::ThreadInternal::cached_time(); }
+LIBTORRENT_EXPORT std::chrono::seconds      cached_seconds() { return utils::ThreadInternal::cached_seconds(); }
+LIBTORRENT_EXPORT Poll*                     poll()           { return utils::ThreadInternal::poll(); }
+LIBTORRENT_EXPORT net::Resolver*            resolver()       { return utils::ThreadInternal::resolver(); }
+LIBTORRENT_EXPORT utils::Scheduler*         scheduler()      { return utils::ThreadInternal::scheduler(); }
 
 }

@@ -18,6 +18,9 @@ public:
 
   void                init_thread() override;
 
+  void                test_set_cached_time(std::chrono::microseconds t) { set_cached_time(365 * 24h + t); }
+  void                test_process_events_without_cached_time()         { process_events_without_cached_time(); }
+
 private:
   TestMainThread();
 
@@ -25,13 +28,12 @@ private:
   std::chrono::microseconds next_timeout() override;
 };
 
-#define SETUP_THREAD_TRACKER()                                          \
-  set_create_poll();                                                    \
-  thread_management_type thread_management;                             \
-  auto test_main_thread = TestMainThread::create();                     \
-  test_main_thread->init_thread();                                      \
-  torrent::ThreadTracker::create_thread(test_main_thread.get());        \
-  torrent::thread_tracker()->init_thread();                             \
+#define SETUP_THREAD_TRACKER()                                      \
+  set_create_poll();                                                \
+  auto test_main_thread = TestMainThread::create();                 \
+  test_main_thread->init_thread();                                  \
+  torrent::ThreadTracker::create_thread(test_main_thread.get());    \
+  torrent::thread_tracker()->init_thread();                         \
   torrent::thread_tracker()->start_thread();
 
 // Make sure tearDown also calls torrent::ThreadTracker::destroy_thread().

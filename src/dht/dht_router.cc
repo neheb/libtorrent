@@ -76,7 +76,7 @@ DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
   }
 
   if (m_nodes.size() < num_bootstrap_complete) {
-    m_contacts = new std::deque<contact_t>;
+    m_contacts = std::make_unique<std::deque<contact_t>>();
 
     if (cache.has_key("contacts")) {
       const Object::list_type& contacts = cache.get_key_list("contacts");
@@ -93,7 +93,6 @@ DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
 
 DhtRouter::~DhtRouter() {
   stop();
-  delete m_contacts;
 
   for (auto& route : m_routingTable)
     delete route.second;
@@ -111,16 +110,18 @@ DhtRouter::start(int port) {
 
   m_server.start(port);
 
-  // Set timeout slot and schedule it to be called immediately for initial bootstrapping if necessary.
-  m_taskTimeout.slot() = [this] { receive_timeout_bootstrap(); };
-  priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(1)).round_seconds());
+  // Set timeout slot and schedule it to be called immediately for initial bootstrapping if
+  // necessary.
+  m_task_timeout.slot() = [this] { receive_timeout_bootstrap(); };
+
+  this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, 1s);
 }
 
 void
 DhtRouter::stop() {
   this_thread::resolver()->cancel(this);
+  this_thread::scheduler()->erase(&m_task_timeout);
 
-  priority_queue_erase(&taskScheduler, &m_taskTimeout);
   m_server.stop();
 }
 
@@ -387,15 +388,15 @@ DhtRouter::receive_timeout_bootstrap() {
       bootstrap();
 
     // Retry in 60 seconds.
-    priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(timeout_bootstrap_retry)).round_seconds());
+    this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, std::chrono::seconds(timeout_bootstrap_retry));
+
     m_numRefresh = 1;  // still bootstrapping
 
   } else {
     // We won't be needing external contacts after this.
-    delete m_contacts;
-    m_contacts = NULL;
+    m_contacts = nullptr;
 
-    m_taskTimeout.slot() = [this] { receive_timeout(); };
+    m_task_timeout.slot() = [this] { receive_timeout(); };
 
     if (!m_numRefresh) {
       // If we're still in the startup, do the usual refreshing too.
@@ -403,7 +404,7 @@ DhtRouter::receive_timeout_bootstrap() {
 
     } else {
       // Otherwise just set the 15 minute timer.
-      priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(timeout_update)).round_seconds());
+      this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, std::chrono::seconds(timeout_update));
     }
 
     m_numRefresh = 2;
@@ -412,7 +413,7 @@ DhtRouter::receive_timeout_bootstrap() {
 
 void
 DhtRouter::receive_timeout() {
-  priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(timeout_update)).round_seconds());
+  this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, std::chrono::seconds(timeout_update));
 
   m_prevToken = m_curToken;
   m_curToken = random();
