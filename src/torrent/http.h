@@ -1,10 +1,12 @@
 #ifndef LIBTORRENT_HTTP_H
 #define LIBTORRENT_HTTP_H
 
-#include <string>
 #include <functional>
 #include <iosfwd>
 #include <list>
+#include <memory>
+#include <string>
+
 #include <torrent/common.h>
 
 namespace torrent {
@@ -17,7 +19,7 @@ class LIBTORRENT_EXPORT Http {
 public:
   using slot_void   = std::function<void()>;
   using slot_string = std::function<void(const std::string&)>;
-  using slot_http   = std::function<Http*(void)>;
+  using slot_http   = std::function<std::unique_ptr<Http>()>;
 
   using signal_void   = std::list<slot_void>;
   using signal_string = std::list<slot_string>;

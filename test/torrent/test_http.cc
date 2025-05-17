@@ -74,9 +74,9 @@ static void increment_value(int* value) { (*value)++; }
 
 void
 test_http::test_basic() {
-  torrent::Http::slot_factory() = std::bind(&create_test_http);
+  torrent::Http::slot_factory() = []{ return std::make_unique<TestHttp>(); };
 
-  torrent::Http* http = torrent::Http::slot_factory()();
+  auto http = torrent::Http::slot_factory()();
   std::stringstream* http_stream = new std::stringstream;
 
   http->set_url("http://example.com");
@@ -90,7 +90,6 @@ test_http::test_basic() {
   http->set_timeout(666);
   CPPUNIT_ASSERT(http->timeout() == 666);
   
-  delete http;
   delete http_stream;
 }
 

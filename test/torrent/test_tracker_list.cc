@@ -168,7 +168,7 @@ void
 test_tracker_list::test_can_scrape() {
   TRACKER_LIST_SETUP();
 
-  torrent::Http::slot_factory() = std::bind(&http_factory);
+  torrent::Http::slot_factory() = []{ return std::make_unique<http_get>(); };
 
   auto download_info = torrent::DownloadInfo();
 
