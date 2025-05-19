@@ -49,7 +49,7 @@ TrackerHttp::TrackerHttp(const TrackerInfo& info, int flags) :
 
 bool
 TrackerHttp::is_busy() const {
-  return m_data != nullptr;
+  return m_data.has_value();
 }
 
 void
@@ -132,7 +132,7 @@ TrackerHttp::send_event(tracker::TrackerState::event_enum new_state) {
     break;
   }
 
-  m_data = std::make_unique<std::stringstream>();
+  m_data.emplace();
 
   std::string request_url = s.str();
 
@@ -142,7 +142,7 @@ TrackerHttp::send_event(tracker::TrackerState::event_enum new_state) {
               parameters.uploaded_adjusted, parameters.completed_adjusted, parameters.download_left);
 
   m_get->set_url(request_url);
-  m_get->set_stream(m_data.get());
+  m_get->set_stream(&m_data.value());
   m_get->set_timeout(2 * 60);
 
   m_get->start();
@@ -185,14 +185,14 @@ TrackerHttp::delayed_send_scrape() {
 
   request_prefix(&s, utils::uri_generate_scrape_url(info().url));
 
-  m_data = std::make_unique<std::stringstream>();
+  m_data.emplace();
 
   std::string request_url = s.str();
 
   LT_LOG_DUMP(request_url.c_str(), request_url.size(), "tracker scrape", 0);
 
   m_get->set_url(request_url);
-  m_get->set_stream(m_data.get());
+  m_get->set_stream(&m_data.value());
   m_get->set_timeout(2 * 60);
 
   m_get->start();
@@ -216,7 +216,7 @@ TrackerHttp::disown() {
   this_thread::scheduler()->erase(&m_delay_scrape);
   m_requested_scrape = false;
 
-  if (m_data == nullptr) {
+  if (!m_data.has_value()) {
     LT_LOG("disowning tracker (already closed) : state:%s url:%s",
            option_as_string(OPTION_TRACKER_EVENT, state().latest_event()), info().url.c_str());
 
@@ -246,7 +246,7 @@ TrackerHttp::type() const {
 
 void
 TrackerHttp::close_directly() {
-  if (m_data == nullptr) {
+  if (!m_data.has_value()) {
     LT_LOG("closing directly (already closed) : state:%s url:%s",
            option_as_string(OPTION_TRACKER_EVENT, state().latest_event()), info().url.c_str());
 
@@ -268,7 +268,7 @@ TrackerHttp::close_directly() {
 
 void
 TrackerHttp::receive_done() {
-  if (m_data == nullptr)
+  if (!m_data.has_value())
     throw internal_error("TrackerHttp::receive_done() called on an invalid object");
 
   LT_LOG("received reply", 0);
@@ -328,7 +328,7 @@ TrackerHttp::receive_signal_failed(const std::string& msg) {
 
 void
 TrackerHttp::receive_failed(const std::string& msg) {
-  if (m_data == nullptr)
+  if (!m_data.has_value())
     throw internal_error("TrackerHttp::receive_failed() called on an invalid object");
 
   LT_LOG("received failure : msg:%s", msg.c_str());
