@@ -75,8 +75,8 @@ private:
   uint64_t            m_connection_id{};
   uint32_t            m_transaction_id{};
 
-  std::unique_ptr<ReadBuffer>  m_read_buffer;
-  std::unique_ptr<WriteBuffer> m_write_buffer;
+  ReadBuffer          m_read_buffer;
+  WriteBuffer         m_write_buffer;
 
   uint32_t            m_tries{};
   uint32_t            m_failed_since_last_resolved{};
