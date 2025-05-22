@@ -38,24 +38,14 @@
 #define LIBTORRENT_HASH_COMPUTE_H
 
 #include <cstring>
-#include <memory>
 
 #include <openssl/evp.h>
 
 namespace torrent {
 
-struct sha1_deleter {
-  void operator()(EVP_MD_CTX* ctx) {
-    if (ctx == nullptr)
-      return;
-
-    EVP_MD_CTX_free(ctx);
-  }
-};
-
 class Sha1 {
 public:
-  Sha1();
+  Sha1() = default;
   ~Sha1() = default;
 
   void init();
@@ -64,27 +54,24 @@ public:
   void final_c(void* buffer);
 
 private:
-  std::unique_ptr<EVP_MD_CTX, sha1_deleter> m_ctx;
+  EVP_MD_CTX* m_ctx;
 };
-
-inline
-Sha1::Sha1() :
-    m_ctx(EVP_MD_CTX_new()) {
-}
 
 inline void
 Sha1::init() {
-  EVP_DigestInit_ex(m_ctx.get(), EVP_sha1(), nullptr);
+  m_ctx = EVP_MD_CTX_new();
+  EVP_DigestInit_ex(m_ctx, EVP_sha1(), nullptr);
 }
 
 inline void
 Sha1::update(const void* data, unsigned int length) {
-  EVP_DigestUpdate(m_ctx.get(), data, length);
+  EVP_DigestUpdate(m_ctx, data, length);
 }
 
 inline void
 Sha1::final_c(void* buffer) {
-  EVP_DigestFinal_ex(m_ctx.get(), static_cast<unsigned char*>(buffer), nullptr);
+  EVP_DigestFinal_ex(m_ctx, static_cast<unsigned char*>(buffer), nullptr);
+  EVP_MD_CTX_free(m_ctx);
 }
 
 inline void
