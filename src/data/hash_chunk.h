@@ -1,11 +1,12 @@
 #ifndef LIBTORRENT_HASH_CHUNK_H
 #define LIBTORRENT_HASH_CHUNK_H
 
-#include "torrent/exceptions.h"
-#include "utils/sha1.h"
+#include <memory>
 
 #include "chunk.h"
 #include "chunk_handle.h"
+#include "torrent/exceptions.h"
+#include "utils/sha1.h"
 
 namespace torrent {
 
@@ -17,23 +18,26 @@ class ChunkListNode;
 
 class HashChunk {
 public:
-  HashChunk() = default;
-  HashChunk(ChunkHandle h)  { set_chunk(h); }
-
-  void                set_chunk(ChunkHandle h)                { m_position = 0; m_chunk = h; m_hash.init(); }
+  HashChunk(ChunkHandle h);
+  ~HashChunk() = default;
 
   ChunkHandle*        chunk()                                 { return &m_chunk; }
   ChunkHandle&        handle()                                { return m_chunk; }
-  void                hash_c(char* buffer)                    { m_hash.final_c(buffer); }
+  uint32_t            remaining();
+
+  void                set_chunk(ChunkHandle h);
+
+  void                hash_c(char* buffer);
 
   // If force is true, then the return value is always true.
   bool                perform(uint32_t length, bool force = true);
 
   void                advise_willneed(uint32_t length);
 
-  uint32_t            remaining();
-
 private:
+  HashChunk(const HashChunk&) = delete;
+  HashChunk& operator=(const HashChunk&) = delete;
+
   inline uint32_t     remaining_part(Chunk::iterator itr, uint32_t pos);
   uint32_t            perform_part(Chunk::iterator itr, uint32_t length);
 
@@ -42,6 +46,11 @@ private:
   ChunkHandle         m_chunk;
   Sha1                m_hash;
 };
+
+inline
+HashChunk::HashChunk(ChunkHandle h) {
+  set_chunk(h);
+}
 
 inline uint32_t
 HashChunk::remaining_part(Chunk::iterator itr, uint32_t pos) {

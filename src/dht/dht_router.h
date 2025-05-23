@@ -4,12 +4,14 @@
 #include "dht/dht_node.h"
 #include "dht/dht_hash_map.h"
 #include "dht/dht_server.h"
-#include "rak/priority_queue_default.h"
 #include "rak/socket_address.h"
 #include "torrent/hash_string.h"
 #include "torrent/object.h"
 #include "torrent/net/types.h"
 #include "torrent/tracker/dht_controller.h"
+#include "torrent/utils/scheduler.h"
+
+#include <optional>
 
 namespace torrent {
 
@@ -119,14 +121,14 @@ private:
   // buffer needs to hold an SHA1 hash (20 bytes), not just the token (8 bytes)
   char*               generate_token(const rak::socket_address* sa, int token, char buffer[20]);
 
-  rak::priority_item  m_taskTimeout;
+  utils::SchedulerEntry m_task_timeout;
 
   DhtServer           m_server{nullptr};
   DhtNodeList         m_nodes;
   DhtBucketList       m_routingTable;
   DhtTrackerList      m_trackers;
 
-  std::deque<contact_t>* m_contacts{};
+  std::optional<std::deque<contact_t>> m_contacts;
 
   int                 m_numRefresh{0};
 

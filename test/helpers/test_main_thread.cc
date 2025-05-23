@@ -8,6 +8,8 @@
 #include "torrent/exceptions.h"
 #include "torrent/poll.h"
 #include "torrent/net/resolver.h"
+#include "torrent/utils/log.h"
+#include "torrent/utils/scheduler.h"
 
 std::unique_ptr<TestMainThread>
 TestMainThread::create() {
@@ -26,18 +28,12 @@ TestMainThread::~TestMainThread() {
 
 void
 TestMainThread::init_thread() {
-  // acquire_global_lock();
-
   if (!torrent::Poll::slot_create_poll())
     throw torrent::internal_error("ThreadMain::init_thread(): Poll::slot_create_poll() not valid.");
 
   m_poll = std::unique_ptr<torrent::Poll>(torrent::Poll::slot_create_poll()());
-  m_poll->set_flags(torrent::Poll::flag_waive_global_lock);
-
   m_resolver = std::make_unique<torrent::net::Resolver>();
-
   m_state = STATE_INITIALIZED;
-  m_flags |= flag_main_thread;
 
   //m_instrumentation_index = INSTRUMENTATION_POLLING_DO_POLL_MAIN - INSTRUMENTATION_POLLING_DO_POLL;
 
@@ -76,4 +72,46 @@ TestMainThread::next_timeout() {
     return std::chrono::microseconds(std::max(torrent::taskScheduler.top()->time() - torrent::cachedTime, rak::timer()).usec());
   else
     return std::chrono::microseconds(10min);
+}
+
+void
+TestFixtureWithMainThread::setUp() {
+  test_fixture::setUp();
+
+  set_create_poll();
+  m_main_thread = TestMainThread::create();
+  m_main_thread->init_thread();
+}
+
+void
+TestFixtureWithMainThread::tearDown() {
+  m_main_thread.reset();
+
+  test_fixture::tearDown();
+}
+
+void
+TestFixtureWithMainAndTrackerThread::setUp() {
+  test_fixture::setUp();
+
+  set_create_poll();
+
+  m_main_thread = TestMainThread::create();
+  m_main_thread->init_thread();
+
+  log_add_group_output(torrent::LOG_TRACKER_EVENTS, "test_output");
+  log_add_group_output(torrent::LOG_TRACKER_REQUESTS, "test_output");
+
+  torrent::ThreadTracker::create_thread(m_main_thread.get());
+  torrent::thread_tracker()->init_thread();
+  torrent::thread_tracker()->start_thread();
+}
+
+void
+TestFixtureWithMainAndTrackerThread::tearDown() {
+  torrent::thread_tracker()->destroy_thread();
+
+  m_main_thread.reset();
+
+  test_fixture::tearDown();
 }

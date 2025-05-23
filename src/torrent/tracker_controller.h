@@ -12,9 +12,6 @@
 // TODO: Remove all unused functions and slots, move to src/tracker. Then add a
 // TrackerControllerWrapper that download and api uses.
 
-// Refactor:
-namespace rak { class priority_item; }
-
 namespace torrent {
 
 struct tracker_controller_private;
@@ -96,7 +93,7 @@ public:
   slot_tracker&       slot_tracker_disabled() { return m_slot_tracker_disabled; }
 
 private:
-  TrackerController() = delete;
+  TrackerController(const TrackerController&) = delete;
   TrackerController& operator=(const TrackerController&) = delete;
 
   void                do_timeout();

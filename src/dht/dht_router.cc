@@ -76,16 +76,13 @@ DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
   }
 
   if (m_nodes.size() < num_bootstrap_complete) {
-    m_contacts = new std::deque<contact_t>;
-
+    m_contacts.emplace();
     if (cache.has_key("contacts")) {
-      const Object::list_type& contacts = cache.get_key_list("contacts");
-
-      for (const auto& contact : contacts) {
-        auto               litr = contact.as_list().begin();
-        const std::string& host = litr->as_string();
-        int port = (++litr)->as_value();
-        m_contacts->emplace_back(host, port);
+      for (const auto& contact : cache.get_key_list("contacts")) {
+        auto litr = contact.as_list().begin();
+        auto host = litr->as_string();
+        auto port = std::next(litr)->as_value();
+        m_contacts->emplace_back(std::move(host), port);
       }
     }
   }
@@ -93,7 +90,6 @@ DhtRouter::DhtRouter(const Object& cache, const rak::socket_address* sa) :
 
 DhtRouter::~DhtRouter() {
   stop();
-  delete m_contacts;
 
   for (auto& route : m_routingTable)
     delete route.second;
@@ -111,16 +107,18 @@ DhtRouter::start(int port) {
 
   m_server.start(port);
 
-  // Set timeout slot and schedule it to be called immediately for initial bootstrapping if necessary.
-  m_taskTimeout.slot() = [this] { receive_timeout_bootstrap(); };
-  priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(1)).round_seconds());
+  // Set timeout slot and schedule it to be called immediately for initial bootstrapping if
+  // necessary.
+  m_task_timeout.slot() = [this] { receive_timeout_bootstrap(); };
+
+  this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, 1s);
 }
 
 void
 DhtRouter::stop() {
   this_thread::resolver()->cancel(this);
+  this_thread::scheduler()->erase(&m_task_timeout);
 
-  priority_queue_erase(&taskScheduler, &m_taskTimeout);
   m_server.stop();
 }
 
@@ -201,7 +199,7 @@ void
 DhtRouter::add_contact(const std::string& host, int port) {
   // Externally obtained nodes are added to the contact list, but only if
   // we're still bootstrapping. We don't contact external nodes after that.
-  if (m_contacts != NULL) {
+  if (m_contacts.has_value()) {
     if (m_contacts->size() >= num_bootstrap_contacts)
       m_contacts->pop_front();
 
@@ -327,7 +325,7 @@ DhtRouter::store_cache(Object* container) const {
   }
 
   // Insert contacts, if we have any.
-  if (m_contacts != NULL) {
+  if (m_contacts.has_value()) {
     Object& contacts = container->insert_key("contacts", Object::create_list());
 
     for (const auto& m_contact : *m_contacts) {
@@ -380,22 +378,22 @@ DhtRouter::receive_timeout_bootstrap() {
   // to a less aggressive non-bootstrap mode of collecting nodes that contact us
   // and through doing normal torrent announces.
   if (m_nodes.size() < num_bootstrap_complete) {
-    if (m_contacts == NULL)
+    if (!m_contacts.has_value())
       throw internal_error("DhtRouter::receive_timeout_bootstrap called without contact list.");
 
     if (!m_nodes.empty() || !m_contacts->empty())
       bootstrap();
 
     // Retry in 60 seconds.
-    priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(timeout_bootstrap_retry)).round_seconds());
+    this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, std::chrono::seconds(timeout_bootstrap_retry));
+
     m_numRefresh = 1;  // still bootstrapping
 
   } else {
     // We won't be needing external contacts after this.
-    delete m_contacts;
-    m_contacts = NULL;
+    m_contacts.reset();
 
-    m_taskTimeout.slot() = [this] { receive_timeout(); };
+    m_task_timeout.slot() = [this] { receive_timeout(); };
 
     if (!m_numRefresh) {
       // If we're still in the startup, do the usual refreshing too.
@@ -403,7 +401,7 @@ DhtRouter::receive_timeout_bootstrap() {
 
     } else {
       // Otherwise just set the 15 minute timer.
-      priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(timeout_update)).round_seconds());
+      this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, std::chrono::seconds(timeout_update));
     }
 
     m_numRefresh = 2;
@@ -412,7 +410,7 @@ DhtRouter::receive_timeout_bootstrap() {
 
 void
 DhtRouter::receive_timeout() {
-  priority_queue_insert(&taskScheduler, &m_taskTimeout, (cachedTime + rak::timer::from_seconds(timeout_update)).round_seconds());
+  this_thread::scheduler()->wait_for_ceil_seconds(&m_task_timeout, std::chrono::seconds(timeout_update));
 
   m_prevToken = m_curToken;
   m_curToken = random();
