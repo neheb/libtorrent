@@ -82,7 +82,7 @@ libtorrent = library(
   gnu_symbol_visibility: 'hidden',
   name_prefix: '',
   link_whole: libtorrent_torrent,
-  dependencies: libtorrent_other_dep,
+  dependencies: [libtorrent_other_dep, ssl_dep],
   version: '24.0.0',
   include_directories: '..',
   install: true,
