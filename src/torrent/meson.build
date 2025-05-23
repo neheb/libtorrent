@@ -66,7 +66,7 @@ libtorrent_torrent = static_library(
   'torrent_torrent',
   libtorrent_torrent_files,
   gnu_symbol_visibility: 'hidden',
-  dependencies: [atomic_dep, execinfo_dep, kqueue_dep, ssl_dep, thread_dep, zlib_dep],
+  dependencies: [atomic_dep, execinfo_dep, kqueue_dep, socket_dep, ssl_dep, thread_dep, zlib_dep],
   include_directories: incdirs,
 )
 
