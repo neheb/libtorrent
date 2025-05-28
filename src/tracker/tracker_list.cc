@@ -6,7 +6,6 @@
 #include <random>
 #include <sstream>
 
-#include "net/address_list.h"
 #include "torrent/download_info.h"
 #include "torrent/exceptions.h"
 #include "torrent/http.h"

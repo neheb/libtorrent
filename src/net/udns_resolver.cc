@@ -6,7 +6,6 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#include "manager.h"
 #include "net/udns/udns.h"
 #include "torrent/common.h"
 #include "torrent/exceptions.h"

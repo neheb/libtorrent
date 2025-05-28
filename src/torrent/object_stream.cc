@@ -1,11 +1,9 @@
 #include "config.h"
 
-#include <iterator>
 #include <iostream>
-#include <cmath>
+#include <iterator>
 #include <limits>
 #include <stdexcept>
-#include <rak/string_manip.h>
 
 #include "utils/sha1.h"
 

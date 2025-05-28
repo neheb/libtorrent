@@ -2,10 +2,9 @@
 
 #include "directory_events.h"
 
-#include <string>
-#include <cerrno>
-#include <unistd.h>
 #include <algorithm>
+#include <string>
+#include <unistd.h>
 
 #ifdef USE_INOTIFY
 #include <sys/inotify.h>
