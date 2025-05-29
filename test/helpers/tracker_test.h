@@ -58,54 +58,10 @@ private:
   int                 m_requesting_state{-1};
 };
 
-inline
-TrackerTest::TrackerTest(torrent::TrackerInfo info, int flags) :
-  torrent::TrackerWorker(std::move(info), flags) {
-
-  state().m_flags |= flag_close_on_done;
-}
-
-inline void
-TrackerTest::set_close_on_done(bool s) {
-  if (s)
-    state().m_flags |= flag_close_on_done;
-  else
-    state().m_flags &= ~flag_close_on_done;
-}
-
-inline void
-TrackerTest::set_scrape_on_success(bool s) {
-  if (s)
-    state().m_flags |= flag_scrape_on_success;
-  else
-    state().m_flags &= ~flag_scrape_on_success;
-}
-
-inline void
-TrackerTest::set_scrapable() {
-  state().m_flags |= torrent::tracker::TrackerState::flag_scrapable;
-}
-
-inline TrackerTest*
-TrackerTest::test_worker(torrent::tracker::Tracker& tracker) {
-  return dynamic_cast<TrackerTest*>(tracker.get_worker());
-}
-
-inline int
-TrackerTest::test_flags(torrent::tracker::Tracker& tracker) {
-  return dynamic_cast<TrackerTest*>(tracker.get_worker())->state().flags();
-}
-
-inline torrent::tracker::TrackerState&
-TrackerTest::test_state(torrent::tracker::Tracker& tracker) {
-  return dynamic_cast<TrackerTest*>(tracker.get_worker())->state();
-}
-
 extern uint32_t return_new_peers;
 inline uint32_t increment_value(int* value) { (*value)++; return return_new_peers; }
 
 inline void increment_value_void(int* value) { (*value)++; }
 inline unsigned int increment_value_uint(int* value) { (*value)++; return return_new_peers; }
-
 
 #endif // LIBTORRENT_HELPER_TRACKER_TEST_H
