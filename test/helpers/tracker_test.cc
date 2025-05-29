@@ -12,6 +12,48 @@
 
 uint32_t return_new_peers = 0xdeadbeef;
 
+TrackerTest::TrackerTest(torrent::TrackerInfo info, int flags) :
+    torrent::TrackerWorker(std::move(info), flags) {
+
+  state().m_flags |= flag_close_on_done;
+}
+
+void
+TrackerTest::set_close_on_done(bool s) {
+  if (s)
+    state().m_flags |= flag_close_on_done;
+  else
+    state().m_flags &= ~flag_close_on_done;
+}
+
+void
+TrackerTest::set_scrape_on_success(bool s) {
+  if (s)
+    state().m_flags |= flag_scrape_on_success;
+  else
+    state().m_flags &= ~flag_scrape_on_success;
+}
+
+void
+TrackerTest::set_scrapable() {
+  state().m_flags |= torrent::tracker::TrackerState::flag_scrapable;
+}
+
+TrackerTest*
+TrackerTest::test_worker(torrent::tracker::Tracker& tracker) {
+  return dynamic_cast<TrackerTest*>(tracker.get_worker());
+}
+
+int
+TrackerTest::test_flags(torrent::tracker::Tracker& tracker) {
+  return dynamic_cast<TrackerTest*>(tracker.get_worker())->state().flags();
+}
+
+torrent::tracker::TrackerState&
+TrackerTest::test_state(torrent::tracker::Tracker& tracker) {
+  return dynamic_cast<TrackerTest*>(tracker.get_worker())->state();
+}
+
 torrent::tracker::Tracker
 TrackerTest::new_tracker([[maybe_unused]] torrent::TrackerList* parent, const std::string& url, int flags) {
   auto tracker_info = torrent::TrackerInfo{
