@@ -52,10 +52,10 @@ DownloadMain::DownloadMain()
   m_delegator.slot_chunk_find() = [this](auto pc, auto prio) { return m_chunkSelector->find(pc, prio); };
   m_delegator.slot_chunk_size() = [this](auto i) { return file_list()->chunk_index_size(i); };
 
-  m_delegator.transfer_list()->slot_canceled()  = [this](auto i) { m_chunkSelector->not_using_index(i); };
-  m_delegator.transfer_list()->slot_queued()    = [this](auto i) { m_chunkSelector->using_index(i); };
-  m_delegator.transfer_list()->slot_completed() = [this](auto i) { receive_chunk_done(i); };
-  m_delegator.transfer_list()->slot_corrupt()   = [this](auto i) { receive_corrupt_chunk(i); };
+  m_delegator.transfer_list().slot_canceled()  = [this](auto i) { m_chunkSelector->not_using_index(i); };
+  m_delegator.transfer_list().slot_queued()    = [this](auto i) { m_chunkSelector->using_index(i); };
+  m_delegator.transfer_list().slot_completed() = [this](auto i) { receive_chunk_done(i); };
+  m_delegator.transfer_list().slot_corrupt()   = [this](auto i) { receive_corrupt_chunk(i); };
 
   m_delay_disconnect_peers.slot() = [this] { m_connectionList->disconnect_queued(); };
   m_task_tracker_request.slot()     = [this] { receive_tracker_request(); };
@@ -143,7 +143,7 @@ DownloadMain::close() {
   // requests to be lost. TODO: Check that this is valid.
 //   m_trackerManager->close();
 
-  m_delegator.transfer_list()->clear();
+  m_delegator.transfer_list().clear();
 
   file_list()->close();
 
@@ -247,7 +247,7 @@ DownloadMain::initial_seeding_done(PeerConnectionBase* pcb) {
 void
 DownloadMain::update_endgame() {
   if (!m_delegator.get_aggressive() &&
-      file_list()->completed_chunks() + m_delegator.transfer_list()->size() + 5 >= file_list()->size_chunks())
+      file_list()->completed_chunks() + m_delegator.transfer_list().size() + 5 >= file_list()->size_chunks())
     m_delegator.set_aggressive(true);
 }
 

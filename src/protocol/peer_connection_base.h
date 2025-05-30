@@ -72,15 +72,15 @@ public:
 
   PeerInfo*           mutable_peer_info()             { return m_peerInfo; }
 
-  PeerChunks*         peer_chunks()                   { return &m_peerChunks; }
-  const PeerChunks*   c_peer_chunks() const           { return &m_peerChunks; }
+  PeerChunks&         peer_chunks()                   { return m_peerChunks; }
+  const PeerChunks&   c_peer_chunks() const           { return m_peerChunks; }
 
   choke_status*       up_choke()                      { return &m_upChoke; }
   choke_status*       down_choke()                    { return &m_downChoke; }
 
   DownloadMain*       download()                      { return m_download; }
-  RequestList*        request_list()                { return &m_request_list; }
-  const RequestList*  request_list() const          { return &m_request_list; }
+  RequestList&        request_list()                  { return m_request_list; }
+  const RequestList&  request_list() const            { return m_request_list; }
 
   ProtocolExtension*  extensions()                    { return m_extensions; }
   DataBuffer*         extension_message()             { return &m_extensionMessage; }

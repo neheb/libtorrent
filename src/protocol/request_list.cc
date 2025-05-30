@@ -287,7 +287,7 @@ RequestList::finished() {
   BlockTransfer* transfer = m_transfer;
   m_transfer = nullptr;
 
-  m_delegator->transfer_list()->finished(transfer);
+  m_delegator->transfer_list().finished(transfer);
 
   instrumentation_update(INSTRUMENTATION_TRANSFER_REQUESTS_FINISHED, 1);
 }
@@ -322,8 +322,8 @@ RequestList::transfer_dissimilar() {
 
 bool
 RequestList::is_interested_in_active() const {
-  auto list = m_delegator->transfer_list();
-  return std::any_of(list->begin(), list->end(), [this](auto transfer) { return m_peerChunks->bitfield()->get(transfer->index()); });
+  const auto& list = m_delegator->transfer_list();
+  return std::any_of(list.begin(), list.end(), [this](auto transfer) { return m_peerChunks->bitfield().get(transfer->index()); });
 }
 
 uint32_t

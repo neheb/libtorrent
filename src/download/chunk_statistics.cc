@@ -72,11 +72,11 @@ ChunkStatistics::received_connect(PeerChunks* pc) {
   if (pc->using_counter())
     throw internal_error("ChunkStatistics::received_connect(...) pc->using_counter() == true.");
 
-  if (pc->bitfield()->is_all_set()) {
+  if (pc->bitfield().is_all_set()) {
     pc->set_using_counter(true);
     m_complete++;
 
-  } else if (!pc->bitfield()->is_all_unset() && should_add(pc)) {
+  } else if (!pc->bitfield().is_all_unset() && should_add(pc)) {
     // There should be additional checks, so that we don't do this
     // when there's no need.
     pc->set_using_counter(true);
@@ -85,8 +85,8 @@ ChunkStatistics::received_connect(PeerChunks* pc) {
     auto itr = base_type::begin();
 
     // Use a bitfield iterator instead.
-    for (Bitfield::size_type index = 0; index < pc->bitfield()->size_bits(); ++index, ++itr)
-      *itr += pc->bitfield()->get(index);
+    for (Bitfield::size_type index = 0; index < pc->bitfield().size_bits(); ++index, ++itr)
+      *itr += pc->bitfield().get(index);
   }
 }
 
@@ -101,7 +101,7 @@ ChunkStatistics::received_disconnect(PeerChunks* pc) {
 
   pc->set_using_counter(false);
 
-  if (pc->bitfield()->is_all_set()) {
+  if (pc->bitfield().is_all_set()) {
     m_complete--;
 
   } else {
@@ -113,8 +113,8 @@ ChunkStatistics::received_disconnect(PeerChunks* pc) {
     auto itr = base_type::begin();
 
     // Use a bitfield iterator instead.
-    for (Bitfield::size_type index = 0; index < pc->bitfield()->size_bits(); ++index, ++itr)
-      *itr -= pc->bitfield()->get(index);
+    for (Bitfield::size_type index = 0; index < pc->bitfield().size_bits(); ++index, ++itr)
+      *itr -= pc->bitfield().get(index);
   }
 }
 
@@ -123,7 +123,7 @@ ChunkStatistics::received_have_chunk(PeerChunks* pc, uint32_t index, uint32_t le
   // When the bitfield is empty, it is very cheap to add the peer to
   // the statistics. It needs to be done here else we need to check if
   // a connection has sent any messages, else it might send a bitfield.
-  if (pc->bitfield()->is_all_unset() && should_add(pc)) {
+  if (pc->bitfield().is_all_unset() && should_add(pc)) {
 
     if (pc->using_counter())
       throw internal_error("ChunkStatistics::received_have_chunk(...) pc->using_counter() == true.");
@@ -132,16 +132,16 @@ ChunkStatistics::received_have_chunk(PeerChunks* pc, uint32_t index, uint32_t le
     m_accounted++;
   }
 
-  pc->bitfield()->set(index);
-  pc->peer_rate()->insert(length);
-  
+  pc->bitfield().set(index);
+  pc->peer_rate().insert(length);
+
   if (pc->using_counter()) {
 
     base_type::operator[](index)++;
 
     // The below code should not cause useless work to be done in case
     // of immediate disconnect.
-    if (pc->bitfield()->is_all_set()) {
+    if (pc->bitfield().is_all_set()) {
       if (m_accounted == 0)
 	throw internal_error("ChunkStatistics::received_disconnect(...) m_accounted == 0.");
       
@@ -153,7 +153,7 @@ ChunkStatistics::received_have_chunk(PeerChunks* pc, uint32_t index, uint32_t le
 
   } else {
 
-    if (pc->bitfield()->is_all_set()) {
+    if (pc->bitfield().is_all_set()) {
       pc->set_using_counter(true);
       m_complete++;
     }

@@ -30,23 +30,23 @@ bool Peer::is_banned() const               { return m_peerInfo->failed_counter()
 void Peer::set_snubbed(bool v)             { m_ptr()->set_upload_snubbed(v); }
 void Peer::set_banned(bool v)              { m_peerInfo->set_failed_counter(v ? 64 : 0); }
 
-const Rate*       Peer::down_rate() const  { return c_ptr()->c_peer_chunks()->download_throttle()->rate(); }
-const Rate*       Peer::up_rate() const    { return c_ptr()->c_peer_chunks()->upload_throttle()->rate(); }
-const Rate*       Peer::peer_rate() const  { return c_ptr()->c_peer_chunks()->peer_rate(); }
+const Rate&       Peer::down_rate() const  { return c_ptr()->c_peer_chunks().download_throttle().rate(); }
+const Rate&       Peer::up_rate() const    { return c_ptr()->c_peer_chunks().upload_throttle().rate(); }
+const Rate&       Peer::peer_rate() const  { return c_ptr()->c_peer_chunks().peer_rate(); }
 
-const Bitfield*   Peer::bitfield() const   { return c_ptr()->c_peer_chunks()->bitfield(); }
+const Bitfield&   Peer::bitfield() const   { return c_ptr()->c_peer_chunks().bitfield(); }
 
-uint32_t Peer::incoming_queue_size() const { return c_ptr()->request_list()->queued_size(); }
-uint32_t Peer::outgoing_queue_size() const { return c_ptr()->c_peer_chunks()->upload_queue()->size(); }
-uint32_t Peer::chunks_done() const         { return c_ptr()->c_peer_chunks()->bitfield()->size_set(); }
+uint32_t Peer::incoming_queue_size() const { return c_ptr()->request_list().queued_size(); }
+uint32_t Peer::outgoing_queue_size() const { return c_ptr()->c_peer_chunks().upload_queue().size(); }
+uint32_t Peer::chunks_done() const         { return c_ptr()->c_peer_chunks().bitfield().size_set(); }
 
 const BlockTransfer*
 Peer::transfer() const {
-  if (c_ptr()->request_list()->transfer() != NULL)
-    return c_ptr()->request_list()->transfer();
+  if (c_ptr()->request_list().transfer())
+    return c_ptr()->request_list().transfer();
 
-  else if (!c_ptr()->request_list()->queued_empty())
-    return c_ptr()->request_list()->queued_front();
+  else if (!c_ptr()->request_list().queued_empty())
+    return c_ptr()->request_list().queued_front();
 
   else
     return NULL;

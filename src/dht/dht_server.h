@@ -59,10 +59,10 @@ public:
   // Called every 15 minutes.
   void                update();
 
-  ThrottleNode*       upload_throttle_node()                  { return &m_uploadNode; }
-  const ThrottleNode* upload_throttle_node() const            { return &m_uploadNode; }
-  ThrottleNode*       download_throttle_node()                { return &m_downloadNode; }
-  const ThrottleNode* download_throttle_node() const          { return &m_downloadNode; }
+  ThrottleNode&       upload_throttle_node()                  { return m_uploadNode; }
+  const ThrottleNode& upload_throttle_node() const            { return m_uploadNode; }
+  ThrottleNode&       download_throttle_node()                { return m_downloadNode; }
+  const ThrottleNode& download_throttle_node() const          { return m_downloadNode; }
 
   void                set_upload_throttle(ThrottleList* t)    { m_uploadThrottle = t; }
   void                set_download_throttle(ThrottleList* t)  { m_downloadThrottle = t; }

@@ -214,7 +214,7 @@ ChunkSelector::received_have_chunk(PeerChunks* pc, uint32_t index) {
 }
 
 bool
-ChunkSelector::search_linear(const Bitfield* bf, rak::partial_queue* pq, const download_data::priority_ranges* ranges, uint32_t first, uint32_t last) {
+ChunkSelector::search_linear(const Bitfield& bf, rak::partial_queue* pq, const download_data::priority_ranges* ranges, uint32_t first, uint32_t last) {
   auto itr = ranges->find(first);
 
   while (itr != ranges->end() && itr->first < last) {
@@ -231,12 +231,12 @@ ChunkSelector::search_linear(const Bitfield* bf, rak::partial_queue* pq, const d
 // Could propably add another argument for max seen or something, this
 // would be used to find better chunks to request.
 inline bool
-ChunkSelector::search_linear_range(const Bitfield* bf, rak::partial_queue* pq, uint32_t first, uint32_t last) {
+ChunkSelector::search_linear_range(const Bitfield& bf, rak::partial_queue* pq, uint32_t first, uint32_t last) {
   if (first >= last || last > size())
     throw internal_error("ChunkSelector::search_linear_range(...) received an invalid range.");
 
   Bitfield::const_iterator local  = m_data->untouched_bitfield()->begin() + first / 8;
-  Bitfield::const_iterator source = bf->begin() + first / 8;
+  Bitfield::const_iterator source = bf.begin() + first / 8;
 
   // Unset any bits before 'first'.
   Bitfield::value_type wanted = (*source & *local) & Bitfield::mask_from(first % 8);

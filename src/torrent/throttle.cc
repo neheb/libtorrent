@@ -65,7 +65,7 @@ Throttle::set_max_rate(uint64_t v) {
     m_ptr()->disable();
 }
 
-const Rate*
+const Rate&
 Throttle::rate() const {
   return m_throttleList->rate_slow();
 }
@@ -104,7 +104,7 @@ Throttle::calculate_max_chunk_size() const {
 
 uint32_t
 Throttle::calculate_interval() const {
-  uint32_t rate = m_throttleList->rate_slow()->rate();
+  uint32_t rate = m_throttleList->rate_slow().rate();
 
   if (rate < 1024)
     return 10 * 100000;

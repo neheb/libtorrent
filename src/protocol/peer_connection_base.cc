@@ -96,20 +96,20 @@ PeerConnectionBase::initialize(DownloadMain* download, PeerInfo* peerInfo, Socke
   m_downChoke.set_entry(m_download->down_group_entry());
 
   m_peerChunks.set_peer_info(m_peerInfo);
-  m_peerChunks.bitfield()->swap(*bitfield);
+  m_peerChunks.bitfield().swap(*bitfield);
 
   std::pair<ThrottleList*, ThrottleList*> throttles = m_download->throttles(m_peerInfo->socket_address());
   m_up->set_throttle(throttles.first);
   m_down->set_throttle(throttles.second);
 
-  m_peerChunks.upload_throttle()->set_list_iterator(m_up->throttle()->end());
-  m_peerChunks.upload_throttle()->slot_activate() = [this] { receive_throttle_up_activate(); };
+  m_peerChunks.upload_throttle().set_list_iterator(m_up->throttle()->end());
+  m_peerChunks.upload_throttle().slot_activate() = [this] { receive_throttle_up_activate(); };
 
-  m_peerChunks.download_throttle()->set_list_iterator(m_down->throttle()->end());
-  m_peerChunks.download_throttle()->slot_activate() = [this] { receive_throttle_down_activate(); };
+  m_peerChunks.download_throttle().set_list_iterator(m_down->throttle()->end());
+  m_peerChunks.download_throttle().slot_activate() = [this] { receive_throttle_down_activate(); };
 
-  request_list()->set_delegator(m_download->delegator());
-  request_list()->set_peer_chunks(&m_peerChunks);
+  request_list().set_delegator(m_download->delegator());
+  request_list().set_peer_chunks(&m_peerChunks);
 
   try {
     initialize_custom();
@@ -255,7 +255,7 @@ PeerConnectionBase::receive_download_choke(bool choke) {
 
     // If the queue isn't empty, then we might still receive some
     // pieces, so don't remove us from throttle or release the chunk.
-    if (!request_list()->is_downloading() && request_list()->queued_empty()) {
+    if (!request_list().is_downloading() && request_list().queued_empty()) {
       m_down->throttle()->erase(m_peerChunks.download_throttle());
       down_chunk_release();
     }
@@ -337,14 +337,14 @@ PeerConnectionBase::load_up_chunk() {
 
   // Also check if we've already preloaded in the recent past, even
   // past unmaps.
-  ChunkManager* cm = manager->chunk_manager();
+  const auto& cm = manager->chunk_manager();
   uint32_t preloadSize = m_upChunk.chunk()->chunk_size() - m_upPiece.offset();
 
   if (cm->preload_type() == 0 ||
       m_upChunk.object()->time_preloaded() >= this_thread::cached_time() - 60s ||
 
       preloadSize < cm->preload_min_size() ||
-      m_peerChunks.upload_throttle()->rate()->rate() < cm->preload_required_rate() * ((preloadSize + (2 << 20) - 1) / (2 << 20))) {
+      m_peerChunks.upload_throttle().rate().rate() < cm->preload_required_rate() * ((preloadSize + (2 << 20) - 1) / (2 << 20))) {
     cm->inc_stats_not_preloaded();
     return;
   }
@@ -391,7 +391,7 @@ PeerConnectionBase::should_connection_unchoke(choke_queue* cq) const {
 
 bool
 PeerConnectionBase::down_chunk_start(const Piece& piece) {
-  if (!request_list()->downloading(piece)) {
+  if (!request_list().downloading(piece)) {
     if (piece.length() == 0) {
       LT_LOG_PIECE_EVENTS("(down) skipping_empty %" PRIu32 " %" PRIu32 " %" PRIu32,
                           piece.index(), piece.offset(), piece.length());
@@ -415,18 +415,18 @@ PeerConnectionBase::down_chunk_start(const Piece& piece) {
   }
 
   LT_LOG_PIECE_EVENTS("(down) %s %" PRIu32 " %" PRIu32 " %" PRIu32,
-                      request_list()->transfer()->is_leader() ? "started_on" : "skipping_partial",
+                      request_list().transfer()->is_leader() ? "started_on" : "skipping_partial",
                       piece.index(), piece.offset(), piece.length());
 
-  return request_list()->transfer()->is_leader();
+  return request_list().transfer()->is_leader();
 }
 
 void
 PeerConnectionBase::down_chunk_finished() {
-  if (!request_list()->transfer()->is_finished())
+  if (!request_list().transfer()->is_finished())
     throw internal_error("PeerConnectionBase::down_chunk_finished() Transfer not finished.");
 
-  BlockTransfer* transfer = request_list()->transfer();
+  auto transfer = request_list().transfer();
 
   LT_LOG_PIECE_EVENTS("(down) %s %" PRIu32 " %" PRIu32 " %" PRIu32,
                       transfer->is_leader() ? "completed " : "skipped  ",
@@ -436,11 +436,11 @@ PeerConnectionBase::down_chunk_finished() {
     if (!m_downChunk.is_valid())
       throw internal_error("PeerConnectionBase::down_chunk_finished() Transfer is the leader, but no chunk allocated.");
 
-    request_list()->finished();
+    request_list().finished();
     m_downChunk.object()->set_time_modified(this_thread::cached_time());
 
   } else {
-    request_list()->skipped();
+    request_list().skipped();
   }
 
   if (m_downStall > 0)
@@ -453,12 +453,12 @@ PeerConnectionBase::down_chunk_finished() {
   // Some tweaking of the pipe size might be necessary if the queue
   // empties too often.
   if (m_downChunk.is_valid() &&
-      (request_list()->queued_empty() || m_downChunk.index() != request_list()->next_queued_piece().index()))
+      (request_list().queued_empty() || m_downChunk.index() != request_list().next_queued_piece().index()))
     down_chunk_release();
 
   // If we were choked by choke_manager but still had queued pieces,
   // then we might still be in the throttle.
-  if (m_downChoke.choked() && request_list()->queued_empty())
+  if (m_downChoke.choked() && request_list().queued_empty())
     m_down->throttle()->erase(m_peerChunks.download_throttle());
 
   write_insert_poll_safe();
@@ -802,17 +802,17 @@ PeerConnectionBase::up_chunk_release() {
 
 void
 PeerConnectionBase::read_request_piece(const Piece& p) {
-  auto itr = std::find(m_peerChunks.upload_queue()->begin(),
-                       m_peerChunks.upload_queue()->end(),
+  auto itr = std::find(m_peerChunks.upload_queue().begin(),
+                       m_peerChunks.upload_queue().end(),
                        p);
 
-  if (m_upChoke.choked() || itr != m_peerChunks.upload_queue()->end() || p.length() > (1 << 17)) {
+  if (m_upChoke.choked() || itr != m_peerChunks.upload_queue().end() || p.length() > (1 << 17)) {
     LT_LOG_PIECE_EVENTS("(up)   request_ignored  %" PRIu32 " %" PRIu32 " %" PRIu32,
                         p.index(), p.offset(), p.length());
     return;
   }
 
-  m_peerChunks.upload_queue()->push_back(p);
+  m_peerChunks.upload_queue().push_back(p);
   write_insert_poll_safe();
 
   LT_LOG_PIECE_EVENTS("(up)   request_added    %" PRIu32 " %" PRIu32 " %" PRIu32,
@@ -821,12 +821,12 @@ PeerConnectionBase::read_request_piece(const Piece& p) {
 
 void
 PeerConnectionBase::read_cancel_piece(const Piece& p) {
-  auto itr = std::find(m_peerChunks.upload_queue()->begin(),
-                       m_peerChunks.upload_queue()->end(),
+  auto itr = std::find(m_peerChunks.upload_queue().begin(),
+                       m_peerChunks.upload_queue().end(),
                        p);
 
-  if (itr != m_peerChunks.upload_queue()->end()) {
-    m_peerChunks.upload_queue()->erase(itr);
+  if (itr != m_peerChunks.upload_queue().end()) {
+    m_peerChunks.upload_queue().erase(itr);
 
     LT_LOG_PIECE_EVENTS("(up)   cancel_requested %" PRIu32 " %" PRIu32 " %" PRIu32,
                         p.index(), p.offset(), p.length());
@@ -838,8 +838,8 @@ PeerConnectionBase::read_cancel_piece(const Piece& p) {
 
 void
 PeerConnectionBase::write_prepare_piece() {
-  m_upPiece = m_peerChunks.upload_queue()->front();
-  m_peerChunks.upload_queue()->pop_front();
+  m_upPiece = m_peerChunks.upload_queue().front();
+  m_peerChunks.upload_queue().pop_front();
 
   // Move these checks somewhere else?
   if (!m_download->file_list()->is_valid_piece(m_upPiece) ||
@@ -895,31 +895,32 @@ PeerConnectionBase::should_request() {
 
 bool
 PeerConnectionBase::try_request_pieces() {
-  if (request_list()->queued_empty())
+  if (request_list().queued_empty())
     m_downStall = 0;
 
-  uint32_t pipeSize = request_list()->calculate_pipe_size(m_peerChunks.download_throttle()->rate()->rate());
+  uint32_t pipeSize = request_list().calculate_pipe_size(m_peerChunks.download_throttle().rate().rate());
 
   // Don't start requesting if we can't do it in large enough chunks.
-  if (request_list()->pipe_size() >= (pipeSize + 10) / 2)
+  if (request_list().pipe_size() >= (pipeSize + 10) / 2)
     return false;
 
   bool success = false;
 
-  while (request_list()->queued_size() < pipeSize && m_up->can_write_request()) {
+  while (request_list().queued_size() < pipeSize && m_up->can_write_request()) {
 
     // It should get the right number the first time around, but loop just to be sure
     int maxRequests = m_up->max_write_request();
-    int maxQueued = pipeSize - request_list()->queued_size();
+    int maxQueued = pipeSize - request_list().queued_size();
     int maxPieces = std::max(std::min(maxRequests, maxQueued), 1);
 
-    std::vector<const Piece*> pieces = request_list()->delegate(maxPieces);
+    std::vector<const Piece*> pieces = request_list().delegate(maxPieces);
+    
     if (pieces.empty()) {
       return false;
     }
 
     for (auto& p : pieces) {
-      if (!m_download->file_list()->is_valid_piece(*p) || !m_peerChunks.bitfield()->get(p->index()))
+      if (!m_download->file_list()->is_valid_piece(*p) || !m_peerChunks.bitfield().get(p->index()))
         throw internal_error("PeerConnectionBase::try_request_pieces() tried to use an invalid piece.");
 
       m_up->write_request(*p);

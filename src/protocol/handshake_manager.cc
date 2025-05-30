@@ -179,7 +179,7 @@ HandshakeManager::receive_succeeded(Handshake* handshake) {
 
     manager->client_list()->retrieve_id(&handshake->peer_info()->mutable_client_info(), handshake->peer_info()->id());
 
-    pcb->peer_chunks()->set_have_timer(handshake->initialized_time());
+    pcb->peer_chunks().set_have_timer(handshake->initialized_time());
 
     LT_LOG_SA_C(handshake->peer_info()->socket_address(), "handshake success: type:%s id:%s",
                 peer_type, hash_string_to_html_str(handshake->peer_info()->id()).c_str());
@@ -255,7 +255,7 @@ HandshakeManager::setup_socket(SocketFd fd) {
   if (!fd.set_nonblock())
     return false;
 
-  ConnectionManager* m = manager->connection_manager();
+  const auto& m = manager->connection_manager();
 
   if (m->priority() != ConnectionManager::iptos::def && !fd.set_priority(m->priority()))
     return false;

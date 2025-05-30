@@ -385,28 +385,28 @@ PeerConnectionMetadata::try_request_metadata_pieces() {
   if (m_download->file_list()->chunk_size() == 1 || !m_extensions->is_remote_supported(ProtocolExtension::UT_METADATA))
     return false;
 
-  if (request_list()->queued_empty())
+  if (request_list().queued_empty())
     m_downStall = 0;
 
-  uint32_t pipeSize = request_list()->calculate_pipe_size(m_peerChunks.download_throttle()->rate()->rate());
+  uint32_t pipeSize = request_list().calculate_pipe_size(m_peerChunks.download_throttle().rate().rate());
 
   // Don't start requesting if we can't do it in large enough chunks.
-  if (request_list()->pipe_size() >= (pipeSize + 10) / 2)
+  if (request_list().pipe_size() >= (pipeSize + 10) / 2)
     return false;
 
   // DEBUG:
-//   if (!request_list()->queued_size() < pipeSize || !m_up->can_write_extension() ||
+//   if (!request_list().queued_size() < pipeSize || !m_up->can_write_extension() ||
   if (!m_up->can_write_extension() || m_extensions->has_pending_message())
     return false;
 
-  std::vector<const Piece*> pieces = request_list()->delegate(1);
+  auto pieces = request_list().delegate(1);
 
   if (pieces.empty())
     return false;
 
   const Piece* p = pieces.front();
 
-  if (!m_download->file_list()->is_valid_piece(*p) || !m_peerChunks.bitfield()->get(p->index()))
+  if (!m_download->file_list()->is_valid_piece(*p) || !m_peerChunks.bitfield().get(p->index()))
     throw internal_error("PeerConnectionMetadata::try_request_metadata_pieces() tried to use an invalid piece.");
 
   // DEBUG:

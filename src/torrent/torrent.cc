@@ -125,13 +125,13 @@ set_main_thread_slots(std::function<void()> do_work) {
   thread_main()->slot_do_work() = std::move(do_work);
 }
 
-ChunkManager*      chunk_manager() { return manager->chunk_manager(); }
-ClientList*        client_list() { return manager->client_list(); }
-ConnectionManager* connection_manager() { return manager->connection_manager(); }
-FileManager*       file_manager() { return manager->file_manager(); }
+const std::unique_ptr<ChunkManager>&      chunk_manager()      { return manager->chunk_manager(); }
+const std::unique_ptr<ClientList>&        client_list()        { return manager->client_list(); }
+const std::unique_ptr<ConnectionManager>& connection_manager() { return manager->connection_manager(); }
+const std::unique_ptr<FileManager>&       file_manager()       { return manager->file_manager(); }
 ResourceManager*   resource_manager() { return manager->resource_manager(); }
 
-tracker::DhtController* dht_controller() { return manager->dht_controller(); }
+const std::unique_ptr<tracker::DhtController>& dht_controller() { return manager->dht_controller(); }
 
 uint32_t
 total_handshakes() {
@@ -141,8 +141,8 @@ total_handshakes() {
 Throttle* down_throttle_global() { return manager->download_throttle(); }
 Throttle* up_throttle_global() { return manager->upload_throttle(); }
 
-const Rate* down_rate() { return manager->download_throttle()->rate(); }
-const Rate* up_rate() { return manager->upload_throttle()->rate(); }
+const Rate& down_rate() { return manager->download_throttle()->rate(); }
+const Rate& up_rate() { return manager->upload_throttle()->rate(); }
 const char* version() { return VERSION; }
 
 EncodingList*
