@@ -18,31 +18,31 @@ ThrottleList::ThrottleList() :
 }
 
 bool
-ThrottleList::is_active(const ThrottleNode* node) const {
-  return std::find(begin(), const_iterator(m_splitActive), node) != m_splitActive;
+ThrottleList::is_active(const ThrottleNode& node) const {
+  return std::find(begin(), const_iterator(m_splitActive), &node) != m_splitActive;
 }
 
 bool
-ThrottleList::is_inactive(const ThrottleNode* node) const {
-  return std::find(const_iterator(m_splitActive), end(), node) != end();
+ThrottleList::is_inactive(const ThrottleNode& node) const {
+  return std::find(const_iterator(m_splitActive), end(), &node) != end();
 }
 
 bool
-ThrottleList::is_throttled(const ThrottleNode* node) const {
-  return node->list_iterator() != end();
+ThrottleList::is_throttled(const ThrottleNode& node) const {
+  return node.list_iterator() != end();
 }
 
 // The quota already present in the node is preserved and unallocated
 // quota is transferred to the node. The node's quota will be less
 // than or equal to 'm_minChunkSize'.
 inline void
-ThrottleList::allocate_quota(ThrottleNode* node) {
-  if (node->quota() >= m_minChunkSize)
+ThrottleList::allocate_quota(ThrottleNode& node) {
+  if (node.quota() >= m_minChunkSize)
     return;
 
-  int quota = std::min(m_maxChunkSize - node->quota(), m_unallocatedQuota);
+  int quota = std::min(m_maxChunkSize - node.quota(), m_unallocatedQuota);
 
-  node->set_quota(node->quota() + quota);
+  node.set_quota(node.quota() + quota);
   m_outstandingQuota += quota;
   m_unallocatedQuota -= quota;
 }
@@ -92,7 +92,7 @@ ThrottleList::update_quota(uint32_t quota) {
 
   // Add remaining to the next, even when less than activate border.
   while (m_splitActive != end()) {
-    allocate_quota(*m_splitActive);
+    allocate_quota(*(*m_splitActive));
 
     if ((*m_splitActive)->quota() < m_minChunkSize)
       break;
@@ -114,7 +114,7 @@ ThrottleList::update_quota(uint32_t quota) {
 }
 
 uint32_t
-ThrottleList::node_quota(ThrottleNode* node) {
+ThrottleList::node_quota(ThrottleNode& node) {
   if (!m_enabled) {
     // Returns max for signed integer to ensure we don't overflow
     // claculations.
@@ -125,8 +125,8 @@ ThrottleList::node_quota(ThrottleNode* node) {
                          "ThrottleList::node_quota(...) called on an inactive node." :
                          "ThrottleList::node_quota(...) could not find node.");
 
-  } else if (node->quota() + m_unallocatedQuota >= m_minChunkSize) {
-    return node->quota() + m_unallocatedQuota;
+  } else if (node.quota() + m_unallocatedQuota >= m_minChunkSize) {
+    return node.quota() + m_unallocatedQuota;
 
   } else {
     return 0;
@@ -140,19 +140,19 @@ ThrottleList::add_rate(uint32_t used) {
 }
 
 uint32_t
-ThrottleList::node_used(ThrottleNode* node, uint32_t used) {
+ThrottleList::node_used(ThrottleNode& node, uint32_t used) {
   add_rate(used);
-  node->rate()->insert(used);
+  node.rate().insert(used);
 
-  if (used == 0 || !m_enabled || node->list_iterator() == end())
+  if (used == 0 || !m_enabled || node.list_iterator() == end())
     return used;
 
-  uint32_t quota = std::min(used, node->quota());
+  uint32_t quota = std::min(used, node.quota());
 
   if (quota > m_outstandingQuota)
     throw internal_error("ThrottleList::node_used(...) used too much quota.");
 
-  node->set_quota(node->quota() - quota);
+  node.set_quota(node.quota() - quota);
   m_outstandingQuota -= quota;
   m_unallocatedQuota -= std::min(used - quota, m_unallocatedQuota);
 
@@ -173,32 +173,32 @@ ThrottleList::node_used_unthrottled(uint32_t used) {
 }
 
 void
-ThrottleList::node_deactivate(ThrottleNode* node) {
+ThrottleList::node_deactivate(ThrottleNode& node) {
   if (!is_active(node))
     throw internal_error(is_inactive(node) ?
                          "ThrottleList::node_deactivate(...) called on an inactive node." :
                          "ThrottleList::node_deactivate(...) could not find node.");
 
-  base_type::splice(end(), *this, node->list_iterator());
+  base_type::splice(end(), *this, node.list_iterator());
 
   if (m_splitActive == end())
-    m_splitActive = node->list_iterator();
+    m_splitActive = node.list_iterator();
 }
 
 void
-ThrottleList::insert(ThrottleNode* node) {
-  if (node->list_iterator() != end())
+ThrottleList::insert(ThrottleNode& node) {
+  if (node.list_iterator() != end())
     return;
 
   if (!m_enabled) {
     // Add to waiting queue.
-    node->set_list_iterator(base_type::insert(end(), node));
-    node->clear_quota();
+    node.set_list_iterator(base_type::insert(end(), &node));
+    node.clear_quota();
 
   } else {
     // Add before the active split, so if we only need to decrement
     // m_splitActive to change the queue it is in.
-    node->set_list_iterator(base_type::insert(m_splitActive, node));
+    node.set_list_iterator(base_type::insert(m_splitActive, &node));
     allocate_quota(node);
   }
 
@@ -206,29 +206,29 @@ ThrottleList::insert(ThrottleNode* node) {
 }
 
 void
-ThrottleList::erase(ThrottleNode* node) {
-  if (node->list_iterator() == end())
+ThrottleList::erase(ThrottleNode& node) {
+  if (node.list_iterator() == end())
     return;
 
   if (m_size == 0)
     throw internal_error("ThrottleList::erase(...) called on an empty list.");
 
   // Do we need an if-statement here?
-  if (node->quota() != 0) {
-    if (node->quota() > m_outstandingQuota)
+  if (node.quota() != 0) {
+    if (node.quota() > m_outstandingQuota)
       throw internal_error("ThrottleList::erase(...) node->quota() > m_outstandingQuota.");
 
-    m_outstandingQuota -= node->quota();
-    m_unallocatedQuota += node->quota();
+    m_outstandingQuota -= node.quota();
+    m_unallocatedQuota += node.quota();
   }
 
-  if (node->list_iterator() == m_splitActive)
-    m_splitActive = base_type::erase(node->list_iterator());
+  if (node.list_iterator() == m_splitActive)
+    m_splitActive = base_type::erase(node.list_iterator());
   else
-    base_type::erase(node->list_iterator());
+    base_type::erase(node.list_iterator());
 
-  node->clear_quota();
-  node->set_list_iterator(end());
+  node.clear_quota();
+  node.set_list_iterator(end());
   m_size--;
 }
 

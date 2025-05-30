@@ -583,8 +583,8 @@ choke_queue::adjust_choke_range(iterator first, iterator last,
                    (const char*)"unchoke" + 2*is_choke,
                    itr_adjust->connection,
                    itr_adjust->weight,
-                   (long long unsigned int)itr_adjust->connection->up_rate()->rate(),
-                   (long long unsigned int)itr_adjust->connection->down_rate()->rate());
+                   (long long unsigned int)itr_adjust->connection->up_rate().rate(),
+                   (long long unsigned int)itr_adjust->connection->down_rate().rate());
     }
 
     // The 'target' iterators remain valid after erase since we're
@@ -609,7 +609,7 @@ calculate_upload_choke(choke_queue::iterator first, choke_queue::iterator last) 
     // Very crude version for now.
     //
     // This needs to give more weight to peers that haven't had time to unchoke us.
-    uint32_t downloadRate = first->connection->peer_chunks()->download_throttle()->rate()->rate() / 16;
+    uint32_t downloadRate = first->connection->peer_chunks().download_throttle().rate().rate() / 16;
     first->weight = choke_queue::order_base - 1 - downloadRate;
 
     first++;
@@ -620,7 +620,7 @@ static void
 calculate_upload_unchoke(choke_queue::iterator first, choke_queue::iterator last) {
   while (first != last) {
     if (first->connection->is_down_local_unchoked()) {
-      uint32_t downloadRate = first->connection->peer_chunks()->download_throttle()->rate()->rate() / 16;
+      uint32_t downloadRate = first->connection->peer_chunks().download_throttle().rate().rate() / 16;
 
       // If the peer transmits at less than 1KB, we should consider it
       // to be a rather stingy peer, and should look for new ones.
@@ -648,7 +648,7 @@ static void
 calculate_upload_choke_seed(choke_queue::iterator first, choke_queue::iterator last) {
   while (first != last) {
     int order = 1; // + first->connection->peer_info()->is_preferred();
-    uint32_t upload_rate = first->connection->peer_chunks()->upload_throttle()->rate()->rate() / 16;
+    uint32_t upload_rate = first->connection->peer_chunks().upload_throttle().rate().rate() / 16;
 
     first->weight = order * choke_queue::order_base - 1 - upload_rate;
     first++;
@@ -684,8 +684,8 @@ calculate_choke_upload_leech_experimental(choke_queue::iterator first, choke_que
     // Preferred peers will get 4 times higher weight.
     int multiplier = 1 + 3 * first->connection->peer_info()->is_preferred();
 
-    uint32_t download_rate = first->connection->peer_chunks()->download_throttle()->rate()->rate() / 64;
-    uint32_t upload_rate   = first->connection->peer_chunks()->upload_throttle()->rate()->rate() / (64 * 4);
+    uint32_t download_rate = first->connection->peer_chunks().download_throttle().rate().rate() / 64;
+    uint32_t upload_rate   = first->connection->peer_chunks().upload_throttle().rate().rate() / (64 * 4);
 
     first->weight = choke_queue::order_base - 1 - (download_rate + upload_rate) * multiplier;
     first++;
@@ -701,7 +701,7 @@ calculate_unchoke_upload_leech_experimental(choke_queue::iterator first, choke_q
     if (first->connection->is_down_local_unchoked()) {
       int multiplier = 1 + 3 * first->connection->peer_info()->is_preferred();
 
-      uint32_t download_rate = first->connection->peer_chunks()->download_throttle()->rate()->rate() / 64;
+      uint32_t download_rate = first->connection->peer_chunks().download_throttle().rate().rate() / 64;
 
       first->weight = choke_queue::order_base + download_rate * multiplier;
 
@@ -730,7 +730,7 @@ static void
 calculate_download_choke(choke_queue::iterator first, choke_queue::iterator last) {
   while (first != last) {
     // Very crude version for now.
-    uint32_t downloadRate = first->connection->peer_chunks()->download_throttle()->rate()->rate() / 16;
+    uint32_t downloadRate = first->connection->peer_chunks().download_throttle().rate().rate() / 16;
     first->weight = choke_queue::order_base - 1 - downloadRate;
 
     first++;
@@ -741,7 +741,7 @@ static void
 calculate_download_unchoke(choke_queue::iterator first, choke_queue::iterator last) {
   while (first != last) {
     // Very crude version for now.
-    uint32_t downloadRate = first->connection->peer_chunks()->download_throttle()->rate()->rate() / 16;
+    uint32_t downloadRate = first->connection->peer_chunks().download_throttle().rate().rate() / 16;
     first->weight = downloadRate;
 
     first++;

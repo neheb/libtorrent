@@ -21,7 +21,7 @@ public:
   uint64_t            max_rate() const { return m_maxRate; }
   void                set_max_rate(uint64_t v);
 
-  const Rate*         rate() const;
+  const Rate&         rate() const;
 
   ThrottleList*       throttle_list()  { return m_throttleList; }
 

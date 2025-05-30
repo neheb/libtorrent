@@ -56,7 +56,7 @@ Delegator::delegate(PeerChunks* peerChunks, uint32_t affinity, uint32_t maxPiece
     if (new_transfers.size() >= maxPieces)
       return new_transfers;
 
-    if (itr->priority() == PRIORITY_HIGH && peerChunks->bitfield()->get(itr->index()))
+    if (itr->priority() == PRIORITY_HIGH && peerChunks->bitfield().get(itr->index()))
       delegate_from_blocklist(new_transfers, maxPieces, itr, peerInfo);
   }
 
@@ -68,7 +68,7 @@ Delegator::delegate(PeerChunks* peerChunks, uint32_t affinity, uint32_t maxPiece
     if (new_transfers.size() >= maxPieces)
       return new_transfers;
 
-    if (itr->priority() == PRIORITY_NORMAL && peerChunks->bitfield()->get(itr->index()))
+    if (itr->priority() == PRIORITY_NORMAL && peerChunks->bitfield().get(itr->index()))
       delegate_from_blocklist(new_transfers, maxPieces, itr, peerInfo);
   }
 
@@ -88,7 +88,7 @@ Delegator::delegate(PeerChunks* peerChunks, uint32_t affinity, uint32_t maxPiece
     if (new_transfers.size() >= maxPieces)
       return new_transfers;
 
-    if (peerChunks->bitfield()->get(itr->index()) && itr->priority() != PRIORITY_OFF) {
+    if (peerChunks->bitfield().get(itr->index()) && itr->priority() != PRIORITY_OFF) {
       for (auto bl_itr = itr->begin(); bl_itr != itr->end() && overlapped != 0; bl_itr++) {
         if (new_transfers.size() >= maxPieces || bl_itr->size_not_stalled() >= overlapped)
           break;

@@ -57,8 +57,8 @@ public:
   ThrottleNode(uint32_t rateSpan) : m_rate(rateSpan)  { clear_quota(); }
   ~ThrottleNode() = default;
 
-  Rate*               rate()                          { return &m_rate; }
-  const Rate*         rate() const                    { return &m_rate; }
+  Rate&               rate()                          { return m_rate; }
+  const Rate&         rate() const                    { return m_rate; }
 
   uint32_t            quota() const                   { return m_quota; }
   void                clear_quota()                   { m_quota = 0; }
