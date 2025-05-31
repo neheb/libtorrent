@@ -20,15 +20,15 @@ ObjectStreamTest::testInputOrdered() {
   torrent::Object orderedObj   = create_bencode(ordered_bencode);
   torrent::Object unorderedObj = create_bencode(unordered_bencode);
 
-  CPPUNIT_ASSERT(!(orderedObj.flags() & torrent::Object::flag_unordered));
-  CPPUNIT_ASSERT(unorderedObj.flags() & torrent::Object::flag_unordered);
+  CPPUNIT_ASSERT(!(orderedObj.flags() & torrent::Object::flag::unordered));
+  CPPUNIT_ASSERT(unorderedObj.flags() & torrent::Object::flag::unordered);
 }
 
 void
 ObjectStreamTest::testInputNullKey() {
   torrent::Object obj = create_bencode("d0:i1e5:filesi2ee");
 
-  CPPUNIT_ASSERT(!(obj.flags() & torrent::Object::flag_unordered));
+  CPPUNIT_ASSERT(!(obj.flags() & torrent::Object::flag::unordered));
 }
 
 void
@@ -37,10 +37,10 @@ ObjectStreamTest::testOutputMask() {
 
   CPPUNIT_ASSERT(compare_bencode(normalObj, "d1:ai1e1:bi2e1:ci3ee"));
 
-  normalObj.get_key("b").set_flags(torrent::Object::flag_session_data);
-  normalObj.get_key("c").set_flags(torrent::Object::flag_static_data);
+  normalObj.get_key("b").set_flags(torrent::Object::flag::session_data);
+  normalObj.get_key("c").set_flags(torrent::Object::flag::static_data);
 
-  CPPUNIT_ASSERT(compare_bencode(normalObj, "d1:ai1e1:ci3ee", torrent::Object::flag_session_data));
+  CPPUNIT_ASSERT(compare_bencode(normalObj, "d1:ai1e1:ci3ee", torrent::Object::flag::session_data));
 }
 
 //
@@ -71,8 +71,8 @@ ObjectStreamTest::testReadBencodeC() {
   torrent::Object orderedObj   = create_bencode_c(ordered_bencode);
   torrent::Object unorderedObj = create_bencode_c(unordered_bencode);
 
-  CPPUNIT_ASSERT(!(orderedObj.flags() & torrent::Object::flag_unordered));
-  CPPUNIT_ASSERT(unorderedObj.flags() & torrent::Object::flag_unordered);
+  CPPUNIT_ASSERT(!(orderedObj.flags() & torrent::Object::flag::unordered));
+  CPPUNIT_ASSERT(unorderedObj.flags() & torrent::Object::flag::unordered);
   CPPUNIT_ASSERT(compare_bencode(orderedObj, ordered_bencode));
 
   //  torrent::Object single_level = create_bencode_c(single_level_bencode);

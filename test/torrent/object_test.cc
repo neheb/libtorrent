@@ -36,17 +36,17 @@ ObjectTest::test_flags() {
   torrent::Object objectNoFlagsEmpty = torrent::Object();
   torrent::Object objectNoFlagsValue = torrent::Object(int64_t());
 
-  objectFlagsValue.set_flags(torrent::Object::flag_static_data | torrent::Object::flag_session_data);
+  objectFlagsValue.set_flags(torrent::Object::flag::static_data | torrent::Object::flag::session_data);
 
   CPPUNIT_ASSERT(objectNoFlagsEmpty.flags() == 0);
   CPPUNIT_ASSERT(objectNoFlagsValue.flags() == 0);
-  CPPUNIT_ASSERT(objectFlagsValue.flags() & torrent::Object::flag_session_data &&
-                 objectFlagsValue.flags() & torrent::Object::flag_static_data);
+  CPPUNIT_ASSERT(objectFlagsValue.flags() & torrent::Object::flag::session_data &&
+                 objectFlagsValue.flags() & torrent::Object::flag::static_data);
 
-  objectFlagsValue.unset_flags(torrent::Object::flag_session_data);
+  objectFlagsValue.unset_flags(torrent::Object::flag::session_data);
 
-  CPPUNIT_ASSERT(!(objectFlagsValue.flags() & torrent::Object::flag_session_data) &&
-                 objectFlagsValue.flags() & torrent::Object::flag_static_data);
+  CPPUNIT_ASSERT(!(objectFlagsValue.flags() & torrent::Object::flag::session_data) &&
+                 objectFlagsValue.flags() & torrent::Object::flag::static_data);
 }
 
 void
