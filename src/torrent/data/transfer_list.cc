@@ -218,7 +218,7 @@ TransferList::mark_failed_peers(BlockList* blockList, Chunk* chunk) {
     // everyone who sent something else is a bad peer.
     block.failed_list()->set_current(std::find_if(block.failed_list()->begin(), block.failed_list()->end(), transfer_list_compare_data(chunk, block.piece())));
 
-    for (const auto& transfer : block.transfers())
+    for (auto& transfer : *block.transfers())
       if (transfer->failed_index() != block.failed_list()->current() && transfer->failed_index() != ~uint32_t())
         badPeers.insert(transfer->peer_info());
   }

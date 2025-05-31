@@ -210,7 +210,7 @@ InitialSeeding::chunk_offer(PeerConnectionBase* pcb, uint32_t chunkDone) {
   // Make sure we don't accidentally offer a chunk it has
   // already, or it would never even request it from us.
   // We'll just offer it to the next peer instead.
-  if (pcb->bitfield().get(index))
+  if (pcb->bitfield()->get(index))
     return no_offer;
 
   m_peerChunks[index] = peer;

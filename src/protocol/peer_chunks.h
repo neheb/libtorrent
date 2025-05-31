@@ -27,13 +27,13 @@ public:
   bool                using_counter() const         { return m_usingCounter; }
   void                set_using_counter(bool state) { m_usingCounter = state; }
 
-  Bitfield&           bitfield()                    { return m_bitfield; }
-  const Bitfield&     bitfield() const              { return m_bitfield; }
+  Bitfield*           bitfield()                    { return &m_bitfield; }
+  const Bitfield*     bitfield() const              { return &m_bitfield; }
 
   auto*               download_cache()              { return &m_downloadCache; }
 
-  auto&               upload_queue()                { return m_uploadQueue; }
-  const auto&         upload_queue() const          { return m_uploadQueue; }
+  auto*               upload_queue()                { return &m_uploadQueue; }
+  const auto*         upload_queue() const          { return &m_uploadQueue; }
   auto*               cancel_queue()                { return &m_cancelQueue; }
 
   // Timer used to figure out what HAVE_PIECE messages have not been
@@ -41,13 +41,13 @@ public:
   std::chrono::microseconds have_timer() const                          { return m_have_timer; }
   void                      set_have_timer(std::chrono::microseconds t) { m_have_timer = t; }
 
-  Rate&               peer_rate()                   { return m_peerRate; }
-  const Rate&         peer_rate() const             { return m_peerRate; }
+  Rate*               peer_rate()                   { return &m_peerRate; }
+  const Rate*         peer_rate() const             { return &m_peerRate; }
 
-  ThrottleNode&       download_throttle()           { return m_downloadThrottle; }
-  const ThrottleNode& download_throttle() const     { return m_downloadThrottle; }
-  ThrottleNode&       upload_throttle()             { return m_uploadThrottle; }
-  const ThrottleNode& upload_throttle() const       { return m_uploadThrottle; }
+  ThrottleNode*       download_throttle()           { return &m_downloadThrottle; }
+  const ThrottleNode* download_throttle() const     { return &m_downloadThrottle; }
+  ThrottleNode*       upload_throttle()             { return &m_uploadThrottle; }
+  const ThrottleNode* upload_throttle() const       { return &m_uploadThrottle; }
 
 private:
   PeerInfo*           m_peerInfo{};

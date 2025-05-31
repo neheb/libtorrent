@@ -228,7 +228,7 @@ Download::peer_list() const {
   return m_ptr->main()->peer_list();
 }
 
-const TransferList&
+const TransferList*
 Download::transfer_list() const {
   return m_ptr->main()->delegator()->transfer_list();
 }
@@ -247,9 +247,9 @@ uint64_t
 Download::bytes_done() const {
   uint64_t a = 0;
 
-  auto d = m_ptr->main()->delegator();
+  Delegator* d = m_ptr->main()->delegator();
 
-  for (auto itr1 : d->transfer_list())
+  for (auto itr1 : *d->transfer_list())
     for (const auto& itr2 : *itr1)
       if (itr2.is_finished())
         a += itr2.piece().length();

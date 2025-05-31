@@ -101,8 +101,8 @@ public:
   bool                received_have_chunk(PeerChunks* pc, uint32_t index);
 
 private:
-  bool                search_linear(const Bitfield& bf, rak::partial_queue* pq, const download_data::priority_ranges* ranges, uint32_t first, uint32_t last);
-  inline bool         search_linear_range(const Bitfield& bf, rak::partial_queue* pq, uint32_t first, uint32_t last);
+  bool                search_linear(const Bitfield* bf, rak::partial_queue* pq, const download_data::priority_ranges* ranges, uint32_t first, uint32_t last);
+  inline bool         search_linear_range(const Bitfield* bf, rak::partial_queue* pq, uint32_t first, uint32_t last);
   inline bool         search_linear_byte(rak::partial_queue* pq, uint32_t index, Bitfield::value_type wanted);
 
 //   inline uint32_t     search_rarest(const Bitfield* bf, priority_ranges* ranges, uint32_t first, uint32_t last);

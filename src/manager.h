@@ -23,15 +23,15 @@ public:
 
   void                cleanup();
 
-  const std::unique_ptr<ChunkManager>&      chunk_manager()      { return m_chunk_manager; }
-  const std::unique_ptr<ConnectionManager>& connection_manager() { return m_connection_manager; }
-  const std::unique_ptr<DownloadManager>&   download_manager()   { return m_download_manager; }
-  const std::unique_ptr<FileManager>&       file_manager()       { return m_file_manager; }
+  ChunkManager*       chunk_manager()      { return m_chunk_manager.get(); }
+  ConnectionManager*  connection_manager() { return m_connection_manager.get(); }
+  DownloadManager*    download_manager()   { return m_download_manager.get(); }
+  FileManager*        file_manager()       { return m_file_manager.get(); }
   HandshakeManager*   handshake_manager()  { return m_handshake_manager.get(); }
   ResourceManager*    resource_manager()   { return m_resource_manager.get(); }
 
-  const std::unique_ptr<ClientList>&             client_list()    { return m_client_list; }
-  const std::unique_ptr<tracker::DhtController>& dht_controller() { return m_dht_controller; }
+  ClientList*             client_list()    { return m_client_list.get(); }
+  tracker::DhtController* dht_controller() { return m_dht_controller.get(); }
 
   EncodingList*       encoding_list()      { return &m_encodingList; }
 

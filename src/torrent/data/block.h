@@ -53,8 +53,8 @@ public:
 
   uint32_t                  index() const                                { return m_piece.index(); }
 
-  const transfer_list_type& queued() const                               { return m_queued; }
-  const transfer_list_type& transfers() const                            { return m_transfers; }
+  const transfer_list_type* queued() const                               { return &m_queued; }
+  const transfer_list_type* transfers() const                            { return &m_transfers; }
 
   // The leading transfer, whom's data we're currently using.
   BlockTransfer*            leader()                                     { return m_leader; }

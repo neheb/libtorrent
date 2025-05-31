@@ -125,7 +125,7 @@ DhtServer::start(int port) {
   m_uploadNode.slot_activate() = [this] { receive_throttle_up_activate(); };
 
   m_downloadNode.set_list_iterator(m_downloadThrottle->end());
-  m_downloadThrottle->insert(m_downloadNode);
+  m_downloadThrottle->insert(&m_downloadNode);
 
   this_thread::poll()->open(this);
   this_thread::poll()->insert_read(this);
@@ -143,8 +143,8 @@ DhtServer::stop() {
 
   this_thread::scheduler()->erase(&m_task_timeout);
 
-  m_uploadThrottle->erase(m_uploadNode);
-  m_downloadThrottle->erase(m_downloadNode);
+  m_uploadThrottle->erase(&m_uploadNode);
+  m_downloadThrottle->erase(&m_downloadNode);
 
   this_thread::poll()->remove_and_close(this);
 
@@ -162,8 +162,8 @@ DhtServer::reset_statistics() {
   m_errorsReceived = 0;
   m_errorsCaught = 0;
 
-  m_uploadNode.rate().set_total(0);
-  m_downloadNode.rate().set_total(0);
+  m_uploadNode.rate()->set_total(0);
+  m_downloadNode.rate()->set_total(0);
 }
 
 // Ping a node whose ID we know.
@@ -781,7 +781,7 @@ DhtServer::event_read() {
   }
 
   m_downloadThrottle->node_used_unthrottled(total);
-  m_downloadNode.rate().insert(total);
+  m_downloadNode.rate()->insert(total);
 
   start_write();
 }
@@ -806,7 +806,7 @@ DhtServer::process_queue(packet_queue& queue, uint32_t* quota) {
     }
 
     if (packet->length() > *quota) {
-      m_uploadThrottle->node_used(m_uploadNode, used);
+      m_uploadThrottle->node_used(&m_uploadNode, used);
       return false;
     }
 
@@ -845,7 +845,7 @@ DhtServer::process_queue(packet_queue& queue, uint32_t* quota) {
     delete packet;
   }
 
-  m_uploadThrottle->node_used(m_uploadNode, used);
+  m_uploadThrottle->node_used(&m_uploadNode, used);
   return true;
 }
 
@@ -854,18 +854,18 @@ DhtServer::event_write() {
   if (m_highQueue.empty() && m_lowQueue.empty())
     throw internal_error("DhtServer::event_write called but both write queues are empty.");
 
-  if (!m_uploadThrottle->is_throttled(m_uploadNode))
+  if (!m_uploadThrottle->is_throttled(&m_uploadNode))
     throw internal_error("DhtServer::event_write called while not in throttle list.");
 
-  uint32_t quota = m_uploadThrottle->node_quota(m_uploadNode);
+  uint32_t quota = m_uploadThrottle->node_quota(&m_uploadNode);
 
   if (quota == 0 || !process_queue(m_highQueue, &quota) || !process_queue(m_lowQueue, &quota)) {
     this_thread::poll()->remove_write(this);
-    m_uploadThrottle->node_deactivate(m_uploadNode);
+    m_uploadThrottle->node_deactivate(&m_uploadNode);
 
   } else if (m_highQueue.empty() && m_lowQueue.empty()) {
     this_thread::poll()->remove_write(this);
-    m_uploadThrottle->erase(m_uploadNode);
+    m_uploadThrottle->erase(&m_uploadNode);
   }
 }
 
@@ -875,8 +875,8 @@ DhtServer::event_error() {
 
 void
 DhtServer::start_write() {
-  if ((!m_highQueue.empty() || !m_lowQueue.empty()) && !m_uploadThrottle->is_throttled(m_uploadNode)) {
-    m_uploadThrottle->insert(m_uploadNode);
+  if ((!m_highQueue.empty() || !m_lowQueue.empty()) && !m_uploadThrottle->is_throttled(&m_uploadNode)) {
+    m_uploadThrottle->insert(&m_uploadNode);
     this_thread::poll()->insert_write(this);
   }
 

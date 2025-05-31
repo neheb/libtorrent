@@ -46,11 +46,11 @@ public:
   const char*          options() const                    { return peer_info()->options(); }
   const sockaddr*      address() const                    { return peer_info()->socket_address(); }
 
-  const Rate&          down_rate() const;
-  const Rate&          up_rate() const;
-  const Rate&          peer_rate() const;
+  const Rate*          down_rate() const;
+  const Rate*          up_rate() const;
+  const Rate*          peer_rate() const;
 
-  const Bitfield&      bitfield() const;
+  const Bitfield*      bitfield() const;
 
   const BlockTransfer* transfer() const;
 

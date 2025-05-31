@@ -31,10 +31,10 @@ public:
 
   bool                is_enabled() const             { return m_enabled; }
 
-  bool                is_active(const ThrottleNode& node) const;
-  bool                is_inactive(const ThrottleNode& node) const;
+  bool                is_active(const ThrottleNode* node) const;
+  bool                is_inactive(const ThrottleNode* node) const;
 
-  bool                is_throttled(const ThrottleNode& node) const;
+  bool                is_throttled(const ThrottleNode* node) const;
 
   // When disabled all nodes are active at all times.
   void                enable();
@@ -55,12 +55,12 @@ public:
   uint32_t            max_chunk_size() const         { return m_maxChunkSize; }
   void                set_max_chunk_size(uint32_t v) { m_maxChunkSize = v; }
 
-  uint32_t            node_quota(ThrottleNode& node);
-  uint32_t            node_used(ThrottleNode& node, uint32_t used);  // both node_used functions
+  uint32_t            node_quota(ThrottleNode* node);
+  uint32_t            node_used(ThrottleNode* node, uint32_t used);  // both node_used functions
   uint32_t            node_used_unthrottled(uint32_t used);          // return the "used" argument
-  void                node_deactivate(ThrottleNode& node);
+  void                node_deactivate(ThrottleNode* node);
 
-  const Rate&         rate_slow() const              { return m_rateSlow; }
+  const Rate*         rate_slow() const              { return &m_rateSlow; }
 
   void                add_rate(uint32_t used);
   uint32_t            rate_added()                   { uint32_t v = m_rateAdded; m_rateAdded = 0; return v; }
@@ -68,11 +68,11 @@ public:
   // It is asumed that inserted nodes are currently active. It won't
   // matter if they do not get any initial quota as a later activation
   // of an active node should be safe.
-  void                insert(ThrottleNode& node);
-  void                erase(ThrottleNode& node);
+  void                insert(ThrottleNode* node);
+  void                erase(ThrottleNode* node);
 
 private:
-  inline void         allocate_quota(ThrottleNode& node);
+  inline void         allocate_quota(ThrottleNode* node);
 
   bool                m_enabled{false};
   uint32_t            m_size{0};
