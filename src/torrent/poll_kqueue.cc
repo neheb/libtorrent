@@ -125,6 +125,8 @@ Poll::create() {
   return std::unique_ptr<Poll>(poll);
 }
 
+Poll::Poll() = default;
+
 Poll::~Poll() {
   m_internal->m_table.clear();
 

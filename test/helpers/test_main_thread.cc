@@ -13,6 +13,8 @@
 #include "torrent/utils/scheduler.h"
 #include "tracker/thread_tracker.h"
 
+TestMainThread::TestMainThread() = default;
+
 std::unique_ptr<TestMainThread>
 TestMainThread::create() {
   // Needs to be called before Thread is created.
