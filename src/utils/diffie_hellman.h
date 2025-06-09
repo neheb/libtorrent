@@ -15,7 +15,7 @@ public:
 
   DiffieHellman(const unsigned char prime[], int primeLength,
                 const unsigned char generator[], int generatorLength);
-  ~DiffieHellman() = default;
+  ~DiffieHellman();
   DiffieHellman(const DiffieHellman&) = delete;
   DiffieHellman& operator=(const DiffieHellman&) = delete;
 

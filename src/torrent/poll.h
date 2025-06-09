@@ -54,7 +54,7 @@ public:
   // Add one for HUP? Or would that be in event?
 
 private:
-  Poll() = default;
+  Poll();
   Poll(const Poll&) = delete;
   Poll& operator=(const Poll&) = delete;
 
