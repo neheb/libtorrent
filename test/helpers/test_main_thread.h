@@ -23,7 +23,7 @@ public:
   void                test_process_events_without_cached_time()         { process_events_without_cached_time(); }
 
 private:
-  TestMainThread() = default;
+  TestMainThread();
 
   void                      call_events() override;
   std::chrono::microseconds next_timeout() override;
