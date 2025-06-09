@@ -20,7 +20,7 @@ public:
   using slot_chunk_handle = std::function<void(ChunkHandle)>;
 
   HashTorrent(ChunkList* c);
-  ~HashTorrent() { clear(); }
+  ~HashTorrent();
 
   bool                start(bool try_quick);
   void                clear();
