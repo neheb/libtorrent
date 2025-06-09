@@ -34,6 +34,8 @@ dh_get_pub_key(const torrent::DiffieHellman::dh_ptr& dh) {
 
 namespace torrent {
 
+DiffieHellman::~DiffieHellman() = default;
+
 DiffieHellman::DiffieHellman(const unsigned char *prime, int primeLength,
                              const unsigned char *generator, int generatorLength) :
   m_dh(DH_new(), &dh_free) {

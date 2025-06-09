@@ -12,6 +12,7 @@ namespace torrent {
 
 std::atomic<ThreadTracker*> ThreadTracker::m_thread_tracker{nullptr};
 
+ThreadTracker::ThreadTracker() = default;
 ThreadTracker::~ThreadTracker() = default;
 
 void
