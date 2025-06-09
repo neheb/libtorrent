@@ -30,6 +30,7 @@ torrent::net::HttpStack* http_stack()                                        { r
 
 ThreadNet* ThreadNet::m_thread_net{nullptr};
 
+ThreadNet::ThreadNet() = default;
 ThreadNet::~ThreadNet() = default;
 
 void

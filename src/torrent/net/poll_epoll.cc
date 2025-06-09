@@ -145,6 +145,8 @@ Poll::create() {
   return std::unique_ptr<Poll>(poll);
 }
 
+Poll::Poll() = default;
+
 Poll::~Poll() {
   assert(m_internal->m_table.empty() && "Poll::~Poll() called with non-empty event table.");
 

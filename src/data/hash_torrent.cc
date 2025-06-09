@@ -16,6 +16,10 @@ HashTorrent::HashTorrent(ChunkList* c) :
     m_chunk_list(c) {
 }
 
+HashTorrent::~HashTorrent() {
+  clear();
+}
+
 bool
 HashTorrent::start(bool try_quick) {
   LT_LOG_THIS(INFO, "Start: position:%u size:%zu try_quick:%u.",
