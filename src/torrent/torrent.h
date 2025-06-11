@@ -21,13 +21,13 @@ bool                is_initialized() LIBTORRENT_EXPORT;
 
 void                set_main_thread_slots(std::function<void()> do_work) LIBTORRENT_EXPORT;
 
-ChunkManager*       chunk_manager() LIBTORRENT_EXPORT;
-ClientList*         client_list() LIBTORRENT_EXPORT;
-ConnectionManager*  connection_manager() LIBTORRENT_EXPORT;
-FileManager*        file_manager() LIBTORRENT_EXPORT;
-ResourceManager*    resource_manager() LIBTORRENT_EXPORT;
+std::unique_ptr<ChunkManager>&       chunk_manager() LIBTORRENT_EXPORT;
+std::unique_ptr<ClientList>&         client_list() LIBTORRENT_EXPORT;
+std::unique_ptr<ConnectionManager>&  connection_manager() LIBTORRENT_EXPORT;
+std::unique_ptr<FileManager>&        file_manager() LIBTORRENT_EXPORT;
+std::unique_ptr<ResourceManager>&    resource_manager() LIBTORRENT_EXPORT;
 
-tracker::DhtController* dht_controller() LIBTORRENT_EXPORT;
+std::unique_ptr<tracker::DhtController>& dht_controller() LIBTORRENT_EXPORT;
 
 uint32_t            total_handshakes() LIBTORRENT_EXPORT;
 
