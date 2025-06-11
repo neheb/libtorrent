@@ -23,15 +23,15 @@ public:
 
   void                cleanup();
 
-  ChunkManager*       chunk_manager()      { return m_chunk_manager.get(); }
-  ConnectionManager*  connection_manager() { return m_connection_manager.get(); }
-  DownloadManager*    download_manager()   { return m_download_manager.get(); }
-  FileManager*        file_manager()       { return m_file_manager.get(); }
-  HandshakeManager*   handshake_manager()  { return m_handshake_manager.get(); }
-  ResourceManager*    resource_manager()   { return m_resource_manager.get(); }
+  auto&               chunk_manager()      { return m_chunk_manager; }
+  auto&               connection_manager() { return m_connection_manager; }
+  auto&               download_manager()   { return m_download_manager; }
+  auto&               file_manager()       { return m_file_manager; }
+  auto&               handshake_manager()  { return m_handshake_manager; }
+  auto&               resource_manager()   { return m_resource_manager; }
 
-  ClientList*             client_list()    { return m_client_list.get(); }
-  tracker::DhtController* dht_controller() { return m_dht_controller.get(); }
+  auto&               client_list()    { return m_client_list; }
+  auto&               dht_controller() { return m_dht_controller; }
 
   EncodingList*       encoding_list()      { return &m_encodingList; }
 
