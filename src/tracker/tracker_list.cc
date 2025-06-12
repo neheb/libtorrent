@@ -154,8 +154,8 @@ TrackerList::insert(unsigned int group, const tracker::Tracker& tracker) {
 
   worker->set_group(group);
 
-  worker->m_slot_enabled = [this, weak_tracker, worker]() {
-      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker]() {
+  worker->m_slot_enabled = [this, weak_tracker, worker] {
+      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker] {
           if (!m_slot_tracker_enabled)
             return;
 
@@ -166,8 +166,8 @@ TrackerList::insert(unsigned int group, const tracker::Tracker& tracker) {
         });
     };
 
-  worker->m_slot_disabled = [this, weak_tracker, worker]() {
-      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker]() {
+  worker->m_slot_disabled = [this, weak_tracker, worker] {
+      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker] {
           if (!m_slot_tracker_disabled)
             return;
 
@@ -178,12 +178,12 @@ TrackerList::insert(unsigned int group, const tracker::Tracker& tracker) {
         });
     };
 
-  worker->m_slot_close = [worker]() {
+  worker->m_slot_close = [worker] {
       thread_tracker()->tracker_manager()->remove_events(worker);
     };
 
   worker->m_slot_success = [this, weak_tracker, worker](AddressList&& l) {
-      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker, l = std::move(l)]() {
+      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker, l = std::move(l)] {
           if (!m_slot_success)
             return;
 
@@ -195,7 +195,7 @@ TrackerList::insert(unsigned int group, const tracker::Tracker& tracker) {
     };
 
   worker->m_slot_failure = [this, weak_tracker, worker](const std::string& msg) {
-      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker, msg]() {
+      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker, msg] {
           if (!m_slot_failed)
             return;
 
@@ -206,8 +206,8 @@ TrackerList::insert(unsigned int group, const tracker::Tracker& tracker) {
         });
     };
 
-  worker->m_slot_scrape_success = [this, weak_tracker, worker]() {
-      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker]() {
+  worker->m_slot_scrape_success = [this, weak_tracker, worker] {
+      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker] {
           if (!m_slot_scrape_success)
             return;
 
@@ -219,7 +219,7 @@ TrackerList::insert(unsigned int group, const tracker::Tracker& tracker) {
     };
 
   worker->m_slot_scrape_failure = [this, weak_tracker, worker](const std::string& msg) {
-      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker, msg]() {
+      thread_tracker()->tracker_manager()->add_event(worker, [this, weak_tracker, msg] {
           if (!m_slot_scrape_failed)
             return;
 
@@ -230,7 +230,7 @@ TrackerList::insert(unsigned int group, const tracker::Tracker& tracker) {
         });
     };
 
-  worker->m_slot_parameters = [this]() {
+  worker->m_slot_parameters = [this] {
       // TODO: Lock here!
 
       TrackerParameters tp;
