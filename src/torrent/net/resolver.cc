@@ -44,15 +44,15 @@ Resolver::resolve_preferred(void* requester, const std::string& hostname, int fa
       if (err == 0) {
         if (sin != nullptr && sin6 != nullptr) {
           if (preferred == AF_INET)
-            result = sa_copy_in(sin.get());
+            result = std::reinterpret_pointer_cast<sockaddr>(sin);
           else
-            result = sa_copy_in6(sin6.get());
+            result = std::reinterpret_pointer_cast<sockaddr>(sin6);
 
         } else if (sin != nullptr) {
-          result = sa_copy_in(sin.get());
+          result = std::reinterpret_pointer_cast<sockaddr>(sin);
 
         } else if (sin6 != nullptr) {
-          result = sa_copy_in6(sin6.get());
+          result = std::reinterpret_pointer_cast<sockaddr>(sin6);
         }
       }
 
@@ -73,10 +73,10 @@ Resolver::resolve_specific(void* requester, const std::string& hostname, int fam
 
       if (err == 0) {
         if (family == AF_INET && sin != nullptr)
-          result = sa_copy_in(sin.get());
+          result = std::reinterpret_pointer_cast<sockaddr>(sin);
 
         if (family == AF_INET6 && sin6 != nullptr)
-          result = sa_copy_in6(sin6.get());
+          result = std::reinterpret_pointer_cast<sockaddr>(sin6);
       }
 
       m_thread->callback(requester, std::bind(std::move(callback), std::move(result), err));
