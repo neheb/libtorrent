@@ -13,8 +13,10 @@
 #include "torrent/utils/log.h"
 
 // TODO: Add a different logging category.
-#define LT_LOG_THIS(log_fmt, ...)                                       \
-  lt_log_print_subsystem(LOG_TORRENT_INFO, "choke_queue", log_fmt, __VA_ARGS__);
+#define LT_LOG_THIS(log_fmt, ...)                                                  \
+  do {                                                                             \
+    lt_log_print_subsystem(LOG_TORRENT_INFO, "choke_queue", log_fmt, __VA_ARGS__); \
+  } while (false)
 
 namespace torrent {
 
