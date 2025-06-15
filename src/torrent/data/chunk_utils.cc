@@ -74,16 +74,16 @@ chunk_list_mapping(Download* download) {
 
 chunk_info_result
 chunk_list_address_info(void* address) {
-  chunk_info_result ci;
-
   for (const auto& chunk : *manager->chunk_manager()) {
     auto result = chunk->find_address(address);
 
     if (result.first != chunk->end()) {
       auto d_itr = manager->download_manager()->find_chunk_list(chunk);
-      if (d_itr == manager->download_manager()->end())
-        return ci;
 
+      if (d_itr == manager->download_manager()->end())
+        return chunk_info_result();
+
+      chunk_info_result ci;
       ci.download = Download(*d_itr);
       ci.chunk_index = result.first->index();
       ci.chunk_offset = result.second->position() +
@@ -97,7 +97,7 @@ chunk_list_address_info(void* address) {
     }
   }
 
-  return ci;
+  return chunk_info_result();
 }
 
 } // namespace torrent
