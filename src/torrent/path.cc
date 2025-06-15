@@ -60,10 +60,10 @@ Path::insert_path(iterator pos, const std::string& path) {
 
 std::string
 Path::as_string() const {
-  std::string s;
-
   if (empty())
-    return s;
+    return std::string();
+
+  std::string s;
 
   for (const auto& c : *this) {
     s += '/';

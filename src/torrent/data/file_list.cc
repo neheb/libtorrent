@@ -550,15 +550,11 @@ FileList::open_file(File* file_node, const Path& lastPath, bool hashing, int fla
 
 MemoryChunk
 FileList::create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t length, bool hashing, int prot) {
-  MemoryChunk ret;
-
   offset -= (*itr)->offset();
   length = std::min<uint64_t>(length, (*itr)->size_bytes() - offset);
 
-  if ((*itr)->is_padding()) {
-    ret = SocketFile().create_padding_chunk(length, prot, MemoryChunk::map_shared);
-    return ret;
-  }
+  if ((*itr)->is_padding())
+    return SocketFile().create_padding_chunk(length, prot, MemoryChunk::map_shared);
 
   if (static_cast<int64_t>(offset) < 0)
     throw internal_error("FileList::chunk_part(...) caught a negative offset", data()->hash());
@@ -566,12 +562,12 @@ FileList::create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t le
   // Check that offset != length of file.
 
   if (!(*itr)->prepare(hashing, prot, 0))
-    return ret;
+    return MemoryChunk();
 
   auto mc = SocketFile((*itr)->file_descriptor()).create_chunk(offset, length, prot, MemoryChunk::map_shared);
 
   if (!mc.is_valid())
-    return ret;
+    return MemoryChunk();
 
   if (mc.size() == 0)
     throw internal_error("FileList::create_chunk(...) mc.size() == 0.", data()->hash());
@@ -590,8 +586,7 @@ FileList::create_chunk_part(FileList::iterator itr, uint64_t offset, uint32_t le
   }
 #endif
 
-  ret = mc;
-  return ret;
+  return mc;
 }
 
 Chunk*
