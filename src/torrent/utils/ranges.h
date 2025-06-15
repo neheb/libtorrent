@@ -157,13 +157,16 @@ ranges<RangesType>::intersect_distance(value_type range) const {
 template <typename RangesType>
 ranges<RangesType>
 ranges<RangesType>::create_union(const ranges& left, const ranges& right) {
+  ranges result;
+
   if (left.empty())
-    return right;
+    result = right;
 
   if (right.empty())
-    return left;
+    result = left;
 
-  ranges result;
+  if (result.empty())
+    return result;
 
   auto   left_itr   = left.begin();
   auto   left_last  = left.end();
