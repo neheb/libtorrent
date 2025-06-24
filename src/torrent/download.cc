@@ -202,11 +202,11 @@ Download::file_list() const {
 }
 
 tracker::TrackerControllerWrapper
-Download::tracker_controller() {
+Download::tracker_controller() const {
   return m_ptr->main()->tracker_controller();
 }
 
-const tracker::TrackerControllerWrapper
+tracker::TrackerControllerWrapper
 Download::c_tracker_controller() const {
   return m_ptr->main()->tracker_controller();
 }
