@@ -66,8 +66,8 @@ public:
   Object*             bencode();
   const Object*       bencode() const;
 
-  tracker::TrackerControllerWrapper       tracker_controller();
-  const tracker::TrackerControllerWrapper c_tracker_controller() const;
+  tracker::TrackerControllerWrapper tracker_controller() const;
+  tracker::TrackerControllerWrapper c_tracker_controller() const;
 
   FileList*           file_list() const;
   PeerList*           peer_list();
