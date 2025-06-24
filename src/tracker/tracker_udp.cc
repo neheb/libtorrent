@@ -312,7 +312,7 @@ TrackerUdp::event_error() {
 
 void
 TrackerUdp::prepare_connect_input() {
-  m_write_buffer->reset();
+  (*m_write_buffer).reset();
   m_write_buffer->write_64(m_connection_id = magic_connection_id);
   m_write_buffer->write_32(m_action = 0);
   m_write_buffer->write_32(m_transaction_id = random());
@@ -322,7 +322,7 @@ TrackerUdp::prepare_connect_input() {
 
 void
 TrackerUdp::prepare_announce_input() {
-  m_write_buffer->reset();
+  (*m_write_buffer).reset();
 
   m_write_buffer->write_64(m_connection_id);
   m_write_buffer->write_32(m_action = 1);

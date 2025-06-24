@@ -323,7 +323,7 @@ PeerConnectionBase::load_up_chunk() {
 
   if (is_encrypted() && m_encryptBuffer == nullptr) {
     m_encryptBuffer = std::make_unique<EncryptBuffer>();
-    m_encryptBuffer->reset();
+    (*m_encryptBuffer).reset();
   }
 
   m_incoreContinous = false;
@@ -680,7 +680,7 @@ PeerConnectionBase::up_chunk_encrypt(uint32_t quota) {
 
   if (m_encryptBuffer->remaining() == 0) {
     // This handles reset also for new chunk transfers.
-    m_encryptBuffer->reset();
+    (*m_encryptBuffer).reset();
 
     quota = std::min<uint32_t>(quota, m_encryptBuffer->reserved());
 
