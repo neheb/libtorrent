@@ -106,6 +106,7 @@ log_rebuild_cache() {
     });
     if (cache_itr == log_cache.end()) {
       cache_itr = log_cache.insert(log_cache.end(), log_cache_entry());
+      cache_itr = std::prev(log_cache.end());
       cache_itr->outputs = use_outputs;
       cache_itr->allocate(use_outputs.count());
 
