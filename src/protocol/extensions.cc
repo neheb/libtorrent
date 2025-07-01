@@ -22,7 +22,7 @@
 namespace torrent {
 
 template <>
-const ExtHandshakeMessage::key_list_type ExtHandshakeMessage::keys = {
+const ExtHandshakeMessage::key_list_type ExtHandshakeMessage::keys = {{
   { key_e,            "e" },
   { key_m_utMetadata, "m::ut_metadata" },
   { key_m_utPex,      "m::ut_pex" },
@@ -30,7 +30,7 @@ const ExtHandshakeMessage::key_list_type ExtHandshakeMessage::keys = {
   { key_p,            "p" },
   { key_reqq,         "reqq" },
   { key_v,            "v" },
-};
+}};
 
 template <>
 const ExtPEXMessage::key_list_type ExtPEXMessage::keys = {
@@ -39,11 +39,11 @@ const ExtPEXMessage::key_list_type ExtPEXMessage::keys = {
 
 // DEBUG: Add type info.
 template <>
-const ExtMetadataMessage::key_list_type ExtMetadataMessage::keys = {
+const ExtMetadataMessage::key_list_type ExtMetadataMessage::keys = {{
   { key_msgType,      "msg_type" },
   { key_piece,        "piece" },
   { key_totalSize,    "total_size" },
-};
+}};
 
 struct message_type {
   const char* key;
