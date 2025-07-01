@@ -48,7 +48,7 @@ namespace torrent {
 // Unsupported keys we receive are dropped (ignored) while decoding.
 // See torrent/object_static_map.h for how this works.
 template <>
-const DhtMessage::key_list_type DhtMessage::base_type::keys = {
+const DhtMessage::key_list_type DhtMessage::base_type::keys = {{
   { key_a_id,       "a::id*S" },
   { key_a_infoHash, "a::info_hash*S" },
   { key_a_port,     "a::port", },
@@ -68,7 +68,7 @@ const DhtMessage::key_list_type DhtMessage::base_type::keys = {
   { key_t,          "t*S" },
   { key_v,          "v*" },
   { key_y,          "y*S" },
-};
+}};
 
 DhtServer::DhtServer(DhtRouter* router)
   : m_router(router) {

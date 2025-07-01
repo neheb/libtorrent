@@ -45,7 +45,7 @@ typedef torrent::static_map_type<keys_2, key_2_LAST> test_map_2_type;
 // Unsupported keys we receive are dropped (ignored) while decoding.
 // See torrent/object_static_map.h for how this works.
 template <>
-const test_map_type::key_list_type test_map_type::keys = {
+const test_map_type::key_list_type test_map_type::keys = {{
   { key_d_a,          "d_a::b" },
   { key_d_d_a,        "d_a::c::a" },
   { key_d_b,          "d_a::d" },
@@ -59,17 +59,17 @@ const test_map_type::key_list_type test_map_type::keys = {
 
   { key_v_a,          "v_a" },
   { key_v_b,          "v_b" },
-};
+}};
 
 template <>
-const test_map_2_type::key_list_type test_map_2_type::keys = {
+const test_map_2_type::key_list_type test_map_2_type::keys = {{
   { key_2_d_x_y,        "d_x::f" },
   { key_2_d_x_z,        "d_x::g" },
   { key_2_l_x_1,        "l_x[]" },
   { key_2_l_x_2,        "l_x[]" },
   { key_2_s_a,          "s_a" },
   { key_2_v_a,          "v_a" },
-};
+}};
 
 void
 ObjectStaticMapTest::test_basics() {
@@ -170,13 +170,13 @@ enum ext_test_keys {
 typedef torrent::static_map_type<ext_test_keys, key_test_LAST> ext_test_message;
 
 template <>
-const ext_test_message::key_list_type ext_test_message::keys = {
+const ext_test_message::key_list_type ext_test_message::keys = {{
   { key_e,            "e" },
   { key_m_utPex,      "m::ut_pex" },
   { key_p,            "p" },
   { key_reqq,         "reqq" },
   { key_v,            "v" },
-};
+}};
 
 void
 ObjectStaticMapTest::test_read_extensions() {
@@ -230,12 +230,12 @@ test_single_type::keys = { { key_single_a, "b" } };
 template <> const test_raw_type::key_list_type
 test_raw_type::keys = { { key_raw_a, "b*" } };
 template <> const test_raw_types_type::key_list_type
-test_raw_types_type::keys = { { key_raw_types_empty, "e*"},
-                              { key_raw_types_list, "l*L"},
-                              { key_raw_types_map, "m*M"},
-                              { key_raw_types_str, "s*S"} };
+test_raw_types_type::keys = {{ { key_raw_types_empty, "e*"},
+                               { key_raw_types_list, "l*L"},
+                               { key_raw_types_map, "m*M"},
+                               { key_raw_types_str, "s*S"} }};
 template <> const test_multiple_type::key_list_type
-test_multiple_type::keys = { { key_multiple_a, "a" }, { key_multiple_b, "b*" }, { key_multiple_c, "c" } };
+test_multiple_type::keys = {{ { key_multiple_a, "a" }, { key_multiple_b, "b*" }, { key_multiple_c, "c" } }};
 template <> const test_dict_type::key_list_type
 test_dict_type::keys = { { key_dict_a_b, "a::b" } };
 

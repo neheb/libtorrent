@@ -31,14 +31,14 @@ public:
   using entry_type   = static_map_entry_type;
   using mapping_type = static_map_mapping_type;
 
-  typedef mapping_type    key_list_type[tmpl_length];
-  typedef entry_type      value_list_type[tmpl_length];
+  using key_list_type = std::array<mapping_type, tmpl_length>;
+  using value_list_type = std::array<entry_type, tmpl_length>;
 
   static constexpr size_t size = tmpl_length;
   static const key_list_type keys;
 
-  entry_type*         values() { return m_values; }
-  const entry_type*   values() const { return m_values; }
+  entry_type*         values() { return m_values.data(); }
+  const entry_type*   values() const { return m_values.data(); }
 
   Object&             operator [] (key_type key)        { return m_values[key].object; }
   const Object&       operator [] (key_type key) const  { return m_values[key].object; }
