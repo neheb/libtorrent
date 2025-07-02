@@ -18,6 +18,8 @@
 
 namespace torrent {
 
+TransferList::TransferList() = default;
+
 TransferList::~TransferList() {
   assert(base_type::empty() && "TransferList::~TransferList() called on an non-empty object");
 }

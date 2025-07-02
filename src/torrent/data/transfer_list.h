@@ -28,7 +28,7 @@ public:
   using base_type::rbegin;
   using base_type::rend;
 
-  TransferList() = default;
+  TransferList();
   ~TransferList();
   TransferList(const TransferList&) = delete;
   TransferList& operator=(const TransferList&) = delete;
