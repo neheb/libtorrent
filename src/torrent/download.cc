@@ -248,12 +248,12 @@ Download::transfer_list() const {
 
 ConnectionList*
 Download::connection_list() {
-  return m_ptr->main()->connection_list();
+  return m_ptr->main()->connection_list().get();
 }
 
 const ConnectionList*
 Download::connection_list() const {
-  return m_ptr->main()->connection_list();
+  return m_ptr->main()->connection_list().get();
 }
 
 uint64_t

@@ -45,7 +45,7 @@ DownloadMain::DownloadMain()
     m_chunkList(new ChunkList),
     m_chunkSelector(new ChunkSelector(file_list()->mutable_data())),
     m_chunkStatistics(new ChunkStatistics),
-    m_connectionList(new ConnectionList(this)) {
+    m_connectionList(std::make_unique<ConnectionList>(this)) {
 
   m_info->set_load_date(utils::cast_seconds(utils::time_since_epoch()).count());
 
@@ -81,7 +81,6 @@ DownloadMain::~DownloadMain() {
   assert(m_info->size_pex() == 0 && "DownloadMain::~DownloadMain(): m_info->size_pex() != 0.");
 
   delete m_tracker_list;
-  delete m_connectionList;
 
   delete m_chunkStatistics;
   delete m_chunkList;
