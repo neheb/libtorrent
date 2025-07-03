@@ -69,7 +69,7 @@ public:
   bool                start_initial_seeding();
   void                initial_seeding_done(PeerConnectionBase* pcb);
 
-  ConnectionList*     connection_list()                          { return m_connectionList; }
+  const auto&         connection_list() const                    { return m_connectionList; }
   FileList*           file_list()                                { return &m_fileList; }
   PeerList*           peer_list()                                { return &m_peerList; }
 
@@ -148,7 +148,7 @@ private:
   have_queue_type     m_haveQueue;
   std::unique_ptr<InitialSeeding> m_initial_seeding;
 
-  ConnectionList*     m_connectionList;
+  std::unique_ptr<ConnectionList> m_connectionList;
   FileList            m_fileList;
   PeerList            m_peerList;
 
