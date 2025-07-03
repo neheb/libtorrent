@@ -23,8 +23,11 @@ public:
 
   static constexpr unsigned int block_size = 1 << 14;
 
-  TransferList*       transfer_list()                     { return &m_transfers; }
-  const TransferList* transfer_list() const               { return &m_transfers; }
+  Delegator() = default;
+  ~Delegator() = default;
+
+  auto& transfer_list()                                   { return m_transfers; }
+  const auto& transfer_list() const                       { return m_transfers; }
 
   std::vector<BlockTransfer*> delegate(PeerChunks* peerChunks, uint32_t affinity, uint32_t maxPieces);
 
@@ -39,7 +42,7 @@ private:
   void               delegate_new_chunks(std::vector<BlockTransfer*> &transfers, uint32_t maxPieces, PeerChunks* pc, bool highPriority);
   Block*             delegate_seeder(PeerChunks* peerChunks);
 
-  TransferList       m_transfers;
+  TransferList m_transfers;
 
   bool               m_aggressive{false};
 
