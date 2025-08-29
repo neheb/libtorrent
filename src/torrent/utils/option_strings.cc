@@ -294,14 +294,14 @@ option_list_strings(option_enum opt_enum) {
   if (opt_enum < OPTION_START_COMPACT) {
     auto itr = option_pair_lists[opt_enum];
 
-    while (itr->name != NULL)
-      result.emplace_back(std::string(itr++->name));
+    while (itr->name != nullptr)
+      result.emplace_back(itr++->name);
 
   } else if (opt_enum < OPTION_MAX_SIZE) {
     auto itr = option_single_lists[opt_enum - OPTION_START_COMPACT].name;
 
-    while (*itr != NULL)
-      result.emplace_back(std::string(*itr++));
+    while (*itr != nullptr)
+      result.emplace_back(*itr++);
   }
 
   return Object::from_list(result);
