@@ -680,7 +680,7 @@ DhtServer::event_read() {
     const HashString* nodeId = NULL;
 
     sockaddr_in6 sa_raw{};
-    sockaddr* sa = reinterpret_cast<sockaddr*>(&sa_raw);
+    auto sa = reinterpret_cast<sockaddr*>(&sa_raw);
 
     try {
       char buffer[2048];
