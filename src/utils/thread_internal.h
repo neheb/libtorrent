@@ -2,6 +2,7 @@
 #define LIBTORRENT_UTILS_THREAD_INTERNAL_H
 
 #include "torrent/common.h"
+#include "torrent/utils/chrono.h"
 #include "torrent/utils/thread.h"
 
 namespace torrent::utils {
