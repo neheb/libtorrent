@@ -47,7 +47,7 @@ SignalInterrupt::create_pair() {
   if (::socketpair(AF_LOCAL, SOCK_STREAM, 0, fds) == -1)
     throw internal_error("torrent::fd_open_socket_pair failed: " + std::string(strerror(errno)));
 
-  pair_type result{new SignalInterrupt(fds[0]), new SignalInterrupt(fds[1])};
+  pair_type result(new SignalInterrupt(fds[0]), new SignalInterrupt(fds[1]));
 
   result.first->m_other = result.second.get();
   result.second->m_other = result.first.get();
