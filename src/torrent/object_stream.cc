@@ -18,14 +18,16 @@ namespace torrent {
 static bool
 object_read_string(std::istream* input, std::string& str) {
   uint32_t size;
-  *input >> size;
 
-  if (input->fail() || input->get() != ':')
+  if (!(*input >> size))
+    return false;
+
+  int sep = input->get();
+  if (sep != ':' || sep == EOF)
     return false;
 
   try {
   	str.resize(size);
-
   } catch (const std::length_error&) {
     return false;
   }
@@ -78,7 +80,7 @@ object_read_bencode_c_string(const char* first, const char* last) {
 
   if (length + 1 > static_cast<unsigned int>(std::distance(first, last)) || length + 1 == 0 || *first++ != ':')
     throw torrent::bencode_error("Invalid bencode data.");
-  
+
   return raw_string(first, length);
 }
 
@@ -166,7 +168,7 @@ object_read_bencode(std::istream* input, Object* object, uint32_t depth) {
   default:
     if (c >= '0' && c <= '9') {
       *object = Object::create_string();
-      
+
       if (object_read_string(input, object->as_string()))
 	return;
     }
@@ -479,7 +481,7 @@ object_write_bencode_c_object(object_write_data_t* output, const Object* object,
     object_write_bencode_c_string(output, raw.begin(), raw.size());
     break;
   }
-  case Object::TYPE_RAW_STRING: 
+  case Object::TYPE_RAW_STRING:
   {
     raw_string raw = object->as_raw_string();
     object_write_bencode_c_value(output, raw.size());
@@ -487,7 +489,7 @@ object_write_bencode_c_object(object_write_data_t* output, const Object* object,
     object_write_bencode_c_string(output, raw.begin(), raw.size());
     break;
   }
-  case Object::TYPE_RAW_LIST: 
+  case Object::TYPE_RAW_LIST:
   {
     raw_list raw = object->as_raw_list();
     object_write_bencode_c_char(output, 'l');
@@ -629,7 +631,7 @@ static_map_read_bencode_c(const char* first,
 
   if (first == last || *first++ != 'd')
     throw torrent::bencode_error("Invalid bencode data.");
-  
+
   static_map_stack_type stack[8];
   static_map_stack_type* stack_itr = stack;
   stack_itr->clear();
@@ -666,7 +668,7 @@ static_map_read_bencode_c(const char* first,
 
     // Locate the right key. Optimize this by remembering previous
     // position...
-    static_map_key_search_result key_search = find_key_match(first_key, last_key, current_key);    
+    static_map_key_search_result key_search = find_key_match(first_key, last_key, current_key);
 
     // We're not interest in this object, skip it.
     if (key_search.second == 0) {
@@ -757,7 +759,7 @@ static_map_read_bencode_c(const char* first,
       throw internal_error("static_map_read_bencode_c: key_search.first->key[base] returned invalid character.");
     }
   }
-  
+
   throw torrent::bencode_error("Invalid bencode data.");
 }
 
@@ -797,7 +799,7 @@ static_map_write_bencode_c_values(object_write_data_t* output,
 
       if (stack_itr->obj_type == Object::TYPE_MAP)
         object_write_bencode_c_obj_string(output, key_begin, std::distance(key_begin, key_end));
-    
+
       // Check if '::' or '[' were found...
       if (*key_end == ':' && *(key_end + 1) == ':') {
         (++stack_itr)->set_key_index(std::distance(first_key->key, key_begin),
