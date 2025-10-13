@@ -19,7 +19,7 @@ public:
 
   DhtNode(const HashString& id, const sockaddr* sa);
   DhtNode(const std::string& id, const Object& cache);
-  ~DhtNode() = default;
+  virtual ~DhtNode() = default;
 
   const HashString&   id() const                 { return *this; }
   raw_string          id_raw_string() const      { return raw_string(data(), size_data); }
