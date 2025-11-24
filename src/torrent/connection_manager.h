@@ -3,11 +3,14 @@
 
 #include <functional>
 #include <list>
+#ifdef _WIN32
+#else
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
 #include <sys/socket.h>
+#endif
 #include <torrent/common.h>
 
 namespace torrent {

@@ -4,8 +4,11 @@
 
 #include <cerrno>
 #include <fcntl.h>
+#ifdef _WIN32
+#else
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#endif
 #include <unistd.h>
 
 #include "torrent/exceptions.h"

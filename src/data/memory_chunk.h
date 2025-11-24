@@ -3,9 +3,13 @@
 
 #include <algorithm>
 #include <cinttypes>
-#include <sys/mman.h>
 #include <cstddef>
 #include <memory>
+
+#ifdef _WIN32
+#else
+#include <sys/mman.h>
+#endif
 
 namespace torrent {
 

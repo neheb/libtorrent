@@ -6,8 +6,14 @@
 
 #include <cstring>
 #include <cinttypes>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2ipdef.h>
+using sa_family_t = ADDRESS_FAMILY;
+#else
 #include <netinet/in.h>
 #include <sys/socket.h>
+#endif
 
 // Unique key for the socket address, excluding port numbers, etc.
 

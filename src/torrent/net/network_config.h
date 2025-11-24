@@ -2,8 +2,11 @@
 #define LIBTORRENT_TORRENT_NET_NETWORK_CONFIG_H
 
 #include <mutex>
+#ifdef _WIN32
+#else
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#endif
 #include <torrent/net/types.h>
 
 namespace torrent::net {

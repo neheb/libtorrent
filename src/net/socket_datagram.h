@@ -1,7 +1,10 @@
 #ifndef LIBTORRENT_NET_SOCKET_DGRAM_H
 #define LIBTORRENT_NET_SOCKET_DGRAM_H
 
+#ifdef _WIN32
+#else
 #include <sys/socket.h>
+#endif
 
 #include "socket_base.h"
 
