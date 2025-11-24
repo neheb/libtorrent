@@ -1,10 +1,14 @@
 #include "config.h"
 
 #include <algorithm>
-#include <arpa/inet.h>
 #include <cstring>
 #include <netdb.h>
 #include <sys/un.h>
+
+#ifdef _WIN32
+#else
+#include <arpa/inet.h>
+#endif
 
 #include "torrent/exceptions.h"
 #include "torrent/net/socket_address.h"

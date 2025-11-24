@@ -2,7 +2,10 @@
 
 #include "socket_datagram.h"
 
+#ifdef _WIN32
+#else
 #include <sys/socket.h>
+#endif
 
 #include "torrent/exceptions.h"
 #include "torrent/net/socket_address.h"

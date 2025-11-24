@@ -3,8 +3,12 @@
 
 #include <memory>
 #include <tuple>
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
 #include <netinet/in.h>
 #include <sys/socket.h>
+#endif
 #include <torrent/common.h>
 
 struct sockaddr_in;
